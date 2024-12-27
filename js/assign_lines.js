@@ -43,6 +43,7 @@ function renderTeamLines() {
     const teamLinesContainer = document.getElementById("team-lines");
     teamLinesContainer.innerHTML = ""; // Clear existing content
 
+    // Loop through all teams
     teams.forEach(team => {
         const teamSection = document.createElement("div");
         teamSection.classList.add("team-section");
@@ -52,13 +53,19 @@ function renderTeamLines() {
         teamSection.appendChild(teamName);
 
         // Forward Lines
-        teamSection.appendChild(createLineSection("Forward Lines", team.forwardLines, team));
+        if (team.lines && team.lines.forwardLines && Array.isArray(team.lines.forwardLines)) {
+            teamSection.appendChild(createLineSection("Forward Lines", team.lines.forwardLines, team));
+        }
 
         // Defense Lines
-        teamSection.appendChild(createLineSection("Defense Lines", team.defenseLines, team));
+        if (team.lines && team.lines.defenseLines && Array.isArray(team.lines.defenseLines)) {
+            teamSection.appendChild(createLineSection("Defense Lines", team.lines.defenseLines, team));
+        }
 
         // Goalies
-        teamSection.appendChild(createLineSection("Goalies", team.goalies, team));
+        if (team.lines && team.lines.goalies && team.lines.goalies.starter) {
+            teamSection.appendChild(createLineSection("Goalies", [team.lines.goalies], team)); // Goalies is an object
+        }
 
         teamLinesContainer.appendChild(teamSection);
     });
@@ -72,22 +79,34 @@ function createLineSection(title, lines, team) {
     sectionTitle.textContent = title;
     section.appendChild(sectionTitle);
 
-    lines.forEach((line, index) => {
-        const lineContainer = document.createElement("div");
-        lineContainer.classList.add("line-placeholder");
+    // Check if lines are an array and not empty
+    if (lines && lines.length > 0) {
+        lines.forEach((line, index) => {
+            const lineContainer = document.createElement("div");
+            lineContainer.classList.add("line-placeholder");
 
-        line.forEach((player, playerIndex) => {
-            const playerElement = document.createElement("div");
-            playerElement.classList.add("player-draggable");
-            playerElement.textContent = player ? player.name : "Drag a player here";
-            playerElement.setAttribute("draggable", true);
-            playerElement.addEventListener("dragstart", (e) => onDragStart(e, team.name, index, playerIndex));
+            // Iterate through each position in the line (LW, C, RW, etc.)
+            Object.keys(line).forEach((position) => {
+                const player = line[position];  // This will be null initially
 
-            lineContainer.appendChild(playerElement);
+                const playerElement = document.createElement("div");
+                playerElement.classList.add("player-draggable");
+
+                // If player is null, show a placeholder
+                playerElement.textContent = player ? player.name : `Drag a ${position} here`;
+                playerElement.setAttribute("draggable", true);
+                playerElement.addEventListener("dragstart", (e) => onDragStart(e, team.name, index, position));
+
+                lineContainer.appendChild(playerElement);
+            });
+
+            section.appendChild(lineContainer);
         });
-
-        section.appendChild(lineContainer);
-    });
+    } else {
+        const emptyMessage = document.createElement("p");
+        emptyMessage.textContent = "No lines assigned yet.";
+        section.appendChild(emptyMessage);
+    }
 
     return section;
 }
