@@ -1,0 +1,78 @@
+[
+    {
+        "name": "Rangers",
+        "players": [],
+        "maxPlayers": 23,
+        "lines": {
+            "forwardLines": [
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null }
+            ],
+            "defenseLines": [
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null }
+            ],
+            "goalies": { "starter": null, "backup": null }
+        }
+    },
+    {
+        "name": "Devils",
+        "players": [],
+        "maxPlayers": 23,
+        "lines": {
+            "forwardLines": [
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null }
+            ],
+            "defenseLines": [
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null }
+            ],
+            "goalies": { "starter": null, "backup": null }
+        }
+    },
+    {
+        "name": "Islanders",
+        "players": [],
+        "maxPlayers": 23,
+        "lines": {
+            "forwardLines": [
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null }
+            ],
+            "defenseLines": [
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null }
+            ],
+            "goalies": { "starter": null, "backup": null }
+        }
+    },
+    {
+        "name": "Sabres",
+        "players": [],
+        "maxPlayers": 23,
+        "lines": {
+            "forwardLines": [
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null },
+                { "LW": null, "C": null, "RW": null }
+            ],
+            "defenseLines": [
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null },
+                { "LD": null, "RD": null }
+            ],
+            "goalies": { "starter": null, "backup": null }
+        }
+    }
+]
