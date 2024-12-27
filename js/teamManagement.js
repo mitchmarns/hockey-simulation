@@ -12,6 +12,7 @@ function loadFromLocalStorage() {
         console.log("Loaded teams and players from localStorage.");
     } else {
         console.log("No data in localStorage, will load from JSON files.");
+        loadDataFromJSON(); // Load data from JSON if localStorage is empty
     }
 }
 
