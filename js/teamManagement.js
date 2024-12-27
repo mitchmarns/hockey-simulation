@@ -50,9 +50,16 @@ function displayPlayers() {
 
         const assignButton = document.createElement("button");
         assignButton.textContent = "Assign";
-        assignButton.onclick = function() {
-            assignPlayerToTeam(player);
-        };
+        
+        // Only show the Assign button if the player isn't already assigned
+        if (player.assigned) {
+            assignButton.disabled = true;
+            assignButton.textContent = "Assigned";
+        } else {
+            assignButton.onclick = function() {
+                assignPlayerToTeam(player);
+            };
+        }
 
         li.appendChild(img);
         li.appendChild(playerName);
@@ -62,6 +69,7 @@ function displayPlayers() {
     });
 }
 
+// Function to assign a player to a team
 function assignPlayerToTeam(player) {
     const selectedTeam = document.getElementById("team-select").value;
 
@@ -88,10 +96,11 @@ function assignPlayerToTeam(player) {
     }
 }
 
+// Function to display the roster for a specific team
 function displayTeamRoster(teamName) {
     const teamRosterContainer = document.getElementById("team-roster");
     const team = teams.find(t => t.name === teamName);
-    
+
     if (!team) {
         return;
     }
@@ -113,3 +122,21 @@ function displayTeamRoster(teamName) {
 
     teamRosterContainer.appendChild(rosterList);
 }
+
+// Function to load all the players and their team assignments on page load
+function loadInitialAssignments() {
+    // Display players that are already assigned to a team
+    teams.forEach(team => {
+        team.players.forEach(player => {
+            displayTeamRoster(team.name); // Re-render roster for each team with assigned players
+        });
+    });
+
+    // Display all players available for assignment
+    displayPlayers();
+}
+
+// Call the loadInitialAssignments function when the page loads
+window.onload = function() {
+    loadInitialAssignments();
+};
