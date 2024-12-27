@@ -1,56 +1,39 @@
-// Initialize teams and players arrays
-let teams = [];
 let players = [];
+let teams = [];
 
-// Check if there's saved data in localStorage
-function loadFromLocalStorage() {
-    const savedTeams = localStorage.getItem("teams");
-    const savedPlayers = localStorage.getItem("players");
+// Fetch player and team data
+fetch('../data/players.json') // Go up one level and then access the data folder
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load players.json");
+        }
+        return response.json();
+    })
+    .then(data => {
+        players = data.players; // Access the "players" array
+        console.log("Players Loaded:", players);
+        displayPlayers();
+    })
+    .catch(error => {
+        console.error("Error loading players:", error);
+    });
 
-    if (savedTeams && savedPlayers) {
-        teams = JSON.parse(savedTeams);
-        players = JSON.parse(savedPlayers);
-    } else {
-        teams = [
-            { "name": "Rangers", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
-            { "name": "Devils", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
-            { "name": "Islanders", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
-            { "name": "Sabres", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } }
-        ];
-    }
-}
+fetch('../data/teams.json') // Same for teams.json
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load teams.json");
+        }
+        return response.json();
+    })
+    .then(data => {
+        teams = data; // Access the "teams" array
+        console.log("Teams Loaded:", teams);
+    })
+    .catch(error => {
+        console.error("Error loading teams:", error);
+    });
 
-// fetch players from players.json and load them into the players array
-function loadPlayersFromJSON() {
-    fetch('../data/players.json')
-        .then(response => {
-            console.log("Response Status:", response.status); // Log status
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();  // Parse the response as JSON
-        })
-        .then(data => {
-            console.log("Players data loaded:", data); // Log the data
-            // Only update players if they are not in localStorage
-            if (players.length === 0) {
-                players = data.players; // Assuming the players are in a "players" array in players.json
-            }
-            loadInitialAssignments(); // Load initial assignments
-        })
-        .catch(error => {
-            console.error("Error loading players.json:", error);
-            alert("Failed to load player data.");
-        });
-}
-
-// save the current state of teams and players to localStorage
-function saveToLocalStorage() {
-    localStorage.setItem("teams", JSON.stringify(teams));
-    localStorage.setItem("players", JSON.stringify(players));
-}
-
-// display players and assignments
+// Display all players on the page
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear the list before re-rendering
@@ -86,7 +69,7 @@ function displayPlayers() {
     });
 }
 
-// assign a player to a team
+// Function to assign a player to a team
 function assignPlayerToTeam(player) {
     const selectedTeam = document.getElementById("team-select").value;
 
@@ -107,9 +90,6 @@ function assignPlayerToTeam(player) {
             alert(`${player.name} has been assigned to the ${selectedTeam}.`);
             displayPlayers(); // Re-render the available players list
             displayTeamRoster(selectedTeam); // Update the selected team's roster
-
-            // Save to localStorage
-            saveToLocalStorage();
         } else {
             alert(`The ${selectedTeam} team is already full.`);
         }
@@ -156,8 +136,7 @@ function loadInitialAssignments() {
     displayPlayers();
 }
 
-// Call the loadFromLocalStorage function to initialize the teams and players from localStorage
+// Call the loadInitialAssignments function when the page loads
 window.onload = function() {
-    loadFromLocalStorage();
-    loadPlayersFromJSON(); // Fetch players from players.json and then load assignments
+    loadInitialAssignments();
 };
