@@ -10,6 +10,14 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
+
+        // After loading from localStorage, refresh the UI
+        displayPlayers();
+        teams.forEach(team => {
+            if (team.players && team.players.length > 0) {
+                displayTeamRoster(team.name);
+            }
+        });
     } else {
         console.log("No data in localStorage, will load from JSON files.");
         loadDataFromJSON(); // Load data from JSON if localStorage is empty
@@ -203,16 +211,17 @@ function removePlayerFromTeam(player, teamName) {
 
 // Function to load all the players and their team assignments on page load
 function loadInitialAssignments() {
-    loadFromLocalStorage();
+    loadFromLocalStorage(); // This will load teams and players from localStorage
+
+    // If data exists, display players and rosters
     if (teams.length === 0 || players.length === 0) {
         loadDataFromJSON(); // Load from JSON if no data in localStorage
     } else {
-        // If data exists in localStorage, display players and rosters
+        // Display the players and team rosters
         displayPlayers();
-
         teams.forEach(team => {
             if (team.players && team.players.length > 0) {
-                displayTeamRoster(team.name); 
+                displayTeamRoster(team.name);
             }
         });
     }
