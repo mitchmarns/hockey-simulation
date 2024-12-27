@@ -11,7 +11,6 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
     } else {
-        // If no saved data, use an empty structure or fallback (won't be used if players.json loads properly)
         teams = [
             { "name": "Rangers", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
             { "name": "Devils", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
@@ -21,7 +20,7 @@ function loadFromLocalStorage() {
     }
 }
 
-// Function to fetch players from players.json and load them into the players array
+// fetch players from players.json and load them into the players array
 function loadPlayersFromJSON() {
     fetch('../data/players.json')
         .then(response => {
@@ -33,7 +32,10 @@ function loadPlayersFromJSON() {
         })
         .then(data => {
             console.log("Players data loaded:", data); // Log the data
-            players = data.players; // Assuming the players are in a "players" array in players.json
+            // Only update players if they are not in localStorage
+            if (players.length === 0) {
+                players = data.players; // Assuming the players are in a "players" array in players.json
+            }
             loadInitialAssignments(); // Load initial assignments
         })
         .catch(error => {
@@ -42,13 +44,13 @@ function loadPlayersFromJSON() {
         });
 }
 
-// Function to save the current state of teams and players to localStorage
+// save the current state of teams and players to localStorage
 function saveToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
     localStorage.setItem("players", JSON.stringify(players));
 }
 
-// Function to display players and their assignments
+// display players and assignments
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear the list before re-rendering
@@ -84,7 +86,7 @@ function displayPlayers() {
     });
 }
 
-// Function to assign a player to a team
+// assign a player to a team
 function assignPlayerToTeam(player) {
     const selectedTeam = document.getElementById("team-select").value;
 
