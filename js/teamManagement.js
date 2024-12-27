@@ -53,6 +53,16 @@ function loadDataFromJSON() {
         });
 }
 
+// Function to save teams to localStorage
+function saveTeamsToLocalStorage() {
+    localStorage.setItem("teams", JSON.stringify(teams));
+}
+
+// Function to save players to localStorage
+function savePlayersToLocalStorage() {
+    localStorage.setItem("players", JSON.stringify(players));
+}
+
 // Display all players on the page
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
@@ -107,8 +117,8 @@ function assignPlayerToTeam(player) {
             player.assigned = true;
 
             // Save the updated teams and players to localStorage
-            localStorage.setItem("teams", JSON.stringify(teams));
-            localStorage.setItem("players", JSON.stringify(players));
+            saveTeamsToLocalStorage();
+            savePlayersToLocalStorage();
 
             // Update the UI
             alert(`${player.name} has been assigned to the ${selectedTeam}.`);
@@ -149,25 +159,17 @@ function displayTeamRoster(teamName) {
 
 // Function to load all the players and their team assignments on page load
 function loadInitialAssignments() {
-    const dataLoadedFromLocalStorage = loadFromLocalStorage();
-
-    if (dataLoadedFromLocalStorage) {
+    loadFromLocalStorage();
+    if (teams.length === 0 || players.length === 0) {
+        loadDataFromJSON(); // Load from JSON if no data in localStorage
+    } else {
         // If data exists in localStorage, display players and rosters
         displayPlayers();
+
         teams.forEach(team => {
             if (team.players && team.players.length > 0) {
-                displayTeamRoster(team.name);
+                displayTeamRoster(team.name); 
             }
-        });
-    } else {
-        // If no data in localStorage, fetch from JSON and then display players and rosters
-        loadDataFromJSON().then(() => {
-            displayPlayers(); // Display players after JSON is loaded
-            teams.forEach(team => {
-                if (team.players && team.players.length > 0) {
-                    displayTeamRoster(team.name);
-                }
-            });
         });
     }
 }
@@ -176,3 +178,4 @@ function loadInitialAssignments() {
 window.onload = function() {
     loadInitialAssignments();
 };
+
