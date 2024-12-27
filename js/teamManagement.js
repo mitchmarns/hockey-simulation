@@ -33,6 +33,18 @@ fetch('../data/teams.json') // Same for teams.json
         console.error("Error loading teams:", error);
     });
 
+// Function to load data from localStorage
+function loadFromLocalStorage() {
+    const savedTeams = localStorage.getItem("teams");
+    const savedPlayers = localStorage.getItem("players");
+
+    if (savedTeams && savedPlayers) {
+        teams = JSON.parse(savedTeams);
+        players = JSON.parse(savedPlayers);
+        console.log("Loaded teams and players from localStorage.");
+    }
+}
+
 // Display all players on the page
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
@@ -86,6 +98,10 @@ function assignPlayerToTeam(player) {
             player.team = selectedTeam;
             player.assigned = true;
 
+            // Save the updated teams and players to localStorage
+            localStorage.setItem("teams", JSON.stringify(teams));
+            localStorage.setItem("players", JSON.stringify(players));
+
             // Update the UI
             alert(`${player.name} has been assigned to the ${selectedTeam}.`);
             displayPlayers(); // Re-render the available players list
@@ -125,7 +141,7 @@ function displayTeamRoster(teamName) {
 
 // Function to load all the players and their team assignments on page load
 function loadInitialAssignments() {
-    // Display players that are already assigned to a team
+    loadFromLocalStorage();
     teams.forEach(team => {
         team.players.forEach(player => {
             displayTeamRoster(team.name); // Re-render roster for each team with assigned players
