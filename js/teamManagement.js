@@ -76,35 +76,38 @@ function displayPlayers() {
         img.src = player.image;
         img.alt = player.name;
 
+        const playerInfo = document.createElement("div");
+
         const playerName = document.createElement("span");
         playerName.textContent = player.name;
 
         const playerPosition = document.createElement("span");
-        playerPosition.textContent = ` (${player.position})`;
+        playerPosition.textContent = ` (${player.position})`; // Add position next to the name
 
         playerInfo.appendChild(playerName);
         playerInfo.appendChild(playerPosition);
 
         const assignButton = document.createElement("button");
         assignButton.textContent = "Assign";
-        
+
         // Only show the Assign button if the player isn't already assigned
         if (player.assigned) {
             assignButton.disabled = true;
             assignButton.textContent = "Assigned";
         } else {
-            assignButton.onclick = function() {
+            assignButton.onclick = function () {
                 assignPlayerToTeam(player);
             };
         }
 
         li.appendChild(img);
-        li.appendChild(playerName);
+        li.appendChild(playerInfo); // Append player info (name + position)
         li.appendChild(assignButton);
 
         playersList.appendChild(li);
     });
 }
+
 
 // Function to assign a player to a team
 function assignPlayerToTeam(player) {
