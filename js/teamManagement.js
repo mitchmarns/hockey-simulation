@@ -23,11 +23,18 @@ function loadFromLocalStorage() {
 
 // Function to fetch players from players.json and load them into the players array
 function loadPlayersFromJSON() {
-    fetch('./data/players.json')
-        .then(response => response.json())
+    fetch('/data/players.json')
+        .then(response => {
+            console.log("Response Status:", response.status); // Log status
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();  // Parse the response as JSON
+        })
         .then(data => {
+            console.log("Players data loaded:", data); // Log the data
             players = data.players; // Assuming the players are in a "players" array in players.json
-            loadInitialAssignments(); // Call the function to load initial assignments and display players
+            loadInitialAssignments(); // Load initial assignments
         })
         .catch(error => {
             console.error("Error loading players.json:", error);
