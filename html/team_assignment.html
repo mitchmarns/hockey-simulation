@@ -7,25 +7,32 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-    <h1>Team Assignment</h1>
-
-    <div>
-        <h2>Select Team</h2>
-        <select id="team">
-            <option value="Rangers">Rangers</option>
-            <option value="Devils">Devils</option>
-            <option value="Islanders">Islanders</option>
-            <option value="Sabres">Sabres</option>
-        </select>
-    </div>
-
-    <div>
-        <h2>Players</h2>
-        <ul id="players"></ul>
-    </div>
-
-    <div>
-        <button onclick="assignToTeam()">Assign Selected Players</button>
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <h1>Team Assignment</h1>
+            <p>Assign players to a team.</p>
+        </header>
+        
+        <!-- Team Selection Section -->
+        <div class="team-selection">
+            <label for="team-select">Select a Team:</label>
+            <select id="team-select">
+                <option value="">--Choose a team--</option>
+                <option value="Rangers">Rangers</option>
+                <option value="Devils">Devils</option>
+                <option value="Islanders">Islanders</option>
+                <option value="Sabres">Sabres</option>
+            </select>
+        </div>
+        
+        <!-- Players List Section -->
+        <div class="players-list">
+            <h2>Available Players</h2>
+            <ul id="players-list">
+                <!-- Player List will be populated here dynamically -->
+            </ul>
+        </div>
     </div>
 
     <script src="../js/teamManagement.js"></script>
