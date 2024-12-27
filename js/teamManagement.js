@@ -195,6 +195,7 @@ function removePlayerFromTeam(player, teamName) {
         team.players = team.players.filter(p => p.id !== player.id);
 
         // Reset player properties
+        players.push(player);
         player.team = null;
         player.assigned = false;
 
