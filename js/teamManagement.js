@@ -23,7 +23,7 @@ function loadFromLocalStorage() {
 
 // Function to fetch players from players.json and load them into the players array
 function loadPlayersFromJSON() {
-    fetch('/data/players.json')
+    fetch('../data/players.json')
         .then(response => {
             console.log("Response Status:", response.status); // Log status
             if (!response.ok) {
