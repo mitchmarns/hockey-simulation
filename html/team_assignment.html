@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Assignment</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Team Assignment</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="game_simulation.html">Game Simulation</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Assign Players to Teams and Lines</h2>
+
+        <label for="team">Select Team:</label>
+        <select id="team">
+            <option value="Rangers">Rangers</option>
+            <option value="Devils">Devils</option>
+            <option value="Islanders">Islanders</option>
+            <option value="Sabres">Sabres</option>
+        </select>
+
+        <label for="player">Select Player:</label>
+        <select id="player">
+            <!-- Players will be populated here -->
+        </select>
+
+        <button onclick="assignToTeam()">Assign to Team</button>
+        <button onclick="assignToForwardLine()">Assign to Forward Line</button>
+        <button onclick="assignToDefenseLine()">Assign to Defense Line</button>
+        <button onclick="assignToGoalieLine()">Assign to Goalie Line</button>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Hockey Simulation</p>
+    </footer>
+
+    <script src="../js/teamManagement.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+</html>
