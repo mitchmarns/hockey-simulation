@@ -160,11 +160,43 @@ function displayTeamRoster(teamName) {
 
     team.players.forEach(player => {
         const li = document.createElement("li");
-        li.textContent = player.name;
+
+        const playerInfo = document.createElement("span");
+        playerInfo.textContent = player.name;
+
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.onclick = function () {
+            removePlayerFromTeam(player, teamName);
+        };
+
+        li.appendChild(playerInfo);
+        li.appendChild(removeButton);
         rosterList.appendChild(li);
     });
 
     teamRosterContainer.appendChild(rosterList);
+}
+
+function removePlayerFromTeam(player, teamName) {
+    const team = teams.find(t => t.name === teamName);
+    if (team) {
+        // Remove player from the team's player list
+        team.players = team.players.filter(p => p.id !== player.id);
+
+        // Reset player properties
+        player.team = null;
+        player.assigned = false;
+
+        // Save updated data to localStorage
+        saveTeamsToLocalStorage();
+        savePlayersToLocalStorage();
+
+        // Update the UI
+        alert(`${player.name} has been removed from the ${teamName}.`);
+        displayPlayers(); // Re-render available players list
+        displayTeamRoster(teamName); // Update the roster display
+    }
 }
 
 // Function to load all the players and their team assignments on page load
