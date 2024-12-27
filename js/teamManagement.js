@@ -10,45 +10,47 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
-        return true; // Data loaded from localStorage
+    } else {
+        console.log("No data in localStorage, will load from JSON files.");
+        loadDataFromJSON(); // Load data from JSON if localStorage is empty
     }
-
-    return false; // No data in localStorage, need to fetch from JSON
 }
+
 
 // Fetch player and team data if localStorage is empty
 function loadDataFromJSON() {
-    return Promise.all([
-        fetch('../data/players.json')  // Correct path when running from root/js
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to load players.json");
-                }
-                return response.json();
-            })
-            .then(data => {
-                players = data.players; // Access the "players" array
-                console.log("Players Loaded:", players);
-            })
-            .catch(error => {
-                console.error("Error loading players:", error);
-            }),
+    fetch('../data/players.json') // Corrected path to players.json
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load players.json");
+            }
+            return response.json();
+        })
+        .then(data => {
+            players = data.players; // Access the "players" array
+            console.log("Players Loaded:", players);
+            savePlayersToLocalStorage(); // Save players to localStorage
+            displayPlayers();
+        })
+        .catch(error => {
+            console.error("Error loading players:", error);
+        });
 
-        fetch('../data/teams.json')  // Correct path when running from root/js
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to load teams.json");
-                }
-                return response.json();
-            })
-            .then(data => {
-                teams = data; // Access the "teams" array
-                console.log("Teams Loaded:", teams);
-            })
-            .catch(error => {
-                console.error("Error loading teams:", error);
-            })
-    ]);
+    fetch('../data/teams.json') // Same for teams.json
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load teams.json");
+            }
+            return response.json();
+        })
+        .then(data => {
+            teams = data; // Access the "teams" array
+            console.log("Teams Loaded:", teams);
+            saveTeamsToLocalStorage(); // Save teams to localStorage
+        })
+        .catch(error => {
+            console.error("Error loading teams:", error);
+        });
 }
 
 // Display all players on the page
