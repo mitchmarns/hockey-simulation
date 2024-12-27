@@ -9,8 +9,7 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
-        renderTeamLines(); 
-        renderAssignedPlayers();
+        renderTeamLines(); // Render lines after data is loaded
     } else {
         console.log("No data in localStorage, will load from JSON files.");
         loadDataFromJSON(); // Load data from JSON if localStorage is empty
@@ -52,11 +51,10 @@ function renderAssignedPlayers() {
         selectedTeam.players.forEach(player => {
             const playerItem = document.createElement("li");
             playerItem.textContent = player.name;
-            playerItem.classList.add("player-item");
+
             playerItem.setAttribute("draggable", "true");
-            
-            // When the drag starts, pass relevant data
             playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, selectedTeam));
+
             playersList.appendChild(playerItem);
         });
     } else {
@@ -78,14 +76,13 @@ function onLineDrop(event, teamName, lineIndex, position) {
     const playerName = event.dataTransfer.getData("text");
     event.preventDefault();
     const team = teams.find(t => t.name === teamName);
-    if (!team) return;
     
     // Find the line and position where the player is dropped
     const line = team.lines.forwardLines[lineIndex];  // Example for forward lines
     line[position] = playerName;  // Assign the player to the correct position
-
-    saveTeamsToLocalStorage();
-    renderTeamLines();  
+    
+    saveTeamsToLocalStorage(); // Save the updated team data
+    renderTeamLines();  // Re-render lines to reflect the changes
 }
 
 // Allow dropping
@@ -143,11 +140,12 @@ function createLineSection(title, lines, team) {
             const playerElement = document.createElement("div");
 
             playerElement.classList.add("player-drop-zone");
-            playerElement.setAttribute("ondrop", "onLineDrop(event, '" + team.name + "', " + index + ", '" + position + "')");
+            playerElement.setAttribute("ondrop", `onLineDrop(event, '${team.name}', ${index}, '${position}')`);
             playerElement.setAttribute("ondragover", "allowDrop(event)");
 
+            // If a player is assigned to this position, display their name
             if (player) {
-                playerElement.textContent = player;  // If player is assigned, show their name
+                playerElement.textContent = player;
             } else {
                 playerElement.textContent = `Drag ${position} here`;  // If no player assigned, show a message
             }
