@@ -19,7 +19,7 @@ function loadFromLocalStorage() {
 // Fetch player and team data if localStorage is empty
 function loadDataFromJSON() {
     return Promise.all([
-        fetch('../data/players.json')
+        fetch('../data/players.json')  // Correct path when running from root/js
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Failed to load players.json");
@@ -34,7 +34,7 @@ function loadDataFromJSON() {
                 console.error("Error loading players:", error);
             }),
 
-        fetch('../data/teams.json')
+        fetch('../data/teams.json')  // Correct path when running from root/js
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Failed to load teams.json");
