@@ -19,22 +19,23 @@ function loadFromLocalStorage() {
 
 // Fetch player and team data if localStorage is empty
 function loadDataFromJSON() {
-    fetch('../data/players.json') // Corrected path to players.json
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to load players.json");
-            }
-            return response.json();
-        })
-        .then(data => {
-            players = data.players; // Access the "players" array
-            console.log("Players Loaded:", players);
-            savePlayersToLocalStorage(); // Save players to localStorage
-            displayPlayers();
-        })
-        .catch(error => {
-            console.error("Error loading players:", error);
-        });
+    fetch('../data/players.json')
+    .then(response => {
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch players.json: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Fetched players data:", data);
+        players = data.players; // Ensure the structure matches the JSON file
+        localStorage.setItem("players", JSON.stringify(players));
+        displayPlayers();
+    })
+    .catch(error => {
+        console.error("Error fetching players.json:", error);
+    });
 
     fetch('../data/teams.json') // Same for teams.json
         .then(response => {
