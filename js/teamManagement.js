@@ -79,6 +79,12 @@ function displayPlayers() {
         const playerName = document.createElement("span");
         playerName.textContent = player.name;
 
+        const playerPosition = document.createElement("span");
+        playerPosition.textContent = ` (${player.position})`;
+
+        playerInfo.appendChild(playerName);
+        playerInfo.appendChild(playerPosition);
+
         const assignButton = document.createElement("button");
         assignButton.textContent = "Assign";
         
