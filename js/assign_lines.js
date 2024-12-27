@@ -9,7 +9,8 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
-        renderTeamLines(); // Render lines after data is loaded
+        renderTeamLines(); 
+        renderAssignedPlayers();
     } else {
         console.log("No data in localStorage, will load from JSON files.");
         loadDataFromJSON(); // Load data from JSON if localStorage is empty
@@ -51,10 +52,11 @@ function renderAssignedPlayers() {
         selectedTeam.players.forEach(player => {
             const playerItem = document.createElement("li");
             playerItem.textContent = player.name;
-
+            playerItem.classList.add("player-item");
             playerItem.setAttribute("draggable", "true");
+            
+            // When the drag starts, pass relevant data
             playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, selectedTeam));
-
             playersList.appendChild(playerItem);
         });
     } else {
@@ -76,12 +78,14 @@ function onLineDrop(event, teamName, lineIndex, position) {
     const playerName = event.dataTransfer.getData("text");
     event.preventDefault();
     const team = teams.find(t => t.name === teamName);
+    if (!team) return;
     
     // Find the line and position where the player is dropped
     const line = team.lines.forwardLines[lineIndex];  // Example for forward lines
     line[position] = playerName;  // Assign the player to the correct position
-    
-    renderTeamLines();  // Re-render lines to reflect the changes
+
+    saveTeamsToLocalStorage();
+    renderTeamLines();  
 }
 
 // Allow dropping
