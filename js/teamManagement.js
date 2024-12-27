@@ -77,7 +77,7 @@ function displayPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear the list before re-rendering
 
-    const unassignedPlayers = players.filter(player => !player.assigned);
+    const unassignedPlayers = players.filter(player => !player.assigned); // Filter players who are not assigned
 
     unassignedPlayers.forEach(player => {
         const li = document.createElement("li");
@@ -135,6 +135,9 @@ function assignPlayerToTeam(player) {
             team.players.push(player);
             player.team = selectedTeam;
             player.assigned = true;
+
+            // Remove player from available players array
+            players = players.filter(p => p.id !== player.id);
 
             // Save the updated teams and players to localStorage
             saveTeamsToLocalStorage();
@@ -195,9 +198,14 @@ function removePlayerFromTeam(player, teamName) {
         team.players = team.players.filter(p => p.id !== player.id);
 
         // Reset player properties
-        players.push(player);
         player.team = null;
         player.assigned = false;
+
+        // Ensure the player is added back to the players array (only if not already added)
+        const playerExists = players.some(p => p.id === player.id);
+        if (!playerExists) {
+            players.push(player); // Add player back to available players list
+        }
 
         // Save updated data to localStorage
         saveTeamsToLocalStorage();
