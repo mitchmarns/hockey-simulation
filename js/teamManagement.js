@@ -2,7 +2,7 @@ let players = [];
 let teams = [];
 
 // Fetch player and team data
-fetch('data/players.json')
+fetch('../data/players.json') // Go up one level and then access the data folder
     .then(response => {
         if (!response.ok) {
             throw new Error("Failed to load players.json");
@@ -10,7 +10,7 @@ fetch('data/players.json')
         return response.json();
     })
     .then(data => {
-        players = data.players;  // Access the "players" array
+        players = data.players; // Access the "players" array
         console.log("Players Loaded:", players);
         displayPlayers();
     })
@@ -18,7 +18,7 @@ fetch('data/players.json')
         console.error("Error loading players:", error);
     });
 
-fetch('data/teams.json')
+fetch('../data/teams.json') // Same for teams.json
     .then(response => {
         if (!response.ok) {
             throw new Error("Failed to load teams.json");
@@ -26,7 +26,7 @@ fetch('data/teams.json')
         return response.json();
     })
     .then(data => {
-        teams = data;
+        teams = data; // Access the "teams" array
         console.log("Teams Loaded:", teams);
     })
     .catch(error => {
