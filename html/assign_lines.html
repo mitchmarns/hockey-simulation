@@ -12,7 +12,26 @@
             <h1>Assign Lines to Teams</h1>
         </header>
         
-        <!-- Team Assignment Section -->
+        <!-- Team Selection Section (optional, if you want to filter by team) -->
+        <div class="team-selection">
+            <label for="team-select">Select Team:</label>
+            <select id="team-select">
+                <option value="Rangers">Rangers</option>
+                <option value="Devils">Devils</option>
+                <option value="Islanders">Islanders</option>
+                <option value="Sabres">Sabres</option>
+            </select>
+        </div>
+
+        <!-- Assigned Players List Section -->
+        <div id="assigned-players">
+            <h2>Assigned Players</h2>
+            <ul id="players-list">
+                <!-- Players will be dynamically inserted here -->
+            </ul>
+        </div>
+
+        <!-- Team Lines Section -->
         <div id="team-lines">
             <!-- Individual team line sections will be dynamically inserted here -->
         </div>
