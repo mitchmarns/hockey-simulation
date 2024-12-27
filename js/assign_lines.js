@@ -39,6 +39,56 @@ function saveTeamsToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
 }
 
+// Render players assigned to the selected team
+function renderAssignedPlayers() {
+    const playersList = document.getElementById("players-list");
+    playersList.innerHTML = '';  // Clear existing list
+
+    const selectedTeamName = document.getElementById("team-select").value;
+    const selectedTeam = teams.find(team => team.name === selectedTeamName);
+
+    if (selectedTeam && selectedTeam.players.length > 0) {
+        selectedTeam.players.forEach(player => {
+            const playerItem = document.createElement("li");
+            playerItem.textContent = player.name;
+
+            playerItem.setAttribute("draggable", "true");
+            playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, selectedTeam));
+
+            playersList.appendChild(playerItem);
+        });
+    } else {
+        const noPlayersMessage = document.createElement("p");
+        noPlayersMessage.textContent = "No players assigned yet.";
+        playersList.appendChild(noPlayersMessage);
+    }
+}
+
+// Handle dragging a player
+function onPlayerDragStart(event, team) {
+    const playerName = event.target.textContent;
+    event.dataTransfer.setData("text", playerName);
+    event.target.style.opacity = 0.5;
+}
+
+// Handle dropping a player onto a line
+function onLineDrop(event, teamName, lineIndex, position) {
+    const playerName = event.dataTransfer.getData("text");
+    event.preventDefault();
+    const team = teams.find(t => t.name === teamName);
+    
+    // Find the line and position where the player is dropped
+    const line = team.lines.forwardLines[lineIndex];  // Example for forward lines
+    line[position] = playerName;  // Assign the player to the correct position
+    
+    renderTeamLines();  // Re-render lines to reflect the changes
+}
+
+// Allow dropping
+function allowDrop(event) {
+    event.preventDefault();
+}
+
 function renderTeamLines() {
     const teamLinesContainer = document.getElementById("team-lines");
     teamLinesContainer.innerHTML = ""; // Clear existing content
@@ -79,37 +129,35 @@ function createLineSection(title, lines, team) {
     sectionTitle.textContent = title;
     section.appendChild(sectionTitle);
 
-    // Check if lines are an array and not empty
-    if (lines && lines.length > 0) {
-        lines.forEach((line, index) => {
-            const lineContainer = document.createElement("div");
-            lineContainer.classList.add("line-placeholder");
+    lines.forEach((line, index) => {
+        const lineContainer = document.createElement("div");
+        lineContainer.classList.add("line-container");
 
-            // Iterate through each position in the line (LW, C, RW, etc.)
-            Object.keys(line).forEach((position) => {
-                const player = line[position];  // This will be null initially
+        // For each position in the line (LW, C, RW, etc.)
+        Object.keys(line).forEach(position => {
+            const player = line[position];
+            const playerElement = document.createElement("div");
 
-                const playerElement = document.createElement("div");
-                playerElement.classList.add("player-draggable");
+            playerElement.classList.add("player-drop-zone");
+            playerElement.setAttribute("ondrop", "onLineDrop(event, '" + team.name + "', " + index + ", '" + position + "')");
+            playerElement.setAttribute("ondragover", "allowDrop(event)");
 
-                // If player is null, show a placeholder
-                playerElement.textContent = player ? player.name : `Drag a ${position} here`;
-                playerElement.setAttribute("draggable", true);
-                playerElement.addEventListener("dragstart", (e) => onDragStart(e, team.name, index, position));
+            if (player) {
+                playerElement.textContent = player;  // If player is assigned, show their name
+            } else {
+                playerElement.textContent = `Drag ${position} here`;  // If no player assigned, show a message
+            }
 
-                lineContainer.appendChild(playerElement);
-            });
-
-            section.appendChild(lineContainer);
+            lineContainer.appendChild(playerElement);
         });
-    } else {
-        const emptyMessage = document.createElement("p");
-        emptyMessage.textContent = "No lines assigned yet.";
-        section.appendChild(emptyMessage);
-    }
+
+        section.appendChild(lineContainer);
+    });
 
     return section;
 }
+
+document.addEventListener("DOMContentLoaded", loadFromLocalStorage);
 
 function onDragStart(event, teamName, lineIndex, playerIndex) {
     const player = players.find(p => p.name === event.target.textContent);
