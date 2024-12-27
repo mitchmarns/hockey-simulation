@@ -142,14 +142,13 @@ function displayTeamRoster(teamName) {
 // Function to load all the players and their team assignments on page load
 function loadInitialAssignments() {
     loadFromLocalStorage();
-    teams.forEach(team => {
-        team.players.forEach(player => {
-            displayTeamRoster(team.name); // Re-render roster for each team with assigned players
-        });
-    });
-
-    // Display all players available for assignment
     displayPlayers();
+
+    teams.forEach(team => {
+        if (team.players && team.players.length > 0) {
+            displayTeamRoster(team.name); 
+        }
+    });
 }
 
 // Call the loadInitialAssignments function when the page loads
