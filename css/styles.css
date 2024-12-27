@@ -98,3 +98,32 @@ header p {
 #players-list li button:hover {
     background-color: #45a049;
 }
+
+/* Assigned Team Roster Section */
+.team-roster {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #e8f5e9;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.team-roster h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.team-roster ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.team-roster ul li {
+    padding: 8px;
+    margin: 5px 0;
+    background-color: #f1f8e9;
+    border: 1px solid #dcedc8;
+    border-radius: 4px;
+    font-size: 1.2em;
+}
