@@ -13,10 +13,27 @@ function loadTeamsFromLocalStorage() {
     }
 }
 
+// Sync with players.js
+function loadPlayersFromLocalStorage() {
+    const savedPlayers = localStorage.getItem("players");
+    if (savedPlayers) {
+        const players = JSON.parse(savedPlayers);
+        console.log("Players loaded from localStorage:", players);
+        return players;
+    } else {
+        console.log("No players data found in localStorage.");
+        return [];
+    }
+}
+
 // Call the function on load
 window.onload = function() {
     const teams = loadTeamsFromLocalStorage();
-    initializeTeams(teams); // Initialize teams using the loaded data or an empty array
+    const players = loadPlayersFromLocalStorage();
+
+    // Now, initialize both teams and players
+    initializeTeams(teams);
+    initializePlayers(players); // New function to initialize players
 };
 
 // Example function to test team data
@@ -25,4 +42,13 @@ function initializeTeams(teams) {
         teams = ["Rangers", "Devils", "Islanders", "Sabres"];
     }
     console.log("Teams:", teams);
+}
+
+// Example function to test player data (added)
+function initializePlayers(players) {
+    if (players.length === 0) {
+        console.log("No players found, would normally load players here.");
+    } else {
+        console.log("Players:", players);
+    }
 }
