@@ -36,6 +36,7 @@ fetch('../data/teams.json') // Same for teams.json
 // Display all players on the page
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
+    playersList.innerHTML = ""; // Clear the list before re-rendering
 
     players.forEach(player => {
         const li = document.createElement("li");
@@ -61,7 +62,6 @@ function displayPlayers() {
     });
 }
 
-// Function to assign a player to a team
 function assignPlayerToTeam(player) {
     const selectedTeam = document.getElementById("team-select").value;
 
@@ -70,24 +70,46 @@ function assignPlayerToTeam(player) {
         return;
     }
 
-    // Assign the player to the selected team
+    // Find the selected team
     const team = teams.find(team => team.name === selectedTeam);
-    if (team && team.players.length < team.maxPlayers) {
-        team.players.push(player);
-        player.team = selectedTeam;
-        player.assigned = true;
+    if (team) {
+        if (team.players.length < team.maxPlayers) {
+            team.players.push(player);
+            player.team = selectedTeam;
+            player.assigned = true;
 
-        // Update the UI
-        alert(`${player.name} has been assigned to the ${selectedTeam}.`);
-        displayPlayers(); // Re-render the list to reflect changes
-    } else {
-        alert(`The ${selectedTeam} team is already full.`);
+            // Update the UI
+            alert(`${player.name} has been assigned to the ${selectedTeam}.`);
+            displayPlayers(); // Re-render the available players list
+            displayTeamRoster(selectedTeam); // Update the selected team's roster
+        } else {
+            alert(`The ${selectedTeam} team is already full.`);
+        }
     }
 }
 
-// Toggle selection of a player
-document.getElementById('players').addEventListener('click', (e) => {
-    if (e.target && e.target.nodeName === 'LI') {
-        e.target.classList.toggle('selected');  // Toggle selected state on click
+function displayTeamRoster(teamName) {
+    const teamRosterContainer = document.getElementById("team-roster");
+    const team = teams.find(t => t.name === teamName);
+    
+    if (!team) {
+        return;
     }
-});
+
+    // Clear any existing roster
+    teamRosterContainer.innerHTML = "";
+
+    const rosterTitle = document.createElement("h2");
+    rosterTitle.textContent = `${teamName} Roster`;
+    teamRosterContainer.appendChild(rosterTitle);
+
+    const rosterList = document.createElement("ul");
+
+    team.players.forEach(player => {
+        const li = document.createElement("li");
+        li.textContent = player.name;
+        rosterList.appendChild(li);
+    });
+
+    teamRosterContainer.appendChild(rosterList);
+}
