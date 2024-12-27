@@ -69,7 +69,9 @@ function displayPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear the list before re-rendering
 
-    players.forEach(player => {
+    const unassignedPlayers = players.filter(player => !player.assigned);
+
+    unassignedPlayers.forEach(player => {
         const li = document.createElement("li");
 
         const img = document.createElement("img");
