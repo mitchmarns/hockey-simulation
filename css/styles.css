@@ -13,3 +13,8 @@ h1 {
     text-align: center;
     color: #333;
 }
+
+.selected {
+    background-color: #4CAF50;
+    color: white;
+}
