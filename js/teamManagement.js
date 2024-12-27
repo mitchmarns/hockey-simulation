@@ -1,39 +1,47 @@
-let players = [];
+// Initialize teams and players arrays
 let teams = [];
+let players = [];
 
-// Fetch player and team data
-fetch('../data/players.json') // Go up one level and then access the data folder
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Failed to load players.json");
-        }
-        return response.json();
-    })
-    .then(data => {
-        players = data.players; // Access the "players" array
-        console.log("Players Loaded:", players);
-        displayPlayers();
-    })
-    .catch(error => {
-        console.error("Error loading players:", error);
-    });
+// Check if there's saved data in localStorage
+function loadFromLocalStorage() {
+    const savedTeams = localStorage.getItem("teams");
+    const savedPlayers = localStorage.getItem("players");
 
-fetch('../data/teams.json') // Same for teams.json
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Failed to load teams.json");
-        }
-        return response.json();
-    })
-    .then(data => {
-        teams = data; // Access the "teams" array
-        console.log("Teams Loaded:", teams);
-    })
-    .catch(error => {
-        console.error("Error loading teams:", error);
-    });
+    if (savedTeams && savedPlayers) {
+        teams = JSON.parse(savedTeams);
+        players = JSON.parse(savedPlayers);
+    } else {
+        // If no saved data, use an empty structure or fallback (won't be used if players.json loads properly)
+        teams = [
+            { "name": "Rangers", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
+            { "name": "Devils", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
+            { "name": "Islanders", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } },
+            { "name": "Sabres", "players": [], "maxPlayers": 23, "lines": { "forwardLines": [], "defenseLines": [], "goalies": {} } }
+        ];
+    }
+}
 
-// Display all players on the page
+// Function to fetch players from players.json and load them into the players array
+function loadPlayersFromJSON() {
+    fetch('./data/players.json')
+        .then(response => response.json())
+        .then(data => {
+            players = data.players; // Assuming the players are in a "players" array in players.json
+            loadInitialAssignments(); // Call the function to load initial assignments and display players
+        })
+        .catch(error => {
+            console.error("Error loading players.json:", error);
+            alert("Failed to load player data.");
+        });
+}
+
+// Function to save the current state of teams and players to localStorage
+function saveToLocalStorage() {
+    localStorage.setItem("teams", JSON.stringify(teams));
+    localStorage.setItem("players", JSON.stringify(players));
+}
+
+// Function to display players and their assignments
 function displayPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear the list before re-rendering
@@ -90,6 +98,9 @@ function assignPlayerToTeam(player) {
             alert(`${player.name} has been assigned to the ${selectedTeam}.`);
             displayPlayers(); // Re-render the available players list
             displayTeamRoster(selectedTeam); // Update the selected team's roster
+
+            // Save to localStorage
+            saveToLocalStorage();
         } else {
             alert(`The ${selectedTeam} team is already full.`);
         }
@@ -136,7 +147,8 @@ function loadInitialAssignments() {
     displayPlayers();
 }
 
-// Call the loadInitialAssignments function when the page loads
+// Call the loadFromLocalStorage function to initialize the teams and players from localStorage
 window.onload = function() {
-    loadInitialAssignments();
+    loadFromLocalStorage();
+    loadPlayersFromJSON(); // Fetch players from players.json and then load assignments
 };
