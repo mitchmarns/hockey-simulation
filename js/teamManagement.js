@@ -35,41 +35,54 @@ fetch('../data/teams.json') // Same for teams.json
 
 // Display all players on the page
 function displayPlayers() {
-    const playerList = document.getElementById('players');
-    playerList.innerHTML = '';
-
-    if (players.length === 0) {
-        playerList.innerHTML = '<li>No players available</li>';
-        return;
-    }
+    const playersList = document.getElementById("players-list");
 
     players.forEach(player => {
-        const li = document.createElement('li');
-        li.textContent = player.name;  // Show player name
-        li.dataset.playerId = player.id;  // Store player ID for later
-        playerList.appendChild(li);
+        const li = document.createElement("li");
+
+        const img = document.createElement("img");
+        img.src = player.image;
+        img.alt = player.name;
+
+        const playerName = document.createElement("span");
+        playerName.textContent = player.name;
+
+        const assignButton = document.createElement("button");
+        assignButton.textContent = "Assign";
+        assignButton.onclick = function() {
+            assignPlayerToTeam(player);
+        };
+
+        li.appendChild(img);
+        li.appendChild(playerName);
+        li.appendChild(assignButton);
+
+        playersList.appendChild(li);
     });
 }
 
 // Function to assign a player to a team
-function assignToTeam() {
-    const selectedTeam = document.getElementById('team').value;
+function assignPlayerToTeam(player) {
+    const selectedTeam = document.getElementById("team-select").value;
 
-    // Find all selected players (those that have been clicked in the list)
-    const selectedPlayers = document.querySelectorAll('#players li.selected');
-    selectedPlayers.forEach(playerItem => {
-        const playerId = parseInt(playerItem.dataset.playerId);
-        const player = players.find(p => p.id === playerId);
-        const team = teams.find(t => t.name === selectedTeam);
+    if (selectedTeam === "") {
+        alert("Please select a team first.");
+        return;
+    }
 
-        if (player && team && player.team === null) {
-            team.players.push(player);  // Add player to the team
-            player.team = selectedTeam;  // Set the player's team
-            console.log(`${player.name} assigned to the ${selectedTeam}`);
-        } else {
-            console.log("Player already assigned or team doesn't exist");
-        }
-    });
+    // Assign the player to the selected team
+    const team = teams.find(team => team.name === selectedTeam);
+    if (team && team.players.length < team.maxPlayers) {
+        team.players.push(player);
+        player.team = selectedTeam;
+        player.assigned = true;
+
+        // Update the UI
+        alert(`${player.name} has been assigned to the ${selectedTeam}.`);
+        displayPlayers(); // Re-render the list to reflect changes
+    } else {
+        alert(`The ${selectedTeam} team is already full.`);
+    }
 }
 
 // Toggle selection of a player
