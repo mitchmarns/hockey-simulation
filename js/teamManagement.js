@@ -10,44 +10,45 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
-    } else {
-        console.log("No data in localStorage, will load from JSON files.");
-        loadDataFromJSON(); // Load data from JSON if localStorage is empty
+        return true; // Data loaded from localStorage
     }
+
+    return false; // No data in localStorage, need to fetch from JSON
 }
 
 // Fetch player and team data if localStorage is empty
 function loadDataFromJSON() {
-    fetch('../data/players.json') // Go up one level and then access the data folder
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to load players.json");
-            }
-            return response.json();
-        })
-        .then(data => {
-            players = data.players; // Access the "players" array
-            console.log("Players Loaded:", players);
-            displayPlayers();
-        })
-        .catch(error => {
-            console.error("Error loading players:", error);
-        });
+    return Promise.all([
+        fetch('../data/players.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load players.json");
+                }
+                return response.json();
+            })
+            .then(data => {
+                players = data.players; // Access the "players" array
+                console.log("Players Loaded:", players);
+            })
+            .catch(error => {
+                console.error("Error loading players:", error);
+            }),
 
-    fetch('../data/teams.json') // Same for teams.json
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to load teams.json");
-            }
-            return response.json();
-        })
-        .then(data => {
-            teams = data; // Access the "teams" array
-            console.log("Teams Loaded:", teams);
-        })
-        .catch(error => {
-            console.error("Error loading teams:", error);
-        });
+        fetch('../data/teams.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load teams.json");
+                }
+                return response.json();
+            })
+            .then(data => {
+                teams = data; // Access the "teams" array
+                console.log("Teams Loaded:", teams);
+            })
+            .catch(error => {
+                console.error("Error loading teams:", error);
+            })
+    ]);
 }
 
 // Display all players on the page
@@ -146,17 +147,25 @@ function displayTeamRoster(teamName) {
 
 // Function to load all the players and their team assignments on page load
 function loadInitialAssignments() {
-    loadFromLocalStorage();
-    if (teams.length === 0 || players.length === 0) {
-        loadDataFromJSON();
-    } else {
+    const dataLoadedFromLocalStorage = loadFromLocalStorage();
+
+    if (dataLoadedFromLocalStorage) {
         // If data exists in localStorage, display players and rosters
         displayPlayers();
-
         teams.forEach(team => {
             if (team.players && team.players.length > 0) {
-                displayTeamRoster(team.name); 
+                displayTeamRoster(team.name);
             }
+        });
+    } else {
+        // If no data in localStorage, fetch from JSON and then display players and rosters
+        loadDataFromJSON().then(() => {
+            displayPlayers(); // Display players after JSON is loaded
+            teams.forEach(team => {
+                if (team.players && team.players.length > 0) {
+                    displayTeamRoster(team.name);
+                }
+            });
         });
     }
 }
