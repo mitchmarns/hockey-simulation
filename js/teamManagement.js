@@ -3,26 +3,45 @@ let teams = [];
 
 // Fetch player and team data
 fetch('data/players.json')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load players.json");
+        }
+        return response.json();
+    })
     .then(data => {
-        players = data;
+        players = data.players;  // Access the "players" array
         console.log("Players Loaded:", players);
         displayPlayers();
     })
-    .catch(error => console.error("Error loading players:", error));
+    .catch(error => {
+        console.error("Error loading players:", error);
+    });
 
 fetch('data/teams.json')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load teams.json");
+        }
+        return response.json();
+    })
     .then(data => {
         teams = data;
         console.log("Teams Loaded:", teams);
     })
-    .catch(error => console.error("Error loading teams:", error));
+    .catch(error => {
+        console.error("Error loading teams:", error);
+    });
 
 // Display all players on the page
 function displayPlayers() {
     const playerList = document.getElementById('players');
     playerList.innerHTML = '';
+
+    if (players.length === 0) {
+        playerList.innerHTML = '<li>No players available</li>';
+        return;
+    }
 
     players.forEach(player => {
         const li = document.createElement('li');
