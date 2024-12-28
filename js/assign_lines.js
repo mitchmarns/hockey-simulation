@@ -80,7 +80,7 @@ function updateTeams() {
 
 // Render all dynamic content
 function renderAll() {
-    renderUnassignedPlayers();
+    renderAssignedPlayers();
     teams.forEach(team => renderTeamLines(team));
 }
 
@@ -97,11 +97,17 @@ function getPlayersAssignedToLines() {
 }
 
 // Render unassigned players
-function renderUnassignedPlayers() {
+function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear list
 
-    const assigned = allPlayers.filter(player => player.assigned && player.team);
+    // Get teams data from localStorage
+    const teams = getFromLocalStorage("teams");
+
+    // Flatten the list of players from all teams and filter those who are assigned
+    const assigned = teams.flatMap(team =>
+        team.players.filter(player => player.assigned && player.team)
+    );
 
     if (assigned.length > 0) {
         assigned.forEach(player => {
@@ -113,6 +119,7 @@ function renderUnassignedPlayers() {
         playersList.textContent = "No players are assigned to teams yet.";
     }
 }
+
 
 // Handle drag start
 function onPlayerDragStart(event, playerName) {
