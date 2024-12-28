@@ -74,53 +74,60 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Handle Auto-Assign button click
-  autoAssignBtn.addEventListener("click", () => {
+autoAssignBtn.addEventListener("click", () => {
     const selectedTeam = teamSelect.value;
     const team = teams.find(t => t.name === selectedTeam); // Get the team data
+
     if (team) {
-      const players = team.players; // Reference players from the team
-      autoAssignPlayers(players, selectedTeam); // Auto-assign players to lines
+      const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
+
+      // Get available positions
+      const positions = {
+        forwardLines: ["line1LW", "line1C", "line1RW", "line2LW", "line2C", "line2RW", "line3LW", "line3C", "line3RW", "line4LW", "line4C", "line4RW"],
+        defenseLines: ["defLine1LD", "defLine1RD", "defLine2LD", "defLine2RD", "defLine3LD", "defLine3RD"],
+        goalies: ["starter", "backup"]
+      };
+
+      const assignedPlayers = {
+        forwards: [],
+        defense: [],
+        goalies: []
+      };
+
+      // Auto assign players to forwards
+      positions.forwardLines.forEach((position, idx) => {
+        const player = players.find(p => !assignedPlayers.forwards.includes(p.id) && p.position === getPositionForLine(idx));
+        if (player) {
+          document.getElementById(position).value = player.id;
+          assignedPlayers.forwards.push(player.id);
+        }
+      });
+
+      // Auto assign players to defense
+      positions.defenseLines.forEach((position, idx) => {
+        const player = players.find(p => !assignedPlayers.defense.includes(p.id) && p.position === (idx % 2 === 0 ? "LD" : "RD"));
+        if (player) {
+          document.getElementById(position).value = player.id;
+          assignedPlayers.defense.push(player.id);
+        }
+      });
+
+      // Auto assign goalies
+      positions.goalies.forEach((position, idx) => {
+        const player = players.find(p => !assignedPlayers.goalies.includes(p.id) && (p.position === "Starter" || p.position === "Backup"));
+        if (player) {
+          document.getElementById(position).value = player.id;
+          assignedPlayers.goalies.push(player.id);
+        }
+      });
     }
   });
 
-  // Function to auto-assign players to lines
-  function autoAssignPlayers(players, team) {
-    const forwardLines = ["line1", "line2", "line3", "line4"];
-    const defenseLines = ["defLine1", "defLine2", "defLine3"];
-    const goalies = ["starter", "backup"];
-
-    let forwards = players.filter(player => player.position === "LW" || player.position === "C" || player.position === "RW");
-    let defense = players.filter(player => player.position === "LD" || player.position === "RD");
-    let goaliesList = players.filter(player => player.position === "Starter" || player.position === "Backup");
-
-    // Shuffle players for randomness (Fisher-Yates shuffle)
-    shuffle(forwards);
-    shuffle(defense);
-    shuffle(goaliesList);
-
-    // Assign players to lines
-    forwardLines.forEach((line, i) => {
-      document.getElementById(`${line}LW`).value = forwards[i * 3]?.id || null;
-      document.getElementById(`${line}C`).value = forwards[i * 3 + 1]?.id || null;
-      document.getElementById(`${line}RW`).value = forwards[i * 3 + 2]?.id || null;
-    });
-
-    defenseLines.forEach((line, i) => {
-      document.getElementById(`${line}LD`).value = defense[i * 2]?.id || null;
-      document.getElementById(`${line}RD`).value = defense[i * 2 + 1]?.id || null;
-    });
-
-    // Assign goalies
-    document.getElementById("starter").value = goaliesList[0]?.id || null;
-    document.getElementById("backup").value = goaliesList[1]?.id || null;
-  }
-
-  // Fisher-Yates Shuffle for randomness
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-    }
+  // Function to get position based on line index
+  function getPositionForLine(idx) {
+    if (idx % 3 === 0) return "LW";
+    if (idx % 3 === 1) return "C";
+    if (idx % 3 === 2) return "RW";
   }
 
   // Function to populate player options based on team
