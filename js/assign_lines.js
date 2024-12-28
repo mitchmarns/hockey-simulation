@@ -73,68 +73,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to populate player options based on team
   function populatePlayerOptions(players, team) {
-    const forwardPositions = ["LW", "C", "RW"];
-    const defensePositions = ["LD", "RD"];
-  
-    const lineSelectors = [
-      "line1LW", "line1C", "line1RW", 
-      "line2LW", "line2C", "line2RW", 
-      "line3LW", "line3C", "line3RW", 
-      "line4LW", "line4C", "line4RW", 
-      "defLine1LD", "defLine1RD", 
-      "defLine2LD", "defLine2RD", 
-      "defLine3LD", "defLine3RD", 
-      "starter", "backup"
-    ];
+  const positions = {
+    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
+    "C": ["line1C", "line2C", "line3C", "line4C"],
+    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
+    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
+    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
+    "Starter": ["starter"],
+    "Backup": ["backup"]
+  };
 
-    // Clear all select options first
-    lineSelectors.forEach(selector => {
-      const selectElement = document.getElementById(selector);
-      selectElement.innerHTML = "";  // Clear options
-    });
+  // Clear all select options first
+  Object.values(positions).flat().forEach(selector => {
+    const selectElement = document.getElementById(selector);
+    selectElement.innerHTML = "";  // Clear options
+  });
 
-    players.forEach(player => {
-      if (player.team === team || player.team === null) { // Filter by team
-        forwardPositions.forEach(position => {
-          if (player.position === position) {
-            const option = document.createElement("option");
-            option.value = player.id;
-            option.text = player.name;
-            addOptionToLines(option, position);
-          }
+  // Filter players by team and position
+  const playersByPosition = {};
+  Object.keys(positions).forEach(position => {
+    playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
+  });
+
+  players.forEach(player => {
+    if (player.team === team || player.team === null) { // Filter by team
+      // Add the player to the correct dropdown based on their position
+      if (positions[player.position]) {
+        const option = document.createElement("option");
+        option.value = player.id;
+        option.text = player.name;
+
+        positions[player.position].forEach(selector => {
+          const selectElement = document.getElementById(selector);
+          selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
         });
-
-        defensePositions.forEach(position => {
-          if (player.position === position) {
-            const option = document.createElement("option");
-            option.value = player.id;
-            option.text = player.name;
-            addOptionToLines(option, position);
-          }
-        });
-
-        // Goalies
-        if (player.position === "Starter" || player.position === "Backup") {
-          const option = document.createElement("option");
-          option.value = player.id;
-          option.text = player.name;
-          document.getElementById("starter").appendChild(option);
-          document.getElementById("backup").appendChild(option.cloneNode(true));
-        }
       }
-    });
+    }
+  });
 
-    // Add "None" option to each dropdown if there are not enough players
-    lineSelectors.forEach(selector => {
+  // Add "None" option to each dropdown if there are not enough players for that position
+  Object.keys(positions).forEach(position => {
+    positions[position].forEach(selector => {
       const selectElement = document.getElementById(selector);
-      if (selectElement.options.length === 0) {
+
+      if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
         const noneOption = document.createElement("option");
-        noneOption.value = null;  // or "None"
+        noneOption.value = null;
         noneOption.text = "None";
         selectElement.appendChild(noneOption);
       }
     });
-  }
+  });
+}
 
   // Helper function to add player to the appropriate line dropdowns
   function addOptionToLines(option, position) {
