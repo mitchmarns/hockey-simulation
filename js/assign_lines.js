@@ -48,12 +48,19 @@ function saveTeamsToLocalStorage() {
 // Render players list on the page
 function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
-    playersList.innerHTML = ''; // Clear existing list
+    playersList.innerHTML = '';  // Clear existing list
 
-    if (players && players.length > 0) {
-        players.forEach(player => {
+    // Filter players who are assigned to a team but not yet assigned to a line
+    const unassignedPlayers = players.filter(player => 
+        player.team && player.lineAssigned === null // Assigned to a team but no line assigned
+    );
+
+    // Check if there are any unassigned players
+    if (unassignedPlayers.length > 0) {
+        unassignedPlayers.forEach(player => {
             const playerItem = document.createElement("li");
             playerItem.textContent = player.name;
+
             playerItem.setAttribute("draggable", "true");
             playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
 
@@ -61,7 +68,7 @@ function renderAssignedPlayers() {
         });
     } else {
         const noPlayersMessage = document.createElement("p");
-        noPlayersMessage.textContent = "No unassigned players found.";
+        noPlayersMessage.textContent = "No players available to assign to lines.";
         playersList.appendChild(noPlayersMessage);
     }
 }
@@ -83,6 +90,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
     line[position] = playerData.name;  // Assign player by name
 
     saveTeamsToLocalStorage(); // Save updated teams to localStorage
+    renderAssignedPlayers();
     renderTeamLines();  // Re-render lines to reflect the changes
 }
 
