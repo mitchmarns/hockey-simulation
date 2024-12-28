@@ -1,10 +1,8 @@
 let teams = [];
-let players = [];
 
-// Load data from localStorage or fetch from JSON files
+// Load data from localStorage
 function loadFromLocalStorage() {
     const savedTeams = localStorage.getItem("teams");
-    const savedPlayers = localStorage.getItem("players");
 
     if (savedTeams) {
         teams = JSON.parse(savedTeams);
@@ -13,37 +11,8 @@ function loadFromLocalStorage() {
         console.log("No teams data found in localStorage.");
     }
 
-    if (savedPlayers) {
-        players = JSON.parse(savedPlayers);
-        console.log("Loaded players from localStorage.");
-    } else {
-        console.log("No players data found in localStorage.");
-    }
-
-    renderAssignedPlayers();
-    renderTeamLines(); // Render lines after data is loaded
-}
-
-// Fetch players and teams data from JSON files
-function loadDataFromJSON() {
-    fetch('../data/players.json')
-        .then(response => response.json())
-        .then(data => {
-            players = data;
-            localStorage.setItem("players", JSON.stringify(players));
-            renderAssignedPlayers(); // Render players in list
-            renderTeamLines();
-        })
-        .catch(error => console.error("Error fetching players:", error));
-
-    fetch('../data/teams.json')
-        .then(response => response.json())
-        .then(data => {
-            teams = data;
-            saveTeamsToLocalStorage(); // Save teams to localStorage
-            renderTeamLines();
-        })
-        .catch(error => console.error("Error loading teams:", error));
+    renderAssignedPlayers(); // Render players assigned to teams
+    renderTeamLines();       // Render team lines
 }
 
 // Save teams data to localStorage
@@ -51,17 +20,47 @@ function saveTeamsToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
 }
 
-// Render players list on the page
+// Extract players assigned to teams from the teams data
+function getAssignedPlayers() {
+    const assignedPlayers = [];
+
+    teams.forEach(team => {
+        // Add all players from forward lines
+        team.lines.forwardLines.forEach(line => {
+            Object.values(line).forEach(player => {
+                if (player) assignedPlayers.push({ name: player, team: team.name });
+            });
+        });
+
+        // Add all players from defense lines
+        team.lines.defenseLines.forEach(line => {
+            Object.values(line).forEach(player => {
+                if (player) assignedPlayers.push({ name: player, team: team.name });
+            });
+        });
+
+        // Add goalies
+        if (team.lines.goalies) {
+            const { starter, backup } = team.lines.goalies;
+            if (starter) assignedPlayers.push({ name: starter, team: team.name });
+            if (backup) assignedPlayers.push({ name: backup, team: team.name });
+        }
+    });
+
+    return assignedPlayers;
+}
+
+// Render players assigned to teams
 function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
-    playersList.innerHTML = '';  // Clear existing list
+    playersList.innerHTML = ''; // Clear existing list
 
-    const unassignedPlayers = players.filter(player => !player.lineAssigned);
+    const assignedPlayers = getAssignedPlayers();
 
-    if (unassignedPlayers.length > 0) {
-        unassignedPlayers.forEach(player => {
+    if (assignedPlayers.length > 0) {
+        assignedPlayers.forEach(player => {
             const playerItem = document.createElement("li");
-            playerItem.textContent = player.name;
+            playerItem.textContent = `${player.name} (${player.team})`;
 
             playerItem.setAttribute("draggable", "true");
             playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
@@ -70,7 +69,7 @@ function renderAssignedPlayers() {
         });
     } else {
         const noPlayersMessage = document.createElement("p");
-        noPlayersMessage.textContent = "No players available to assign to lines.";
+        noPlayersMessage.textContent = "No players assigned to teams.";
         playersList.appendChild(noPlayersMessage);
     }
 }
@@ -97,18 +96,6 @@ function onLineDrop(event, teamName, lineIndex, position) {
         return;
     }
 
-    // Ensure the player is assigned to the correct team
-    if (playerData.team !== teamName) {
-        console.log(`${playerData.name} is not assigned to ${teamName}.`);
-        return;
-    }
-
-    // Ensure the player can only be assigned to the correct position
-    if (playerData.position !== position) {
-        console.log(`${playerData.name} cannot be assigned to ${position} as their position is ${playerData.position}.`);
-        return;
-    }
-
     // Check if the position is already filled in the line
     const line = lineIndex >= 0 ? team.lines.forwardLines[lineIndex] : team.lines.goalies;
 
@@ -120,16 +107,10 @@ function onLineDrop(event, teamName, lineIndex, position) {
     // Assign player to the correct position
     line[position] = playerData.name;
 
-    // Update the player's data
-    playerData.lineAssigned = position;
-    const playerIndex = players.findIndex(p => p.id === playerData.id);
-    if (playerIndex !== -1) {
-        players[playerIndex] = playerData;
-    }
-
-    saveTeamsToLocalStorage(); // Save updated teams to localStorage
+    // Update teams data
+    saveTeamsToLocalStorage();
     renderAssignedPlayers(); // Re-render the players list
-    renderTeamLines(); // Re-render lines to reflect the changes
+    renderTeamLines();       // Re-render lines to reflect the changes
 }
 
 // Allow dropping a player on a line position
