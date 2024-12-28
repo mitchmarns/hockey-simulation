@@ -56,23 +56,8 @@ function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = '';  // Clear existing list
 
-    // Log the players to check if the team and lineAssigned properties are correctly set
-    console.log("Teams in localStorage: ", teams);
+    const unassignedPlayers = players.filter(player => !player.lineAssigned);
 
-    // Filter players who are assigned to a team but not yet assigned to a line
-    const unassignedPlayers = [];
-    teams.forEach(team => {
-        team.players.forEach(player => {
-            if (player.lineAssigned === null) {  // No line assigned
-                unassignedPlayers.push(player);
-            }
-        });
-    });
-
-    // Log the filtered players
-    console.log("Unassigned Players: ", unassignedPlayers);
-
-    // Check if there are any unassigned players
     if (unassignedPlayers.length > 0) {
         unassignedPlayers.forEach(player => {
             const playerItem = document.createElement("li");
@@ -94,13 +79,17 @@ function renderAssignedPlayers() {
 function onPlayerDragStart(event, player) {
     event.dataTransfer.setData("player", JSON.stringify(player));
     event.target.style.opacity = 0.5;
+
+    event.target.addEventListener("dragend", () => {
+        event.target.style.opacity = 1;
+    });
 }
 
 // Handle dropping a player onto a line
 function onLineDrop(event, teamName, lineIndex, position) {
     const playerData = JSON.parse(event.dataTransfer.getData("player"));
     event.preventDefault();
-    
+
     const team = teams.find(t => t.name === teamName);
 
     if (!team) {
@@ -111,28 +100,32 @@ function onLineDrop(event, teamName, lineIndex, position) {
     // Ensure the player is assigned to the correct team
     if (playerData.team !== teamName) {
         console.log(`${playerData.name} is not assigned to ${teamName}.`);
-        return; // Player is not on the correct team, do not assign
+        return;
     }
 
     // Ensure the player can only be assigned to the correct position
     if (playerData.position !== position) {
         console.log(`${playerData.name} cannot be assigned to ${position} as their position is ${playerData.position}.`);
-        return; // Player's position doesn't match the drop zone
+        return;
     }
 
     // Check if the position is already filled in the line
-    const line = team.lines.forwardLines[lineIndex];  // For forward lines
-    
+    const line = lineIndex >= 0 ? team.lines.forwardLines[lineIndex] : team.lines.goalies;
+
     if (line[position]) {
         console.log(`${position} on ${teamName} Line ${lineIndex + 1} is already occupied.`);
-        return; // Position is already filled, don't allow assignment
+        return;
     }
 
     // Assign player to the correct position
-    line[position] = playerData.name;  // Assign player by name
+    line[position] = playerData.name;
 
-    // Set the player's lineAssigned property to reflect their position
+    // Update the player's data
     playerData.lineAssigned = position;
+    const playerIndex = players.findIndex(p => p.id === playerData.id);
+    if (playerIndex !== -1) {
+        players[playerIndex] = playerData;
+    }
 
     saveTeamsToLocalStorage(); // Save updated teams to localStorage
     renderAssignedPlayers(); // Re-render the players list
@@ -149,7 +142,6 @@ function renderTeamLines() {
     const teamLinesContainer = document.getElementById("team-lines");
     teamLinesContainer.innerHTML = ""; // Clear existing content
 
-    // Loop through all teams and create sections for each
     teams.forEach(team => {
         const teamSection = document.createElement("div");
         teamSection.classList.add("team-section");
@@ -159,18 +151,18 @@ function renderTeamLines() {
         teamSection.appendChild(teamName);
 
         // Render Forward Lines
-        if (team.lines && team.lines.forwardLines && Array.isArray(team.lines.forwardLines)) {
-            teamSection.appendChild(createLineSection("Forward Lines", team.lines.forwardLines, team));
+        if (team.lines && team.lines.forwardLines) {
+            teamSection.appendChild(createLineSection("Forward Lines", team.lines.forwardLines, team, "forward"));
         }
 
         // Render Defense Lines
-        if (team.lines && team.lines.defenseLines && Array.isArray(team.lines.defenseLines)) {
-            teamSection.appendChild(createLineSection("Defense Lines", team.lines.defenseLines, team));
+        if (team.lines && team.lines.defenseLines) {
+            teamSection.appendChild(createLineSection("Defense Lines", team.lines.defenseLines, team, "defense"));
         }
 
         // Render Goalies
-        if (team.lines && team.lines.goalies && team.lines.goalies.starter) {
-            teamSection.appendChild(createLineSection("Goalies", [team.lines.goalies], team)); // Goalies is an object
+        if (team.lines && team.lines.goalies) {
+            teamSection.appendChild(createLineSection("Goalies", [team.lines.goalies], team, "goalie"));
         }
 
         teamLinesContainer.appendChild(teamSection);
@@ -178,7 +170,7 @@ function renderTeamLines() {
 }
 
 // Create the line sections (Forward, Defense, Goalies)
-function createLineSection(title, lines, team) {
+function createLineSection(title, lines, team, type) {
     const section = document.createElement("div");
     section.classList.add("line-section");
 
@@ -190,7 +182,6 @@ function createLineSection(title, lines, team) {
         const lineContainer = document.createElement("div");
         lineContainer.classList.add("line-container");
 
-        // For each position in the line (LW, C, RW, etc.)
         Object.keys(line).forEach(position => {
             const player = line[position];
             const playerElement = document.createElement("div");
@@ -199,12 +190,7 @@ function createLineSection(title, lines, team) {
             playerElement.setAttribute("ondrop", `onLineDrop(event, '${team.name}', ${index}, '${position}')`);
             playerElement.setAttribute("ondragover", "allowDrop(event)");
 
-            // Add validation for correct position
-            if (player) {
-                playerElement.textContent = player;
-            } else {
-                playerElement.textContent = `Drag ${position} here`;  // Show message if no player assigned
-            }
+            playerElement.textContent = player || `Drag ${position} here`;
 
             lineContainer.appendChild(playerElement);
         });
@@ -216,4 +202,3 @@ function createLineSection(title, lines, team) {
 }
 
 document.addEventListener("DOMContentLoaded", loadFromLocalStorage);
-
