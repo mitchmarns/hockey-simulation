@@ -72,99 +72,100 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Function to populate player options based on team
- function populatePlayerOptions(players, team) {
-  const forwardPositions = ["LW", "C", "RW"];
-  const defensePositions = ["LD", "RD"];
+  function populatePlayerOptions(players, team) {
+    const forwardPositions = ["LW", "C", "RW"];
+    const defensePositions = ["LD", "RD"];
   
-  const lineSelectors = [
-    "line1LW", "line1C", "line1RW", 
-    "line2LW", "line2C", "line2RW", 
-    "line3LW", "line3C", "line3RW", 
-    "line4LW", "line4C", "line4RW", 
-    "defLine1LD", "defLine1RD", 
-    "defLine2LD", "defLine2RD", 
-    "defLine3LD", "defLine3RD", 
-    "starter", "backup"
-  ];
+    const lineSelectors = [
+      "line1LW", "line1C", "line1RW", 
+      "line2LW", "line2C", "line2RW", 
+      "line3LW", "line3C", "line3RW", 
+      "line4LW", "line4C", "line4RW", 
+      "defLine1LD", "defLine1RD", 
+      "defLine2LD", "defLine2RD", 
+      "defLine3LD", "defLine3RD", 
+      "starter", "backup"
+    ];
 
-  // Clear all select options first
-  lineSelectors.forEach(selector => {
-    const selectElement = document.getElementById(selector);
-    selectElement.innerHTML = "";  // Clear options
-  });
+    // Clear all select options first
+    lineSelectors.forEach(selector => {
+      const selectElement = document.getElementById(selector);
+      selectElement.innerHTML = "";  // Clear options
+    });
 
-  players.forEach(player => {
-    if (player.team === team || player.team === null) { // Filter by team
-      forwardPositions.forEach(position => {
-        if (player.position === position) {
+    players.forEach(player => {
+      if (player.team === team || player.team === null) { // Filter by team
+        forwardPositions.forEach(position => {
+          if (player.position === position) {
+            const option = document.createElement("option");
+            option.value = player.id;
+            option.text = player.name;
+            addOptionToLines(option, position);
+          }
+        });
+
+        defensePositions.forEach(position => {
+          if (player.position === position) {
+            const option = document.createElement("option");
+            option.value = player.id;
+            option.text = player.name;
+            addOptionToLines(option, position);
+          }
+        });
+
+        // Goalies
+        if (player.position === "Starter" || player.position === "Backup") {
           const option = document.createElement("option");
           option.value = player.id;
           option.text = player.name;
-          addOptionToLines(option, position);
+          document.getElementById("starter").appendChild(option);
+          document.getElementById("backup").appendChild(option.cloneNode(true));
         }
-      });
-
-      defensePositions.forEach(position => {
-        if (player.position === position) {
-          const option = document.createElement("option");
-          option.value = player.id;
-          option.text = player.name;
-          addOptionToLines(option, position);
-        }
-      });
-
-      // Goalies
-      if (player.position === "Starter" || player.position === "Backup") {
-        const option = document.createElement("option");
-        option.value = player.id;
-        option.text = player.name;
-        document.getElementById("starter").appendChild(option);
-        document.getElementById("backup").appendChild(option.cloneNode(true));
       }
-    }
-  });
+    });
 
-  // Add "None" option to each dropdown if there are not enough players
-  lineSelectors.forEach(selector => {
-    const selectElement = document.getElementById(selector);
-    if (selectElement.options.length === 0) {
-      const noneOption = document.createElement("option");
-      noneOption.value = null;  // or "None"
-      noneOption.text = "None";
-      selectElement.appendChild(noneOption);
-    }
-  });
-}
-
-// Helper function to add player to the appropriate line dropdowns
-function addOptionToLines(option, position) {
-  const lineSelectors = {
-    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
-    "C": ["line1C", "line2C", "line3C", "line4C"],
-    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
-    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"]
-  };
-
-  // Add the player option to the respective line positions
-  if (lineSelectors[position]) {
-    lineSelectors[position].forEach(line => {
-      const lineElement = document.getElementById(line);
-      lineElement.appendChild(option.cloneNode(true));
+    // Add "None" option to each dropdown if there are not enough players
+    lineSelectors.forEach(selector => {
+      const selectElement = document.getElementById(selector);
+      if (selectElement.options.length === 0) {
+        const noneOption = document.createElement("option");
+        noneOption.value = null;  // or "None"
+        noneOption.text = "None";
+        selectElement.appendChild(noneOption);
+      }
     });
   }
-}
 
-// Function to load teams from localStorage
-function loadTeamsFromLocalStorage() {
-  if (teams.length > 0) {
-    // Process the teams data
-    console.log("Teams loaded:", teams);
-    // Continue with any other logic you need
-  } else {
-    console.log("No teams found in localStorage.");
+  // Helper function to add player to the appropriate line dropdowns
+  function addOptionToLines(option, position) {
+    const lineSelectors = {
+      "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
+      "C": ["line1C", "line2C", "line3C", "line4C"],
+      "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
+      "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
+      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"]
+    };
+
+    // Add the player option to the respective line positions
+    if (lineSelectors[position]) {
+      lineSelectors[position].forEach(line => {
+        const lineElement = document.getElementById(line);
+        lineElement.appendChild(option.cloneNode(true));
+      });
+    }
   }
-}
 
-// Call the function to load teams
-loadTeamsFromLocalStorage();
+  // Function to load teams from localStorage
+  function loadTeamsFromLocalStorage() {
+    if (teams.length > 0) {
+      // Process the teams data
+      console.log("Teams loaded:", teams);
+      // Continue with any other logic you need
+    } else {
+      console.log("No teams found in localStorage.");
+    }
+  }
+
+  // Call the function to load teams
+  loadTeamsFromLocalStorage();
+});
