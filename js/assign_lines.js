@@ -206,26 +206,25 @@ function populatePlayerOptions(players, team) {
   }
 
   function rankPlayersForPosition(players, position) {
-  return players
-    .filter(player => !player.lineAssigned) // Exclude already assigned players
-    .map(player => {
-      const { skills } = player;
-      let score = 0;
-
-      if (position === "LW" || position === "RW") {
-        score = skills.speed * 0.4 + skills.shooting * 0.4 + skills.awareness * 0.2;
-      } else if (position === "C") {
-        score = skills.faceoffs * 0.5 + skills.passing * 0.3 + skills.awareness * 0.2;
-      } else if (position === "LD" || position === "RD") {
-        score = skills.defense * 0.5 + skills.strength * 0.3 + skills.shotBlocking * 0.2;
-      } else if (position === "Starter" || position === "Backup") {
-        score = skills.glove * 0.4 + skills.stick * 0.4 + skills.reactions * 0.2;
-      }
-
-      return { ...player, score };
-    })
-    .sort((a, b) => b.score - a.score); // Higher scores first
-}
+    return players
+      .map(player => {
+        const { skills } = player;
+        let score = 0;
+  
+        if (position === "LW" || position === "RW") {
+          score = skills.speed * 0.4 + skills.shooting * 0.4 + skills.awareness * 0.2;
+        } else if (position === "C") {
+          score = skills.faceoffs * 0.5 + skills.passing * 0.3 + skills.awareness * 0.2;
+        } else if (position === "LD" || position === "RD") {
+          score = skills.defense * 0.5 + skills.strength * 0.3 + skills.shotBlocking * 0.2;
+        } else if (position === "Starter" || position === "Backup") {
+          score = skills.glove * 0.4 + skills.stick * 0.4 + skills.reactions * 0.2;
+        }
+  
+        return { ...player, score };
+      })
+      .sort((a, b) => b.score - a.score); // Higher scores first
+  }
 
   // Function to load teams from localStorage
   function loadTeamsFromLocalStorage() {
