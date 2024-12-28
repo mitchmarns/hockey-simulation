@@ -110,12 +110,36 @@ function loadLineAssignments(team, players) {
     lineAssignmentDiv.appendChild(goalieLineDiv);
 }
 
-function assignPlayer(team, playerId) {
-    const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
-    const player = teams[team].find(p => p.id === playerId);
+function assignPlayer(teamName, playerId) {
+    const teamsData = localStorage.getItem('teams');
+    if (!teamsData) {
+        console.error("No teams data found in localStorage.");
+        return;
+    }
 
-    // Store the player's line assignment here
-    console.log(`Assigned ${player.name} to a line for ${team}`);
+    // Parse the JSON string into an array of teams
+    const teams = JSON.parse(teamsData);
+
+    // Find the team by name
+    const team = teams.find(t => t.name === teamName);
+    if (!team) {
+        console.error(`Team not found: ${teamName}`);
+        return;
+    }
+
+    // Find the player by ID in the selected team's players array
+    const player = team.players.find(p => p.id === playerId);
+    if (!player) {
+        console.error(`Player with ID ${playerId} not found in team ${teamName}`);
+        return;
+    }
+
+    // Mark the player as assigned (or perform your assignment logic)
+    player.lineAssigned = true; // Example: Update a property to indicate assignment
+    console.log(`Assigned player ${player.name} to a line in team ${teamName}`);
+
+    // Update localStorage with the modified data
+    localStorage.setItem('teams', JSON.stringify(teams));
 }
 
 function assignToLine(team, lineType, lineIndex) {
