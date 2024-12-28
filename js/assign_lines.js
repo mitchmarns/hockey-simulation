@@ -110,7 +110,12 @@ function loadLineAssignments(team, players) {
     lineAssignmentDiv.appendChild(goalieLineDiv);
 }
 
-function assignPlayer(teamName, playerId) {
+function assignPlayer(teamName, playerId, lineIndex) {
+    if (lineIndex === undefined || isNaN(lineIndex)) {
+        console.error("lineIndex is not defined or invalid.");
+        return;
+    }
+    
     const teamsData = localStorage.getItem('teams');
     if (!teamsData) {
         console.error("No teams data found in localStorage.");
@@ -134,21 +139,15 @@ function assignPlayer(teamName, playerId) {
         return;
     }
 
-    // Validate the position and lineIndex
-    if (typeof lineIndex !== 'number' || lineIndex < 0 || lineIndex >= team.lines.forwardLines.length) {
-        console.error(`Invalid line index: ${lineIndex}`);
-        return;
-    }
-
     // Assign the player to the specified line and position
     if (team.lines.forwardLines[lineIndex] && position in team.lines.forwardLines[lineIndex]) {
-        team.lines.forwardLines[lineIndex][position] = player.name; // Assign player name or ID
+        team.lines.forwardLines[lineIndex][position] = player.name; // Assign player's name
     } else if (team.lines.defenseLines[lineIndex] && position in team.lines.defenseLines[lineIndex]) {
         team.lines.defenseLines[lineIndex][position] = player.name;
     } else if (team.lines.goalies && position in team.lines.goalies) {
         team.lines.goalies[position] = player.name;
     } else {
-        console.error(`Invalid position: ${position}`);
+        console.error(`Invalid position or line index: ${position}, ${lineIndex}`);
         return;
     }
 
