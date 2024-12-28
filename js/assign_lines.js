@@ -79,12 +79,8 @@ autoAssignBtn.addEventListener("click", () => {
     const team = teams.find(t => t.name === selectedTeam); // Get the team data
 
     if (team) {
-    // Reset `lineAssigned` for all players in the team
-    team.players.forEach(player => {
-      player.lineAssigned = false;
-    });
-
-      const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
+    const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
+    const usedPlayers = new Set(); // Track used players
 
       // Get available positions
       const positions = {
