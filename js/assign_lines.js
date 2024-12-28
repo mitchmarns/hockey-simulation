@@ -23,7 +23,7 @@ function loadDataFromJSON() {
     fetch('../data/players.json')
         .then(response => response.json())
         .then(data => {
-            players = data.players;
+            players = data;
             localStorage.setItem("players", JSON.stringify(players));
             renderAssignedPlayers(); // Render players in list
             renderTeamLines();
