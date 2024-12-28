@@ -173,14 +173,6 @@ autoAssignBtn.addEventListener("click", () => {
         option.text = player.name;
         selectElement.appendChild(option);
       });
-
-      // Add "None" option if no players for that position
-      if (selectElement.options.length === 0) {
-        const noneOption = document.createElement("option");
-        noneOption.value = null;
-        noneOption.text = "None";
-        selectElement.appendChild(noneOption);
-      }
     });
   });
 }
