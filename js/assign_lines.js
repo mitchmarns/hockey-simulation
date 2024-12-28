@@ -150,20 +150,65 @@ function allowDrop(event) {
 }
 
 // Render team lines
-function renderTeamLines() {
-    const container = document.getElementById("team-lines");
-    container.innerHTML = ""; // Clear container
+function renderTeamLines(team) {
+    const teamContainer = document.createElement("div");
+    teamContainer.classList.add("team-container");
+    
+    // Create team heading
+    const teamHeading = createElement("h3", { textContent: team.name });
+    teamContainer.appendChild(teamHeading);
+    
+    // Loop through each line in the team lines
+    const linesContainer = createElement("div", { className: "lines-container" });
+    for (let lineType in team.lines) {
+        const lineGroup = team.lines[lineType];
+        const lineContainer = createElement("div", { className: `${lineType}-container` });
+        lineGroup.forEach((line, index) => {
+            const lineElement = createElement("div", { className: "line" });
+            Object.keys(line).forEach(position => {
+                const playerName = line[position];
+                const dropZone = createElement("div", {
+                    className: "player-drop-zone",
+                    id: `${team.name}-${lineType}-line-${index}-${position}`,
+                    textContent: playerName ? `${playerName}` : `Drag ${position} here`,
+                });
 
-    teams.forEach(team => {
-        const section = createElement("div", { className: "team-section" });
-        section.appendChild(createElement("h2", { textContent: `${team.name} Line Assignment` }));
+                dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
+                dropZone.ondragover = allowDrop;
 
-        section.appendChild(renderLineSection("Forward Lines", team.lines.forwardLines, team, "forward"));
-        section.appendChild(renderLineSection("Defense Lines", team.lines.defenseLines, team, "defense"));
-        section.appendChild(renderLineSection("Goalies", [team.lines.goalies], team, "goalie"));
+                if (playerName) {
+                    const player = team.players.find(p => p.name === playerName);
 
-        container.appendChild(section);
-    });
+                    // Create the player card
+                    const playerCard = createElement("div", { className: "player-card" });
+
+                    // Player image
+                    const playerImage = createElement("img", {
+                        src: player.image,  // Player image from the team data
+                        alt: player.name,
+                        className: "player-image"
+                    });
+
+                    // Player name and position
+                    const playerPosition = createElement("p", { textContent: position });
+                    const playerNameElement = createElement("p", { textContent: playerName });
+
+                    playerCard.appendChild(playerImage);
+                    playerCard.appendChild(playerNameElement);
+                    playerCard.appendChild(playerPosition);
+
+                    dropZone.appendChild(playerCard);
+                }
+
+                lineElement.appendChild(dropZone);
+            });
+            lineContainer.appendChild(lineElement);
+        });
+        linesContainer.appendChild(lineContainer);
+    }
+
+    teamContainer.appendChild(linesContainer);
+    document.body.appendChild(teamContainer);
 }
 
 // Render a line section (Forward, Defense, Goalies)
