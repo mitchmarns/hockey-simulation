@@ -1,8 +1,10 @@
 let teams = [];
+let allPlayers = [];
 
-// Load data from localStorage
+// Load data from localStorage and initialize
 function loadFromLocalStorage() {
     const savedTeams = localStorage.getItem("teams");
+    const savedPlayers = localStorage.getItem("players");
 
     if (savedTeams) {
         teams = JSON.parse(savedTeams);
@@ -11,8 +13,15 @@ function loadFromLocalStorage() {
         console.log("No teams data found in localStorage.");
     }
 
-    renderAssignedPlayers(); // Render players assigned to teams
-    renderTeamLines();       // Render team lines
+    if (savedPlayers) {
+        allPlayers = JSON.parse(savedPlayers);
+        console.log("Loaded players from localStorage.");
+    } else {
+        console.log("No players data found in localStorage.");
+    }
+
+    renderUnassignedPlayers(); // Render unassigned players
+    renderTeamLines();         // Render team lines
 }
 
 // Save teams data to localStorage
@@ -20,47 +29,54 @@ function saveTeamsToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
 }
 
-// Extract players assigned to teams from the teams data
+// Extract players assigned to teams
 function getAssignedPlayers() {
-    const assignedPlayers = [];
+    const assignedPlayerNames = [];
 
     teams.forEach(team => {
         // Add all players from forward lines
         team.lines.forwardLines.forEach(line => {
             Object.values(line).forEach(player => {
-                if (player) assignedPlayers.push({ name: player, team: team.name });
+                if (player) assignedPlayerNames.push(player);
             });
         });
 
         // Add all players from defense lines
         team.lines.defenseLines.forEach(line => {
             Object.values(line).forEach(player => {
-                if (player) assignedPlayers.push({ name: player, team: team.name });
+                if (player) assignedPlayerNames.push(player);
             });
         });
 
         // Add goalies
         if (team.lines.goalies) {
             const { starter, backup } = team.lines.goalies;
-            if (starter) assignedPlayers.push({ name: starter, team: team.name });
-            if (backup) assignedPlayers.push({ name: backup, team: team.name });
+            if (starter) assignedPlayerNames.push(starter);
+            if (backup) assignedPlayerNames.push(backup);
         }
     });
 
-    return assignedPlayers;
+    return assignedPlayerNames;
 }
 
-// Render players assigned to teams
-function renderAssignedPlayers() {
+// Get unassigned players
+function getUnassignedPlayers() {
+    const assignedPlayerNames = getAssignedPlayers();
+
+    return allPlayers.filter(player => !assignedPlayerNames.includes(player.name));
+}
+
+// Render unassigned players
+function renderUnassignedPlayers() {
     const playersList = document.getElementById("players-list");
-    playersList.innerHTML = ''; // Clear existing list
+    playersList.innerHTML = ""; // Clear existing list
 
-    const assignedPlayers = getAssignedPlayers();
+    const unassignedPlayers = getUnassignedPlayers();
 
-    if (assignedPlayers.length > 0) {
-        assignedPlayers.forEach(player => {
+    if (unassignedPlayers.length > 0) {
+        unassignedPlayers.forEach(player => {
             const playerItem = document.createElement("li");
-            playerItem.textContent = `${player.name} (${player.team})`;
+            playerItem.textContent = player.name;
 
             playerItem.setAttribute("draggable", "true");
             playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
@@ -69,7 +85,7 @@ function renderAssignedPlayers() {
         });
     } else {
         const noPlayersMessage = document.createElement("p");
-        noPlayersMessage.textContent = "No players assigned to teams.";
+        noPlayersMessage.textContent = "All players are assigned to teams.";
         playersList.appendChild(noPlayersMessage);
     }
 }
@@ -109,8 +125,8 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Update teams data
     saveTeamsToLocalStorage();
-    renderAssignedPlayers(); // Re-render the players list
-    renderTeamLines();       // Re-render lines to reflect the changes
+    renderUnassignedPlayers(); // Re-render the unassigned players list
+    renderTeamLines();         // Re-render lines to reflect the changes
 }
 
 // Allow dropping a player on a line position
