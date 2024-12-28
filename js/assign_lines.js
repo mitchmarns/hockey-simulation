@@ -152,39 +152,31 @@ function allowDrop(event) {
 }
 
 // Render team lines
-function renderTeamLines(team) {
-    const teamContainer = document.createElement("div");
-    teamContainer.classList.add("team-container");
+function renderTeamLines() {
+    const container = document.getElementById("teams-container");
+    container.innerHTML = "";  // Clear container
 
-    // Add Team Name
-    const teamHeading = document.createElement("h3");
-    teamHeading.textContent = team.name;
-    teamContainer.appendChild(teamHeading);
+    teams.forEach(team => {
+        const teamContainer = createElement("div", { className: "team-container" });
 
-    // Render players with images
-    const playersContainer = document.createElement("div");
-    playersContainer.classList.add("players-container");
-    team.players.forEach(player => {
-        if (player.image) { // Check if the player has an image
-            const playerCard = document.createElement("div");
-            playerCard.classList.add("player-card");
+        // Add Team Name
+        const teamHeading = createElement("h3", { textContent: team.name });
+        teamContainer.appendChild(teamHeading);
 
-            const playerName = document.createElement("p");
-            playerName.textContent = player.name;
-            playerCard.appendChild(playerName);
+        // Render Forward Lines
+        const forwardSection = renderLineSection("Forward Lines", team.lines.forwardLines, team, "forward");
+        teamContainer.appendChild(forwardSection);
 
-            const playerImage = document.createElement("img");
-            playerImage.src = player.image;
-            playerImage.alt = `${player.name}'s image`;
-            playerImage.classList.add("player-image");
-            playerCard.appendChild(playerImage);
+        // Render Defense Lines
+        const defenseSection = renderLineSection("Defense Lines", team.lines.defenseLines, team, "defense");
+        teamContainer.appendChild(defenseSection);
 
-            playersContainer.appendChild(playerCard);
-        }
+        // Render Goalies
+        const goalieSection = renderLineSection("Goalies", [team.lines.goalies], team, "goalie");
+        teamContainer.appendChild(goalieSection);
+
+        container.appendChild(teamContainer);  // Append the team container to the main container
     });
-
-    teamContainer.appendChild(playersContainer);
-    document.body.appendChild(teamContainer);  // Append team container to the body or specific element
 }
 
 // Render a line section (Forward, Defense, Goalies)
@@ -215,8 +207,6 @@ function renderLineSection(title, lines, team, type) {
                     alt: `${playerName}'s Image`,
                     className: "player-image"
                 });
-
-                console.log(playerImage);
 
                 const playerPosition = createElement("p", { textContent: position });
                 const playerNameElement = createElement("p", { textContent: playerName });
