@@ -141,34 +141,35 @@ document.addEventListener("DOMContentLoaded", () => {
       selectElement.innerHTML = "";  // Clear options
     });
 
-    players.forEach(player => {
-      if (player.team === team || player.team === null) { // Filter by team
-        if (positions[player.position]) {
-          const option = document.createElement("option");
-          option.value = player.id;
-          option.text = player.name;
+    // Filter players by team and position
+  const playersByPosition = {};
+  Object.keys(positions).forEach(position => {
+    playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
+  });
 
-          positions[player.position].forEach(selector => {
-            const selectElement = document.getElementById(selector);
-            selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
-          });
-        }
+  // Populate the dropdowns for each position
+  Object.keys(positions).forEach(position => {
+    positions[position].forEach(selector => {
+      const selectElement = document.getElementById(selector);
+
+      // Add players to the dropdown for each position
+      playersByPosition[position].forEach(player => {
+        const option = document.createElement("option");
+        option.value = player.id;
+        option.text = player.name;
+        selectElement.appendChild(option);
+      });
+
+      // Add "None" option if no players for that position
+      if (selectElement.options.length === 0) {
+        const noneOption = document.createElement("option");
+        noneOption.value = null;
+        noneOption.text = "None";
+        selectElement.appendChild(noneOption);
       }
     });
-
-    // Add "None" option if there are not enough players for a position
-    Object.keys(positions).forEach(position => {
-      positions[position].forEach(selector => {
-        const selectElement = document.getElementById(selector);
-        if (selectElement.options.length === 0) {
-          const noneOption = document.createElement("option");
-          noneOption.value = null;
-          noneOption.text = "None";
-          selectElement.appendChild(noneOption);
-        }
-      });
-    });
-  }
+  });
+}
 
   // Function to load the line assignments into the dropdowns
   function loadLineAssignments(team) {
