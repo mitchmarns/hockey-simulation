@@ -75,50 +75,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle Auto-Assign button click
 autoAssignBtn.addEventListener("click", () => {
-    const selectedTeam = teamSelect.value;
-    const team = teams.find(t => t.name === selectedTeam); // Get the team data
+  const selectedTeam = teamSelect.value;
+  const team = teams.find(t => t.name === selectedTeam); // Get the team data
 
-    if (team) {
+  if (team) {
     const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
     const usedPlayers = new Set(); // Track used players
 
-      // Get available positions
-      const positions = {
-        forwardLines: ["line1LW", "line1C", "line1RW", "line2LW", "line2C", "line2RW", "line3LW", "line3C", "line3RW", "line4LW", "line4C", "line4RW"],
-        defenseLines: ["defLine1LD", "defLine1RD", "defLine2LD", "defLine2RD", "defLine3LD", "defLine3RD"],
-        goalies: ["starter", "backup"]
-      };
+    // Get available positions
+    const positions = {
+      forwardLines: ["line1LW", "line1C", "line1RW", "line2LW", "line2C", "line2RW", "line3LW", "line3C", "line3RW", "line4LW", "line4C", "line4RW"],
+      defenseLines: ["defLine1LD", "defLine1RD", "defLine2LD", "defLine2RD", "defLine3LD", "defLine3RD"],
+      goalies: ["starter", "backup"]
+    };
 
-// Assign forwards
+    // Assign forwards
     positions.forwardLines.forEach((position, idx) => {
       const posType = getPositionForLine(idx); // LW, C, RW
-      const rankedPlayers = rankPlayersForPosition(players, posType);
-      if (rankedPlayers.length > 0) {
-        const bestPlayer = rankedPlayers[0];
+      const availablePlayers = rankPlayersForPosition(players, posType).filter(player => !usedPlayers.has(player.id));
+      if (availablePlayers.length > 0) {
+        const bestPlayer = availablePlayers[0];
         document.getElementById(position).value = bestPlayer.id;
         bestPlayer.lineAssigned = true; // Mark as assigned
+        usedPlayers.add(bestPlayer.id); // Mark player as used
       }
     });
 
     // Assign defense
     positions.defenseLines.forEach((position, idx) => {
       const posType = idx % 2 === 0 ? "LD" : "RD";
-      const rankedPlayers = rankPlayersForPosition(players, posType);
-      if (rankedPlayers.length > 0) {
-        const bestPlayer = rankedPlayers[0];
+      const availablePlayers = rankPlayersForPosition(players, posType).filter(player => !usedPlayers.has(player.id));
+      if (availablePlayers.length > 0) {
+        const bestPlayer = availablePlayers[0];
         document.getElementById(position).value = bestPlayer.id;
         bestPlayer.lineAssigned = true; // Mark as assigned
+        usedPlayers.add(bestPlayer.id); // Mark player as used
       }
     });
 
     // Assign goalies
     positions.goalies.forEach((position, idx) => {
       const posType = idx === 0 ? "Starter" : "Backup";
-      const rankedPlayers = rankPlayersForPosition(players, posType);
-      if (rankedPlayers.length > 0) {
-        const bestPlayer = rankedPlayers[0];
+      const availablePlayers = rankPlayersForPosition(players, posType).filter(player => !usedPlayers.has(player.id));
+      if (availablePlayers.length > 0) {
+        const bestPlayer = availablePlayers[0];
         document.getElementById(position).value = bestPlayer.id;
         bestPlayer.lineAssigned = true; // Mark as assigned
+        usedPlayers.add(bestPlayer.id); // Mark player as used
       }
     });
 
