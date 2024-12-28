@@ -1,3 +1,5 @@
+let teams = JSON.parse(localStorage.getItem("teams"));
+
 // Function to populate lines for a given team
 function populateLines(team) {
   const teamName = team.name.toLowerCase();
@@ -102,9 +104,6 @@ function saveTeamsToLocalStorage() {
   const teams = JSON.parse(localStorage.getItem("teams"));
   localStorage.setItem("teams", JSON.stringify(teams));
 }
-
-// Ensure the teams are loaded from localStorage
-const teams = JSON.parse(localStorage.getItem("teams"));
 
 // Populate lines for each team
 teams.forEach(team => populateLines(team));
