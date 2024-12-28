@@ -108,7 +108,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
         return;
     }
 
-    // Ensure the player is assigned to the team
+    // Ensure the player is assigned to the correct team
     if (playerData.team !== teamName) {
         console.log(`${playerData.name} is not assigned to ${teamName}.`);
         return; // Player is not on the correct team, do not assign
@@ -120,8 +120,9 @@ function onLineDrop(event, teamName, lineIndex, position) {
         return; // Player's position doesn't match the drop zone
     }
 
-    // Check if the position is available on the line
+    // Check if the position is already filled in the line
     const line = team.lines.forwardLines[lineIndex];  // For forward lines
+    
     if (line[position]) {
         console.log(`${position} on ${teamName} Line ${lineIndex + 1} is already occupied.`);
         return; // Position is already filled, don't allow assignment
@@ -129,6 +130,8 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Assign player to the correct position
     line[position] = playerData.name;  // Assign player by name
+
+    // Set the player's lineAssigned property to reflect their position
     playerData.lineAssigned = position;
 
     saveTeamsToLocalStorage(); // Save updated teams to localStorage
@@ -196,11 +199,11 @@ function createLineSection(title, lines, team) {
             playerElement.setAttribute("ondrop", `onLineDrop(event, '${team.name}', ${index}, '${position}')`);
             playerElement.setAttribute("ondragover", "allowDrop(event)");
 
-            // If a player is assigned to this position, display their name
+            // Add validation for correct position
             if (player) {
                 playerElement.textContent = player;
             } else {
-                playerElement.textContent = `Drag ${position} here`;  // If no player assigned, show a message
+                playerElement.textContent = `Drag ${position} here`;  // Show message if no player assigned
             }
 
             lineContainer.appendChild(playerElement);
