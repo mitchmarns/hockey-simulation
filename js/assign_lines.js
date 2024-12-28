@@ -22,10 +22,19 @@ function populateLines(team) {
       RW: ${RW ? RW.name : 'N/A'}
     `;
     
-    // Mark players as assigned
-    if (LW) assignedPlayers.add(LW.name);
-    if (C) assignedPlayers.add(C.name);
-    if (RW) assignedPlayers.add(RW.name);
+    // Update the team's lines data in memory
+    if (LW) {
+      assignedPlayers.add(LW.name);
+      team.lines.forwardLines[index].LW = LW.name; // Save the player name in the line data
+    }
+    if (C) {
+      assignedPlayers.add(C.name);
+      team.lines.forwardLines[index].C = C.name; // Save the player name in the line data
+    }
+    if (RW) {
+      assignedPlayers.add(RW.name);
+      team.lines.forwardLines[index].RW = RW.name; // Save the player name in the line data
+    }
 
     forwardLinesContainer.appendChild(lineElement);
   });
@@ -48,8 +57,14 @@ function populateLines(team) {
     `;
     
     // Mark players as assigned
-    if (LD) assignedPlayers.add(LD.name);
-    if (RD) assignedPlayers.add(RD.name);
+    if (LD) {
+      assignedPlayers.add(LD.name);
+      team.lines.defenseLines[index].LD = LD.name; // Save the player name in the line data
+    }
+    if (RD) {
+      assignedPlayers.add(RD.name);
+      team.lines.defenseLines[index].RD = RD.name; // Save the player name in the line data
+    }
 
     defenseLinesContainer.appendChild(lineElement);
   });
@@ -67,10 +82,26 @@ function populateLines(team) {
   `;
   
   // Mark goalies as assigned
-  if (starter) assignedPlayers.add(starter.name);
-  if (backup) assignedPlayers.add(backup.name);
+  if (starter) {
+    assignedPlayers.add(starter.name);
+    team.lines.goalies.starter = starter.name; // Save the starter player name in the team data
+  }
+  if (backup) {
+    assignedPlayers.add(backup.name);
+    team.lines.goalies.backup = backup.name; // Save the backup player name in the team data
+  }
 
   goalieContainer.appendChild(goalieElement);
+}
+
+// Save the updated team lineup to localStorage
+  saveTeamsToLocalStorage();
+}
+
+// Function to save the teams data back to localStorage
+function saveTeamsToLocalStorage() {
+  const teams = JSON.parse(localStorage.getItem("teams"));
+  localStorage.setItem("teams", JSON.stringify(teams));
 }
 
 // Ensure the teams are loaded from localStorage
