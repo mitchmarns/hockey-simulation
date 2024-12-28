@@ -8,26 +8,18 @@
 </head>
 <body>
     <h1>Assign Players to Lines</h1>
+    
+    <label for="teamSelect">Select Team:</label>
+    <select id="teamSelect">
+        <option value="">--Select Team--</option>
+    </select>
 
-    <div id="teamSelection">
-        <label for="teamSelect">Select Team:</label>
-        <select id="teamSelect" onchange="loadPlayers()">
-            <option value="">Choose a team</option>
-            <option value="Rangers">Rangers</option>
-            <option value="Devils">Devils</option>
-            <option value="Islanders">Islanders</option>
-            <option value="Sabres">Sabres</option>
-        </select>
-    </div>
+    <h2>Players</h2>
+    <div id="playerList"></div>
 
-    <div id="playerList" class="team-players">
-        <!-- Player list will be loaded here dynamically -->
-    </div>
+    <h2>Assign Lines</h2>
+    <div id="lineAssignment"></div>
 
-    <div id="lineAssignment">
-        <h3>Assign to Lines</h3>
-        <!-- Line assignment sections will be dynamically added here -->
-    </div>
 
         <script src="../js/assign_lines.js"></script>
 </body>
