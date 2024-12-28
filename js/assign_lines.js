@@ -139,6 +139,8 @@ function handleDrop(event, teamName, lineIndex, position) {
   saveTeamsToLocalStorage();  // Save updated team after handling drop
 }
 
+loadTeamsFromLocalStorage();
+
 // Populate lines for each team
 let teams = JSON.parse(localStorage.getItem("teams"));
 teams.forEach(team => populateLines(team));
