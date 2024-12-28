@@ -117,6 +117,11 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Update the drop zone to show the player's image and name
     const player = allPlayers.find(p => p.name === playerName);
+    if (!player) {
+        console.log("Player not found:", playerName);
+        return;
+    }
+    
     const playerCard = createElement("div", { className: "player-card" });
 
     const img = document.createElement("img");
