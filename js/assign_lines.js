@@ -1,59 +1,47 @@
-// assign_lines.js
-
 document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem('teamsData') === null) {
-        // Sample data structure if teams data doesn't exist in localStorage
-        const teamsData = {
-            "Rangers": [
-                { id: 1, name: "Player 1", position: "LW" },
-                { id: 2, name: "Player 2", position: "C" },
-                { id: 3, name: "Player 3", position: "RW" }
-            ],
-            "Devils": [
-                { id: 4, name: "Player 4", position: "LW" },
-                { id: 5, name: "Player 5", position: "C" },
-                { id: 6, name: "Player 6", position: "RW" }
-            ],
-            "Islanders": [
-                { id: 7, name: "Player 7", position: "LW" },
-                { id: 8, name: "Player 8", position: "C" },
-                { id: 9, name: "Player 9", position: "RW" }
-            ],
-            "Sabres": [
-                { id: 10, name: "Player 10", position: "LW" },
-                { id: 11, name: "Player 11", position: "C" },
-                { id: 12, name: "Player 12", position: "RW" }
-            ]
-        };
-        localStorage.setItem('teamsData', JSON.stringify(teamsData));
+    // Check if the teams data exists in localStorage
+    if (localStorage.getItem('teams') === null) {
+        console.log("No teams data found in localStorage.");
+        return;
     }
+
+    // Load the teams data from localStorage
+    const teams = JSON.parse(localStorage.getItem('teams'));
+
+    const teamSelect = document.getElementById('teamSelect');
+
+    // Populate the team select dropdown with team names
+    Object.keys(teams).forEach(teamName => {
+        const option = document.createElement('option');
+        option.value = teamName;
+        option.textContent = teamName;
+        teamSelect.appendChild(option);
+    });
+
+    // Load the players when a team is selected
+    teamSelect.addEventListener('change', function () {
+        loadPlayers(teams);
+    });
 });
 
-function loadPlayers() {
+function loadPlayers(teams) {
     const teamSelect = document.getElementById('teamSelect');
     const selectedTeam = teamSelect.value;
-    const teamsData = JSON.parse(localStorage.getItem('teamsData'));
+    const players = teams[selectedTeam].players;
 
-    if (selectedTeam) {
-        const players = teamsData[selectedTeam];
+    const playerList = document.getElementById('playerList');
+    playerList.innerHTML = ''; // Clear the previous list of players
 
-        // Clear previous player list
-        const playerList = document.getElementById('playerList');
-        playerList.innerHTML = '';
-
-        // Create a list of players for assignment
-        players.forEach(player => {
-            const playerCard = document.createElement('div');
-            playerCard.classList.add('player-card');
-            playerCard.innerHTML = `
-                <p>${player.name} - ${player.position}</p>
-                <button onclick="assignPlayer('${selectedTeam}', ${player.id})">Assign to Line</button>
-            `;
-            playerList.appendChild(playerCard);
-        });
-
-        loadLineAssignments(selectedTeam, players);
-    }
+    // Display players for the selected team
+    players.forEach(player => {
+        const playerCard = document.createElement('div');
+        playerCard.classList.add('player-card');
+        playerCard.innerHTML = `
+            <p>${player.name} - ${player.position}</p>
+            <button onclick="assignPlayer('${selectedTeam}', ${player.id})">Assign to Line</button>
+        `;
+        playerList.appendChild(playerCard);
+    });
 }
 
 function loadLineAssignments(team, players) {
@@ -109,8 +97,8 @@ function loadLineAssignments(team, players) {
 }
 
 function assignPlayer(team, playerId) {
-    const teamsData = JSON.parse(localStorage.getItem('teamsData'));
-    const player = teamsData[team].find(p => p.id === playerId);
+    const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
+    const player = teams[team].players.find(p => p.id === playerId);
 
     // Store the player's line assignment here
     console.log(`Assigned ${player.name} to a line for ${team}`);
@@ -121,8 +109,8 @@ function assignToLine(team, lineType, lineIndex) {
     const playerId = lineSelect.value;
 
     if (playerId) {
-        const teamsData = JSON.parse(localStorage.getItem('teamsData'));
-        const player = teamsData[team].find(p => p.id === playerId);
+        const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
+        const player = teams[team].players.find(p => p.id === playerId);
         console.log(`Assigned ${player.name} to ${lineType} Line ${lineIndex + 1}`);
         // You can also store this information back into localStorage or update the UI accordingly
     }
