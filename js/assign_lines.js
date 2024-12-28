@@ -143,29 +143,33 @@ function renderLineSection(title, lines, team, type) {
         const lineContainer = createElement("div", { className: "line-container" });
 
         Object.keys(line).forEach(position => {
-            const player = line[position];
+            const playerName = line[position];
+
             const dropZone = createElement("div", {
                 className: "player-drop-zone",
-                textContent: player || `Drag ${position} here`,
+                textContent: playerName ? `${playerName}` : `Drag ${position} here`,
             });
 
-            // Add the correct drop logic to differentiate between forward, defense, and goalie positions
             dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
             dropZone.ondragover = allowDrop;
 
             // Add player cards with images if assigned
-            if (player) {
+            if (playerName) {
+                const player = allPlayers.find(p => p.name === playerName);
                 const playerCard = createElement("div", { className: "player-card" });
+
+                // Add image if it exists
                 const playerImage = createElement("img", {
-                    src: getPlayerImage(player), // Use player image from player data
-                    alt: `${player}'s Image`,
+                    src: player ? player.image : 'https://via.placeholder.com/50', // Default image if no player found
+                    alt: `${playerName}'s Image`,
                     className: "player-image"
                 });
-                const playerName = createElement("p", { textContent: player });
+
                 const playerPosition = createElement("p", { textContent: position });
+                const playerNameElement = createElement("p", { textContent: playerName });
 
                 playerCard.appendChild(playerImage);
-                playerCard.appendChild(playerName);
+                playerCard.appendChild(playerNameElement);
                 playerCard.appendChild(playerPosition);
 
                 dropZone.appendChild(playerCard);
