@@ -91,16 +91,21 @@ autoAssignBtn.addEventListener("click", () => {
     };
 
     // Rank all players for each position
-    const rankedForwards = rankPlayersForPosition(players, "LW").concat(rankPlayersForPosition(players, "C")).concat(rankPlayersForPosition(players, "RW"));
-    const rankedDefense = rankPlayersForPosition(players, "LD").concat(rankPlayersForPosition(players, "RD"));
-    const rankedGoalies = rankPlayersForPosition(players, "Starter").concat(rankPlayersForPosition(players, "Backup"));
+    const rankedForwards = rankPlayersForPosition(players, "LW")
+      .concat(rankPlayersForPosition(players, "C"))
+      .concat(rankPlayersForPosition(players, "RW"));
+    const rankedDefense = rankPlayersForPosition(players, "LD")
+      .concat(rankPlayersForPosition(players, "RD"));
+    const rankedGoalies = rankPlayersForPosition(players, "Starter")
+      .concat(rankPlayersForPosition(players, "Backup"));
+    
     const allRankedPlayers = [...rankedForwards, ...rankedDefense, ...rankedGoalies];
 
     // Assign players to the lines sequentially
     let lineIndex = 0;
     allRankedPlayers.forEach(player => {
       if (usedPlayers.has(player.id)) return; // Skip if already assigned
-    
+
       // Assign the player to the next available slot
       if (lineIndex < positions.forwardLines.length) {
         document.getElementById(positions.forwardLines[lineIndex]).value = player.id;
@@ -109,12 +114,15 @@ autoAssignBtn.addEventListener("click", () => {
       } else {
         document.getElementById(positions.goalies[lineIndex - positions.forwardLines.length - positions.defenseLines.length]).value = player.id;
       }
-    
+
       usedPlayers.add(player.id); // Mark the player as used
       lineIndex++; // Move to the next line position
     });
 
     console.log("Auto-assigned players for", selectedTeam);
+
+    // Ensure that players are populated in dropdowns after assignment
+    populatePlayerOptions(players, selectedTeam);
   }
 });
 
