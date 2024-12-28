@@ -6,16 +6,22 @@ function loadFromLocalStorage() {
     const savedTeams = localStorage.getItem("teams");
     const savedPlayers = localStorage.getItem("players");
 
-    if (savedTeams && savedPlayers) {
+    if (savedTeams) {
         teams = JSON.parse(savedTeams);
-        players = JSON.parse(savedPlayers);
-        console.log("Loaded teams and players from localStorage.");
-        renderAssignedPlayers();
-        renderTeamLines(); // Render lines after data is loaded
+        console.log("Loaded teams from localStorage.");
     } else {
-        console.log("No data in localStorage, will load from JSON files.");
-        loadDataFromJSON(); // Load data from JSON if localStorage is empty
+        console.log("No teams data found in localStorage.");
     }
+
+    if (savedPlayers) {
+        players = JSON.parse(savedPlayers);
+        console.log("Loaded players from localStorage.");
+    } else {
+        console.log("No players data found in localStorage.");
+    }
+
+    renderAssignedPlayers();
+    renderTeamLines(); // Render lines after data is loaded
 }
 
 // Fetch players and teams data from JSON files
@@ -51,12 +57,17 @@ function renderAssignedPlayers() {
     playersList.innerHTML = '';  // Clear existing list
 
     // Log the players to check if the team and lineAssigned properties are correctly set
-    console.log("All Players: ", players);
+    console.log("Teams in localStorage: ", teams);
 
     // Filter players who are assigned to a team but not yet assigned to a line
-    const unassignedPlayers = players.filter(player => 
-        player.team && player.lineAssigned === null // Assigned to a team but no line assigned
-    );
+    const unassignedPlayers = [];
+    teams.forEach(team => {
+        team.players.forEach(player => {
+            if (player.lineAssigned === null) {  // No line assigned
+                unassignedPlayers.push(player);
+            }
+        });
+    });
 
     // Log the filtered players
     console.log("Unassigned Players: ", unassignedPlayers);
