@@ -122,11 +122,6 @@ function handleDrop(event, teamName, lineIndex, position) {
   saveTeamsToLocalStorage();  // Save updated team after handling drop
 }
 
-// Function to save the teams data back to localStorage
-function saveTeamsToLocalStorage() {
-  localStorage.setItem("teams", JSON.stringify(teams));  // Save directly from the in-memory 'teams' variable
-}
-
 // Populate lines for each team
 teams.forEach(team => populateLines(team));
 
