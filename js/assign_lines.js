@@ -1,149 +1,127 @@
-function loadTeamsFromLocalStorage() {
-  const savedTeams = localStorage.getItem('teams');
-  if (savedTeams) {
-    // Parse the teams and assign it back to the teams variable
-    teams = JSON.parse(savedTeams);
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const teamSelect = document.getElementById("teamSelect");
+  const saveLinesBtn = document.getElementById("saveLinesBtn");
 
-// Function to save the teams data back to localStorage
-function saveTeamsToLocalStorage() {
-  localStorage.setItem("teams", JSON.stringify(teams));  // Save directly from the in-memory 'teams' variable
-}
+  // Fetch players data from players.json
+  fetch('data/players.json')
+    .then(response => response.json())
+    .then(data => {
+      const players = data.players;
+      
+      teamSelect.addEventListener("change", () => {
+        const selectedTeam = teamSelect.value;
+        populatePlayerOptions(players, selectedTeam);
+      });
 
-// Function to handle saving the team lines (triggered by the Save button)
-function saveTeamLines() {
-  saveTeamsToLocalStorage();  // Save teams to localStorage
-  alert("Team lines have been saved!");  // Alert message confirming save
-}
+      // Handle saving line assignments
+      saveLinesBtn.addEventListener("click", () => {
+        const team = teamSelect.value;
+        const lineAssignments = {
+          team: team,
+          forwardLines: {
+            line1: {
+              LW: document.getElementById("line1LW").value,
+              C: document.getElementById("line1C").value,
+              RW: document.getElementById("line1RW").value
+            },
+            line2: {
+              LW: document.getElementById("line2LW").value,
+              C: document.getElementById("line2C").value,
+              RW: document.getElementById("line2RW").value
+            },
+            line3: {
+              LW: document.getElementById("line3LW").value,
+              C: document.getElementById("line3C").value,
+              RW: document.getElementById("line3RW").value
+            },
+            line4: {
+              LW: document.getElementById("line4LW").value,
+              C: document.getElementById("line4C").value,
+              RW: document.getElementById("line4RW").value
+            }
+          },
+          defenseLines: {
+            defLine1: {
+              LD: document.getElementById("defLine1LD").value,
+              RD: document.getElementById("defLine1RD").value
+            },
+            defLine2: {
+              LD: document.getElementById("defLine2LD").value,
+              RD: document.getElementById("defLine2RD").value
+            },
+            defLine3: {
+              LD: document.getElementById("defLine3LD").value,
+              RD: document.getElementById("defLine3RD").value
+            }
+          },
+          goalies: {
+            starter: document.getElementById("starter").value,
+            backup: document.getElementById("backup").value
+          }
+        };
 
-// Populate lines for a given team
-function populateLines(team) {
-  const teamName = team.name.toLowerCase();
-  let assignedPlayers = new Set(); // Track assigned players for this team
+        // Save line assignments (you can use localStorage or any other method)
+        console.log("Line Assignments Saved:", lineAssignments);
+      });
 
-  // Forward Lines
-  const forwardLinesContainer = document.getElementById(`${teamName}-forward-lines`);
-  team.lines.forwardLines.forEach((line, index) => {
-    const lineElement = document.createElement('div');
-    lineElement.classList.add('line');
-    lineElement.setAttribute('draggable', true);
-    lineElement.setAttribute('data-line-index', index);  // Store the line index in the element
-    lineElement.addEventListener('dragstart', handleDragStart);  // Add dragstart event listener
+      // Function to populate player options based on team
+      function populatePlayerOptions(players, team) {
+        const forwardPositions = ["LW", "C", "RW"];
+        const defensePositions = ["LD", "RD"];
+        
+        const lineSelectors = [
+          "line1LW", "line1C", "line1RW", 
+          "line2LW", "line2C", "line2RW", 
+          "line3LW", "line3C", "line3RW", 
+          "line4LW", "line4C", "line4RW", 
+          "defLine1LD", "defLine1RD", 
+          "defLine2LD", "defLine2RD", 
+          "defLine3LD", "defLine3RD", 
+          "starter", "backup"
+        ];
 
-    // Assign players to the line, ensuring no duplicate assignments
-    const LW = team.players.find(player => player.position === 'LW' && player.team === team.name && !assignedPlayers.has(player.name));
-    const C = team.players.find(player => player.position === 'C' && player.team === team.name && !assignedPlayers.has(player.name));
-    const RW = team.players.find(player => player.position === 'RW' && player.team === team.name && !assignedPlayers.has(player.name));
+        // Clear all select options first
+        lineSelectors.forEach(selector => {
+          const selectElement = document.getElementById(selector);
+          selectElement.innerHTML = "";  // Clear options
+        });
 
-    // Assign players to the line if available, otherwise use 'N/A'
-    lineElement.innerHTML = `
-      <strong>Line ${index + 1}:</strong> 
-      LW: ${LW ? LW.name : 'N/A'} | 
-      C: ${C ? C.name : 'N/A'} | 
-      RW: ${RW ? RW.name : 'N/A'}
-    `;
-    
-    // Update the team's lines data in memory
-    if (LW) {
-      assignedPlayers.add(LW.name);
-      team.lines.forwardLines[index].LW = LW.name; // Save the player name in the line data
-    }
-    if (C) {
-      assignedPlayers.add(C.name);
-      team.lines.forwardLines[index].C = C.name; // Save the player name in the line data
-    }
-    if (RW) {
-      assignedPlayers.add(RW.name);
-      team.lines.forwardLines[index].RW = RW.name; // Save the player name in the line data
-    }
+        players.forEach(player => {
+          if (player.team === team || player.team === null) { // Filter by team
+            forwardPositions.forEach(position => {
+              if (player.position === position) {
+                const option = document.createElement("option");
+                option.value = player.id;
+                option.text = player.name;
+                document.getElementById(`line1${position}`).appendChild(option);
+                document.getElementById(`line2${position}`).appendChild(option.cloneNode(true));
+                document.getElementById(`line3${position}`).appendChild(option.cloneNode(true));
+                document.getElementById(`line4${position}`).appendChild(option.cloneNode(true));
+              }
+            });
 
-    forwardLinesContainer.appendChild(lineElement);
-  });
+            defensePositions.forEach(position => {
+              if (player.position === position) {
+                const option = document.createElement("option");
+                option.value = player.id;
+                option.text = player.name;
+                document.getElementById(`defLine1${position}`).appendChild(option);
+                document.getElementById(`defLine2${position}`).appendChild(option.cloneNode(true));
+                document.getElementById(`defLine3${position}`).appendChild(option.cloneNode(true));
+              }
+            });
 
-  // Defense Lines
-  const defenseLinesContainer = document.getElementById(`${teamName}-defense-lines`);
-  team.lines.defenseLines.forEach((line, index) => {
-    const lineElement = document.createElement('div');
-    lineElement.classList.add('line');
-    lineElement.setAttribute('draggable', true);
-    lineElement.setAttribute('data-line-index', index);  // Store the line index in the element
-    lineElement.addEventListener('dragstart', handleDragStart);  // Add dragstart event listener
-
-    // Assign players to the defense line, ensuring no duplicate assignments
-    const LD = team.players.find(player => player.position === 'LD' && player.team === team.name && !assignedPlayers.has(player.name));
-    const RD = team.players.find(player => player.position === 'RD' && player.team === team.name && !assignedPlayers.has(player.name));
-
-    // Assign players to the line if available, otherwise use 'N/A'
-    lineElement.innerHTML = `
-      <strong>Line ${index + 1}:</strong> 
-      LD: ${LD ? LD.name : 'N/A'} | 
-      RD: ${RD ? RD.name : 'N/A'}
-    `;
-    
-    // Mark players as assigned
-    if (LD) {
-      assignedPlayers.add(LD.name);
-      team.lines.defenseLines[index].LD = LD.name; // Save the player name in the line data
-    }
-    if (RD) {
-      assignedPlayers.add(RD.name);
-      team.lines.defenseLines[index].RD = RD.name; // Save the player name in the line data
-    }
-
-    defenseLinesContainer.appendChild(lineElement);
-  });
-
-  // Goalies
-  const goalieContainer = document.getElementById(`${teamName}-goalie`);
-  const starter = team.players.find(player => player.position === 'starter' && player.team === team.name && !assignedPlayers.has(player.name));
-  const backup = team.players.find(player => player.position === 'backup' && player.team === team.name && !assignedPlayers.has(player.name));
-
-  const goalieElement = document.createElement('div');
-  goalieElement.classList.add('line');
-  goalieElement.setAttribute('draggable', true);
-  goalieElement.addEventListener('dragstart', handleDragStart); // Add dragstart event listener
-  goalieElement.innerHTML = `
-    Starter: ${starter ? starter.name : 'N/A'} | 
-    Backup: ${backup ? backup.name : 'N/A'}
-  `;
-  
-  // Mark goalies as assigned
-  if (starter) {
-    assignedPlayers.add(starter.name);
-    team.lines.goalies.starter = starter.name; // Save the starter player name in the team data
-  }
-  if (backup) {
-    assignedPlayers.add(backup.name);
-    team.lines.goalies.backup = backup.name; // Save the backup player name in the team data
-  }
-
-  goalieContainer.appendChild(goalieElement);
-
-  // Save the updated team lineup to localStorage
-  saveTeamsToLocalStorage();
-}
-
-// Handle dragstart event
-function handleDragStart(event) {
-  event.dataTransfer.setData('text/plain', event.target.getAttribute('data-line-index'));
-}
-
-// Handle drop event (on a target element)
-function handleDrop(event, teamName, lineIndex, position) {
-  const lineIndexToUpdate = event.dataTransfer.getData('text/plain');
-  const targetLine = document.querySelector(`#${teamName}-line-${lineIndex}`);
-
-  // Your logic for updating the lines goes here (e.g., swapping players or assigning them)
-
-  saveTeamsToLocalStorage();  // Save updated team after handling drop
-}
-
-loadTeamsFromLocalStorage();
-
-// Populate lines for each team
-let teams = JSON.parse(localStorage.getItem("teams"));
-teams.forEach(team => populateLines(team));
-
-// Event listener for the Save button
-document.getElementById("saveLinesBtn").addEventListener("click", saveTeamLines);
+            // Goalies
+            if (player.position === "Starter" || player.position === "Backup") {
+              const option = document.createElement("option");
+              option.value = player.id;
+              option.text = player.name;
+              document.getElementById("starter").appendChild(option);
+              document.getElementById("backup").appendChild(option.cloneNode(true));
+            }
+          }
+        });
+      }
+    })
+    .catch(err => console.error('Error loading player data:', err));
+});
