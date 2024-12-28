@@ -94,15 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     players.forEach(player => {
+    if (player.team === team || player.team === null) { // Filter by team
       forwardPositions.forEach(position => {
         if (player.position === position) {
           const option = document.createElement("option");
           option.value = player.id;
           option.text = player.name;
-          document.getElementById(`line1${position}`).appendChild(option);
-          document.getElementById(`line2${position}`).appendChild(option.cloneNode(true));
-          document.getElementById(`line3${position}`).appendChild(option.cloneNode(true));
-          document.getElementById(`line4${position}`).appendChild(option.cloneNode(true));
+          addOptionToLines(option, position);
         }
       });
 
@@ -111,9 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const option = document.createElement("option");
           option.value = player.id;
           option.text = player.name;
-          document.getElementById(`defLine1${position}`).appendChild(option);
-          document.getElementById(`defLine2${position}`).appendChild(option.cloneNode(true));
-          document.getElementById(`defLine3${position}`).appendChild(option.cloneNode(true));
+          addOptionToLines(option, position);
         }
       });
 
@@ -125,16 +121,39 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("starter").appendChild(option);
         document.getElementById("backup").appendChild(option.cloneNode(true));
       }
+    }
+  });
+
+  // Add "None" option to each dropdown if there are not enough players
+  lineSelectors.forEach(selector => {
+    const selectElement = document.getElementById(selector);
+    if (selectElement.options.length === 0) {
+      const noneOption = document.createElement("option");
+      noneOption.value = null;  // or "None"
+      noneOption.text = "None";
+      selectElement.appendChild(noneOption);
+    }
+  });
+}
+
+// Helper function to add player to the appropriate line dropdowns
+function addOptionToLines(option, position) {
+  const lineSelectors = {
+    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
+    "C": ["line1C", "line2C", "line3C", "line4C"],
+    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
+    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
+    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"]
+  };
+
+  // Add the player option to the respective line positions
+  if (lineSelectors[position]) {
+    lineSelectors[position].forEach(line => {
+      const lineElement = document.getElementById(line);
+      lineElement.appendChild(option.cloneNode(true));
     });
   }
-
-  // Ensure the team data is loaded and player options are populated
-  if (teams.length > 0) {
-    const defaultTeam = teams[0]; // Default to the first team if available
-    teamSelect.value = defaultTeam.name; // Set the default selection
-    populatePlayerOptions(defaultTeam.players, defaultTeam.name); // Populate player options for the first team
-  }
-});
+}
 
 // Function to load teams from localStorage
 function loadTeamsFromLocalStorage() {
