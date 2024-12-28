@@ -29,63 +29,70 @@ function saveTeamsToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
 }
 
-// Extract players assigned to teams
-function getAssignedPlayers() {
-    const assignedPlayerNames = [];
+// Parse the teams array from localStorage
+const teams = JSON.parse(localStorage.getItem("teams")) || [];
+
+// Extract players assigned to lines
+function getPlayersAssignedToLines() {
+    const assignedToLines = [];
 
     teams.forEach(team => {
-        // Add all players from forward lines
+        // Check forward lines
         team.lines.forwardLines.forEach(line => {
             Object.values(line).forEach(player => {
-                if (player) assignedPlayerNames.push(player);
+                if (player) assignedToLines.push(player);
             });
         });
 
-        // Add all players from defense lines
+        // Check defense lines
         team.lines.defenseLines.forEach(line => {
             Object.values(line).forEach(player => {
-                if (player) assignedPlayerNames.push(player);
+                if (player) assignedToLines.push(player);
             });
         });
 
-        // Add goalies
+        // Check goalies
         if (team.lines.goalies) {
             const { starter, backup } = team.lines.goalies;
-            if (starter) assignedPlayerNames.push(starter);
-            if (backup) assignedPlayerNames.push(backup);
+            if (starter) assignedToLines.push(starter);
+            if (backup) assignedToLines.push(backup);
         }
     });
 
-    return assignedPlayerNames;
+    return assignedToLines.map(player => player.name); // Return player names
 }
 
-// Get unassigned players
-function getUnassignedPlayers() {
-    const assignedPlayerNames = getAssignedPlayers();
+// Get players assigned to a team but not yet to a line
+function getUnassignedLinePlayers() {
+    const playersAssignedToLines = getPlayersAssignedToLines();
+    const playersAssignedToTeams = teams.flatMap(team =>
+        team.players.filter(player => player.assigned).map(player => player.name)
+    );
 
-    return allPlayers.filter(player => !assignedPlayerNames.includes(player.name));
+    // Players in a team but not yet in a line
+    return playersAssignedToTeams.filter(playerName => !playersAssignedToLines.includes(playerName));
 }
 
-// Render unassigned players
+// Render players assigned to a team but not yet to a line
 function renderUnassignedPlayers() {
     const playersList = document.getElementById("players-list");
-    playersList.innerHTML = ""; // Clear existing list
+    playersList.innerHTML = ""; // Clear the existing list
 
-    const unassignedPlayers = getUnassignedPlayers();
+    const unassignedLinePlayers = getUnassignedLinePlayers();
 
-    if (unassignedPlayers.length > 0) {
-        unassignedPlayers.forEach(player => {
+    if (unassignedLinePlayers.length > 0) {
+        unassignedLinePlayers.forEach(playerName => {
             const playerItem = document.createElement("li");
-            playerItem.textContent = player.name;
+            playerItem.textContent = playerName;
 
             playerItem.setAttribute("draggable", "true");
-            playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
+            playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, { name: playerName }));
 
             playersList.appendChild(playerItem);
         });
     } else {
         const noPlayersMessage = document.createElement("p");
-        noPlayersMessage.textContent = "All players are assigned to teams.";
+        noPlayersMessage.textContent = "All players are assigned to lines.";
         playersList.appendChild(noPlayersMessage);
     }
 }
