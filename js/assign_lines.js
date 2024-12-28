@@ -91,7 +91,7 @@ autoAssignBtn.addEventListener("click", () => {
 // Assign forwards
     positions.forwardLines.forEach((position, idx) => {
       const posType = getPositionForLine(idx); // LW, C, RW
-      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      const rankedPlayers = rankPlayersForPosition(players, posType);
       if (rankedPlayers.length > 0) {
         const bestPlayer = rankedPlayers[0];
         document.getElementById(position).value = bestPlayer.id;
@@ -102,7 +102,7 @@ autoAssignBtn.addEventListener("click", () => {
     // Assign defense
     positions.defenseLines.forEach((position, idx) => {
       const posType = idx % 2 === 0 ? "LD" : "RD";
-      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      const rankedPlayers = rankPlayersForPosition(players, posType);
       if (rankedPlayers.length > 0) {
         const bestPlayer = rankedPlayers[0];
         document.getElementById(position).value = bestPlayer.id;
@@ -113,7 +113,7 @@ autoAssignBtn.addEventListener("click", () => {
     // Assign goalies
     positions.goalies.forEach((position, idx) => {
       const posType = idx === 0 ? "Starter" : "Backup";
-      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      const rankedPlayers = rankPlayersForPosition(players, posType);
       if (rankedPlayers.length > 0) {
         const bestPlayer = rankedPlayers[0];
         document.getElementById(position).value = bestPlayer.id;
