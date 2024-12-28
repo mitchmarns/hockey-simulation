@@ -110,25 +110,13 @@ function loadLineAssignments(team, players) {
     lineAssignmentDiv.appendChild(goalieLineDiv);
 }
 
-function assignPlayer(teamName, playerId, lineIndex) {
-    if (lineIndex === undefined || isNaN(lineIndex)) {
-        console.error("lineIndex is not defined or invalid.");
-        return;
-    }
-    
-    const teamsData = localStorage.getItem('teams');
-    if (!teamsData) {
-        console.error("No teams data found in localStorage.");
-        return;
-    }
-
-    // Parse the JSON string into an array of teams
-    const teams = JSON.parse(teamsData);
-
-    // Find the team by name
+function assignPlayer(teamName, playerId, lineIndex = null) {
+    const teams = localStorage.getItem('teams');
     const team = teams.find(t => t.name === teamName);
+    const selectedPlayerId = parseInt(document.querySelector("#player-select").value, 10);
+
     if (!team) {
-        console.error(`Team not found: ${teamName}`);
+        console.error("Team not found!");
         return;
     }
 
@@ -139,25 +127,29 @@ function assignPlayer(teamName, playerId, lineIndex) {
         return;
     }
 
-    // Assign the player to the specified line and position
-    if (team.lines.forwardLines[lineIndex] && position in team.lines.forwardLines[lineIndex]) {
-        team.lines.forwardLines[lineIndex][position] = player.name; // Assign player's name
-    } else if (team.lines.defenseLines[lineIndex] && position in team.lines.defenseLines[lineIndex]) {
-        team.lines.defenseLines[lineIndex][position] = player.name;
-    } else if (team.lines.goalies && position in team.lines.goalies) {
-        team.lines.goalies[position] = player.name;
+    if (lineType === "goalies") {
+        // Handle goalie assignment
+        if (role === "starter" || role === "backup") {
+            team.lines.goalies[role] = player;
+        } else {
+            console.error("Invalid goalie role!");
+            return;
+        }
     } else {
-        console.error(`Invalid position or line index: ${position}, ${lineIndex}`);
-        return;
+        // Handle other line assignments
+        if (lineIndex === null || lineIndex < 0 || lineIndex >= team.lines[lineType].length) {
+            console.error("Invalid or missing lineIndex!");
+            return;
+        }
+
+        team.lines[lineType][lineIndex][role] = player;
     }
 
-    // Mark the player as assigned
     player.lineAssigned = true;
+    player.lineAssignments = { lineType, role, lineIndex };
 
-    // Save the updated teams array back to localStorage
-    localStorage.setItem('teams', JSON.stringify(teams));
-
-    console.log(`Assigned ${player.name} to ${teamName}, Line ${lineIndex + 1}, Position: ${position}`);
+    localStorage.setItem("teams", JSON.stringify(teams));
+    updateUI();
 }
 
 function assignToLine(team, lineType, lineIndex) {
