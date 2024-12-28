@@ -134,14 +134,32 @@ function assignPlayer(teamName, playerId) {
         return;
     }
 
-    // Mark the player as assigned (or perform your assignment logic)
-    player.lineAssigned = true; // Example: Update a property to indicate assignment
-    console.log(`Assigned player ${player.name} to a line in team ${teamName}`);
+    // Check if the position and lineIndex are valid
+    if (lineIndex < 0 || lineIndex >= team.lines.forwardLines.length) {
+        console.error(`Invalid line index: ${lineIndex}`);
+        return;
+    }
 
-    // Update localStorage with the modified data
+    // Assign the player to the specified line and position
+    if (position in team.lines.forwardLines[lineIndex]) {
+        team.lines.forwardLines[lineIndex][position] = player.name; // Assign player name or ID
+    } else if (position in team.lines.defenseLines[lineIndex]) {
+        team.lines.defenseLines[lineIndex][position] = player.name;
+    } else if (position in team.lines.goalies) {
+        team.lines.goalies[position] = player.name;
+    } else {
+        console.error(`Invalid position: ${position}`);
+        return;
+    }
+
+    // Mark the player as assigned
+    player.lineAssigned = true;
+
+    // Save the updated teams array back to localStorage
     localStorage.setItem('teams', JSON.stringify(teams));
-}
 
+    console.log(`Assigned ${player.name} to ${teamName}, Line ${lineIndex + 1}, Position: ${position}`);
+}
 function assignToLine(team, lineType, lineIndex) {
     const lineSelect = document.getElementById(`${lineType}Line${lineIndex}`);
     const playerId = lineSelect.value;
