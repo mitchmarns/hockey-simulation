@@ -92,7 +92,6 @@ function populateLines(team) {
   }
 
   goalieContainer.appendChild(goalieElement);
-}
 
 // Save the updated team lineup to localStorage
   saveTeamsToLocalStorage();
