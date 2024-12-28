@@ -10,6 +10,7 @@ function loadFromLocalStorage() {
         teams = JSON.parse(savedTeams);
         players = JSON.parse(savedPlayers);
         console.log("Loaded teams and players from localStorage.");
+        renderAssignedPlayers();
         renderTeamLines(); // Render lines after data is loaded
     } else {
         console.log("No data in localStorage, will load from JSON files.");
@@ -49,15 +50,20 @@ function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ''; // Clear existing list
 
-    players.forEach(player => {
-        const playerItem = document.createElement("li");
-        playerItem.textContent = player.name;
+    if (players && players.length > 0) {
+        players.forEach(player => {
+            const playerItem = document.createElement("li");
+            playerItem.textContent = player.name;
+            playerItem.setAttribute("draggable", "true");
+            playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
 
-        playerItem.setAttribute("draggable", "true");
-        playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, player));
-
-        playersList.appendChild(playerItem);
-    });
+            playersList.appendChild(playerItem);
+        });
+    } else {
+        const noPlayersMessage = document.createElement("p");
+        noPlayersMessage.textContent = "No unassigned players found.";
+        playersList.appendChild(noPlayersMessage);
+    }
 }
 
 // Handle drag start event for a player
