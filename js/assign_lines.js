@@ -58,7 +58,7 @@ function loadPlayers(teams) {
     loadLineAssignments(selectedTeamName, players); // Call to load the lines
 }
 
-function loadLineAssignments(team, players) {
+function loadLineAssignments(teamName, players) {
     const lineAssignmentDiv = document.getElementById('lineAssignment');
     lineAssignmentDiv.innerHTML = ''; // Clear previous line assignments
 
@@ -74,7 +74,7 @@ function loadLineAssignments(team, players) {
         forwardLineDiv.classList.add('line');
         forwardLineDiv.innerHTML = `
             <label for="forwardLine${i}">Forward Line ${i + 1}</label>
-            <select id="forwardLine${i}" onchange="assignToLine('${team}', 'Forward', ${i})">
+            <select id="forwardLine${i}" onchange="assignToLine('${teamName}', 'Forward', ${i})">
                 <option value="">Select Forward Line ${i + 1}</option>
                 ${forwardLine.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
             </select>
@@ -89,7 +89,7 @@ function loadLineAssignments(team, players) {
         defenseLineDiv.classList.add('line');
         defenseLineDiv.innerHTML = `
             <label for="defenseLine${i}">Defense Line ${i + 1}</label>
-            <select id="defenseLine${i}" onchange="assignToLine('${team}', 'Defense', ${i})">
+            <select id="defenseLine${i}" onchange="assignToLine('${teamName}', 'Defense', ${i})">
                 <option value="">Select Defense Line ${i + 1}</option>
                 ${defenseLine.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
             </select>
@@ -102,7 +102,7 @@ function loadLineAssignments(team, players) {
     goalieLineDiv.classList.add('line');
     goalieLineDiv.innerHTML = `
         <label for="goalieLine">Goalie Line</label>
-        <select id="goalieLine" onchange="assignToLine('${team}', 'Goalie')">
+        <select id="goalieLine" onchange="assignToLine('${teamName}', 'Goalie')">
             <option value="">Select Goalie</option>
             ${goalies.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
         </select>
@@ -111,10 +111,9 @@ function loadLineAssignments(team, players) {
 }
 
 function assignPlayer(teamName, playerId, lineIndex = null) {
-    const teams = localStorage.getItem('teams');
+    const teams = JSON.parse(localStorage.getItem('teams'));
     const team = teams.find(t => t.name === teamName);
-    const selectedPlayerId = parseInt(document.querySelector("#player-select").value, 10);
-
+    
     if (!team) {
         console.error("Team not found!");
         return;
@@ -127,39 +126,34 @@ function assignPlayer(teamName, playerId, lineIndex = null) {
         return;
     }
 
-    if (lineType === "goalies") {
-        // Handle goalie assignment
-        if (role === "starter" || role === "backup") {
-            team.lines.goalies[role] = player;
-        } else {
-            console.error("Invalid goalie role!");
-            return;
-        }
+    // Example logic for assigning to lines (ensure to define lineType and role clearly)
+    if (lineIndex === null) {
+        // Assign to a goalie line or another line type here based on your role and line type logic
     } else {
-        // Handle other line assignments
-        if (lineIndex === null || lineIndex < 0 || lineIndex >= team.lines[lineType].length) {
-            console.error("Invalid or missing lineIndex!");
-            return;
-        }
-
-        team.lines[lineType][lineIndex][role] = player;
+        // Assign to specific line (e.g., Forward, Defense)
     }
 
     player.lineAssigned = true;
-    player.lineAssignments = { lineType, role, lineIndex };
-
     localStorage.setItem("teams", JSON.stringify(teams));
     updateUI();
 }
 
-function assignToLine(team, lineType, lineIndex) {
+function assignToLine(teamName, lineType, lineIndex) {
     const lineSelect = document.getElementById(`${lineType}Line${lineIndex}`);
     const playerId = lineSelect.value;
 
     if (playerId) {
-        const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
-        const player = teams[team].find(p => p.id === playerId);
+        const teams = JSON.parse(localStorage.getItem('teams'));  // Parse teams data
+        const team = teams.find(t => t.name === teamName);
+        const player = team.players.find(p => p.id === parseInt(playerId));
+
         console.log(`Assigned ${player.name} to ${lineType} Line ${lineIndex + 1}`);
-        // You can also store this information back into localStorage or update the UI accordingly
+
+        // Store or update the line assignment as needed
+        // You can also store this back into localStorage or update the UI accordingly
     }
+}
+
+function updateUI() {
+    // Any necessary UI updates after line assignment or player assignment
 }
