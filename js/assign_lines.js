@@ -122,18 +122,29 @@ function renderAssignedPlayers() {
 
 
 // Handle drag start
-function onPlayerDragStart(event, playerName) {
-    event.dataTransfer.setData("playerName", playerName);
-}
-
-// Handle dropping a player onto a line
 function onLineDrop(event, teamName, lineIndex, position) {
     event.preventDefault();
 
     const playerName = event.dataTransfer.getData("playerName");
+
+    // Debugging: Log the teamName and playerName
+    console.log("Dropped player:", playerName);
+    console.log("Team Name:", teamName);
+
+    // Find the team in the teams array
     const team = teams.find(t => t.name === teamName);
+    // Find the player in the allPlayers array
     const player = allPlayers.find(p => p.name === playerName);
 
+    // Debugging: Log whether the team and player were found
+    if (!team) {
+        console.log("Team not found:", teamName);
+    }
+    if (!player) {
+        console.log("Player not found:", playerName);
+    }
+
+    // If either team or player is not found, return
     if (!team || !player) {
         console.log("Team or player not found.");
         return;
@@ -142,7 +153,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
     let line;
     let lineContainer;
 
-    // Determine line type
+    // Determine line type (forward, defense, goalie)
     if (position.includes('F')) {
         line = team.lines.forwardLines[lineIndex];
         lineContainer = document.getElementById(`${teamName}-forward-line-${lineIndex}-${position}`);
@@ -154,7 +165,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
         lineContainer = document.getElementById(`${teamName}-goalie-${position}`);
     }
 
-    // If the position is already occupied, return early
+    // If the position is already occupied, return
     if (line[position]) {
         console.log(`${position} on ${teamName} is already occupied.`);
         return;
@@ -162,20 +173,11 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Assign player to the line
     line[position] = playerName;
-    
-    // Update the player's team and assignment status
-    player.team = teamName;
-    player.assigned = true;
-
-    // Save the updated players to localStorage
-    saveToLocalStorage('players', allPlayers);
-
-    // Render updated lines
     updateTeams();
 
-    // Create and add the player card to the line
+    // Create player card and update the line container
     const playerCard = createPlayerCard(playerName, player.image, position);
-    lineContainer.innerHTML = ''; // Clear previous content
+    lineContainer.innerHTML = '';
     lineContainer.appendChild(playerCard);
 }
 
