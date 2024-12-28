@@ -88,40 +88,42 @@ autoAssignBtn.addEventListener("click", () => {
         goalies: ["starter", "backup"]
       };
 
-      const assignedPlayers = {
-        forwards: [],
-        defense: [],
-        goalies: []
-      };
+// Assign forwards
+    positions.forwardLines.forEach((position, idx) => {
+      const posType = getPositionForLine(idx); // LW, C, RW
+      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      if (rankedPlayers.length > 0) {
+        const bestPlayer = rankedPlayers[0];
+        document.getElementById(position).value = bestPlayer.id;
+        bestPlayer.lineAssigned = true; // Mark as assigned
+      }
+    });
 
-      // Auto assign players to forwards
-      positions.forwardLines.forEach((position, idx) => {
-        const player = players.find(p => !assignedPlayers.forwards.includes(p.id) && p.position === getPositionForLine(idx));
-        if (player) {
-          document.getElementById(position).value = player.id;
-          assignedPlayers.forwards.push(player.id);
-        }
-      });
+    // Assign defense
+    positions.defenseLines.forEach((position, idx) => {
+      const posType = idx % 2 === 0 ? "LD" : "RD";
+      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      if (rankedPlayers.length > 0) {
+        const bestPlayer = rankedPlayers[0];
+        document.getElementById(position).value = bestPlayer.id;
+        bestPlayer.lineAssigned = true; // Mark as assigned
+      }
+    });
 
-      // Auto assign players to defense
-      positions.defenseLines.forEach((position, idx) => {
-        const player = players.find(p => !assignedPlayers.defense.includes(p.id) && p.position === (idx % 2 === 0 ? "LD" : "RD"));
-        if (player) {
-          document.getElementById(position).value = player.id;
-          assignedPlayers.defense.push(player.id);
-        }
-      });
+    // Assign goalies
+    positions.goalies.forEach((position, idx) => {
+      const posType = idx === 0 ? "Starter" : "Backup";
+      const rankedPlayers = rankPlayersForPosition(availablePlayers, posType);
+      if (rankedPlayers.length > 0) {
+        const bestPlayer = rankedPlayers[0];
+        document.getElementById(position).value = bestPlayer.id;
+        bestPlayer.lineAssigned = true; // Mark as assigned
+      }
+    });
 
-      // Auto assign goalies
-      positions.goalies.forEach((position, idx) => {
-        const player = players.find(p => !assignedPlayers.goalies.includes(p.id) && (p.position === "Starter" || p.position === "Backup"));
-        if (player) {
-          document.getElementById(position).value = player.id;
-          assignedPlayers.goalies.push(player.id);
-        }
-      });
-    }
-  });
+    console.log("Auto-assigned players for", selectedTeam);
+  }
+});
 
   // Function to get position based on line index
   function getPositionForLine(idx) {
@@ -201,6 +203,27 @@ function populatePlayerOptions(players, team) {
       if (lineAssignments.goalies.backup) document.getElementById("backup").value = lineAssignments.goalies.backup;
     }
   }
+
+  function rankPlayersForPosition(players, position) {
+  return players
+    .map(player => {
+      const { skills } = player;
+      let score = 0;
+
+      if (position === "LW" || position === "RW") {
+        score = skills.speed * 0.4 + skills.shooting * 0.4 + skills.awareness * 0.2;
+      } else if (position === "C") {
+        score = skills.faceoffs * 0.5 + skills.passing * 0.3 + skills.awareness * 0.2;
+      } else if (position === "LD" || position === "RD") {
+        score = skills.defense * 0.5 + skills.strength * 0.3 + skills.shotBlocking * 0.2;
+      } else if (position === "Starter" || position === "Backup") {
+        score = skills.glove * 0.4 + skills.stick * 0.4 + skills.reactions * 0.2;
+      }
+
+      return { ...player, score };
+    })
+    .sort((a, b) => b.score - a.score); // Higher scores first
+}
 
   // Function to load teams from localStorage
   function loadTeamsFromLocalStorage() {
