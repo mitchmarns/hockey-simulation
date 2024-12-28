@@ -48,6 +48,15 @@ header p {
 }
 
 /* Players List Section */
+.player {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
 .players-list {
     margin-top: 20px;
 }
@@ -134,6 +143,56 @@ header p {
 }
 
 /* Team Line Assignment */
+.line {
+  margin-bottom: 20px;
+} 
+
+.line-assignment-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.line-slots {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.line-slot {
+  width: 120px;
+  height: 40px;
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.line-slot.slot-content {
+  background-color: #5dbb63;
+  color: white;
+}
+
+.line-slot img {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+}
+
+.injured {
+  opacity: 0.5;
+  background-color: #f2d0d0;
+}
+
+.healthy-scratch {
+  opacity: 0.6;
+  background-color: #e0e0e0;
+}
+
 #team-lines {
     display: flex;
     flex-wrap: wrap;
@@ -183,6 +242,11 @@ header p {
     cursor: pointer;
 }
 
+.available-players {
+  display: flex;
+  flex-direction: column;
+}
+
 .player-drop-zone {
     width: 80px;
     height: 100px;
@@ -230,6 +294,11 @@ header p {
 }
 
 /* Add styles for unassigned players list */
+#players {
+  flex: 1;
+  margin-right: 20px;
+}
+
 #players-list {
     list-style: none;
     padding: 0;
