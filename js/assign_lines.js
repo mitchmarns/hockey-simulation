@@ -134,18 +134,18 @@ function assignPlayer(teamName, playerId) {
         return;
     }
 
-    // Check if the position and lineIndex are valid
-    if (lineIndex < 0 || lineIndex >= team.lines.forwardLines.length) {
+    // Validate the position and lineIndex
+    if (typeof lineIndex !== 'number' || lineIndex < 0 || lineIndex >= team.lines.forwardLines.length) {
         console.error(`Invalid line index: ${lineIndex}`);
         return;
     }
 
     // Assign the player to the specified line and position
-    if (position in team.lines.forwardLines[lineIndex]) {
+    if (team.lines.forwardLines[lineIndex] && position in team.lines.forwardLines[lineIndex]) {
         team.lines.forwardLines[lineIndex][position] = player.name; // Assign player name or ID
-    } else if (position in team.lines.defenseLines[lineIndex]) {
+    } else if (team.lines.defenseLines[lineIndex] && position in team.lines.defenseLines[lineIndex]) {
         team.lines.defenseLines[lineIndex][position] = player.name;
-    } else if (position in team.lines.goalies) {
+    } else if (team.lines.goalies && position in team.lines.goalies) {
         team.lines.goalies[position] = player.name;
     } else {
         console.error(`Invalid position: ${position}`);
@@ -160,6 +160,7 @@ function assignPlayer(teamName, playerId) {
 
     console.log(`Assigned ${player.name} to ${teamName}, Line ${lineIndex + 1}, Position: ${position}`);
 }
+
 function assignToLine(team, lineType, lineIndex) {
     const lineSelect = document.getElementById(`${lineType}Line${lineIndex}`);
     const playerId = lineSelect.value;
