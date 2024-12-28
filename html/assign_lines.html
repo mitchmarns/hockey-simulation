@@ -1,30 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assign Lines</title>
-    <link rel="stylesheet" href="../css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hockey Line Assignment</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Assign Players to Lines</h1>
-    
-    <label for="teamSelect">Select Team:</label>
-    <select id="teamSelect">
-        <option value="">--Select Team--</option>
-    </select>
 
-    <h2>Players</h2>
-    <div id="playerList">
-         <div class="player-card">
-             <button onclick="assignPlayer('Rangers', 1, 'C', 0)">Assign to Line</button>
-         </div>
+  <div id="team">
+    <h1>Team: Rangers</h1>
+  </div>
+
+  <div class="line-assignment-container">
+    <div id="players" class="available-players">
+      <h2>Available Players</h2>
     </div>
 
-    <h2>Assign Lines</h2>
-    <div id="lineAssignment"></div>
+    <div class="line-slots">
+      <h2>Assign Players to Lines</h2>
 
+      <!-- Forward Lines -->
+      <div class="line" data-line="forwardLines-1">
+        <h3>Forward Line 1</h3>
+        <div class="line-slot" data-position="Rangers-forwardLines-1-LW">LW</div>
+        <div class="line-slot" data-position="Rangers-forwardLines-1-C">C</div>
+        <div class="line-slot" data-position="Rangers-forwardLines-1-RW">RW</div>
+      </div>
 
-        <script src="../js/assign_lines.js"></script>
+      <!-- Repeat for other lines -->
+      <div class="line" data-line="forwardLines-2">
+        <h3>Forward Line 2</h3>
+        <div class="line-slot" data-position="Rangers-forwardLines-2-LW">LW</div>
+        <div class="line-slot" data-position="Rangers-forwardLines-2-C">C</div>
+        <div class="line-slot" data-position="Rangers-forwardLines-2-RW">RW</div>
+      </div>
+
+      <!-- Goalies -->
+      <div class="line" data-line="goalies">
+        <h3>Goalies</h3>
+        <div class="line-slot" data-position="Rangers-goalies-Starter">Starter</div>
+        <div class="line-slot" data-position="Rangers-goalies-Backup">Backup</div>
+      </div>
+
+      <!-- Defense Lines -->
+      <div class="line" data-line="defenseLines-1">
+        <h3>Defense Line 1</h3>
+        <div class="line-slot" data-position="Rangers-defenseLines-1-LD">LD</div>
+        <div class="line-slot" data-position="Rangers-defenseLines-1-RD">RD</div>
+      </div>
+
+      <!-- Repeat for other defense lines -->
+      <div class="line" data-line="defenseLines-2">
+        <h3>Defense Line 2</h3>
+        <div class="line-slot" data-position="Rangers-defenseLines-2-LD">LD</div>
+        <div class="line-slot" data-position="Rangers-defenseLines-2-RD">RD</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/lines.js"></script>
 </body>
 </html>
