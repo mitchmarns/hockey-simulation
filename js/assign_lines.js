@@ -119,16 +119,17 @@ function onLineDrop(event, teamName, lineIndex, position) {
     const player = allPlayers.find(p => p.name === playerName);
     const playerCard = createElement("div", { className: "player-card" });
 
-    const playerImage = createElement("img", {
-        src: player ? player.image : 'https://via.placeholder.com/50',
-        alt: `${playerName}'s Image`,
-        className: "player-image"
-    });
+    const img = document.createElement("img");
+    img.src = player ? player.image : 'https://via.placeholder.com/50'; // Default image if no player found
+    img.alt = `${playerName}'s Image`;
+    img.className = "player-image";
 
-    const playerPosition = createElement("p", { textContent: position });
-    const playerNameElement = createElement("p", { textContent: playerName });
+    const playerPosition = document.createElement("p");
+    playerPosition.textContent = position;
+    const playerNameElement = document.createElement("p");
+    playerNameElement.textContent = playerName;
 
-    playerCard.appendChild(playerImage);
+    playerCard.appendChild(img);
     playerCard.appendChild(playerNameElement);
     playerCard.appendChild(playerPosition);
 
