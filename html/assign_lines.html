@@ -3,41 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Team Line Assignments</title>
+  <title>Assign Lines</title>
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-  <h1>Team Line Assignments</h1>
+  <h1>Assign Players to Lines</h1>
 
-  <button id="saveLinesBtn">Save Lines</button>
-
-  <div id="rangers-container">
-    <h2>Rangers</h2>
-    <div id="rangers-forward-lines"></div>
-    <div id="rangers-defense-lines"></div>
-    <div id="rangers-goalie"></div>
+  <!-- Team Selection -->
+  <div id="teamSelection">
+    <label for="teamSelect">Select a team:</label>
+    <select id="teamSelect">
+      <option value="Rangers">Rangers</option>
+      <option value="Devils">Devils</option>
+      <option value="Islanders">Islanders</option>
+      <option value="Sabres">Sabres</option>
+    </select>
   </div>
 
-  <div id="devils-container">
-    <h2>Devils</h2>
-    <div id="devils-forward-lines"></div>
-    <div id="devils-defense-lines"></div>
-    <div id="devils-goalie"></div>
+  <!-- Forward Line Assignments -->
+  <div id="forwardLines">
+    <h2>Forward Lines</h2>
+    <div id="line1">
+      <h3>Line 1</h3>
+      <select id="line1LW"></select>
+      <select id="line1C"></select>
+      <select id="line1RW"></select>
+    </div>
+    <div id="line2">
+      <h3>Line 2</h3>
+      <select id="line2LW"></select>
+      <select id="line2C"></select>
+      <select id="line2RW"></select>
+    </div>
+    <div id="line3">
+      <h3>Line 3</h3>
+      <select id="line3LW"></select>
+      <select id="line3C"></select>
+      <select id="line3RW"></select>
+    </div>
+    <div id="line4">
+      <h3>Line 4</h3>
+      <select id="line4LW"></select>
+      <select id="line4C"></select>
+      <select id="line4RW"></select>
+    </div>
   </div>
 
-  <div id="islanders-container">
-    <h2>Islanders</h2>
-    <div id="islanders-forward-lines"></div>
-    <div id="islanders-defense-lines"></div>
-    <div id="islanders-goalie"></div>
+  <!-- Defense Line Assignments -->
+  <div id="defenseLines">
+    <h2>Defense Lines</h2>
+    <div id="defLine1">
+      <h3>Line 1</h3>
+      <select id="defLine1LD"></select>
+      <select id="defLine1RD"></select>
+    </div>
+    <div id="defLine2">
+      <h3>Line 2</h3>
+      <select id="defLine2LD"></select>
+      <select id="defLine2RD"></select>
+    </div>
+    <div id="defLine3">
+      <h3>Line 3</h3>
+      <select id="defLine3LD"></select>
+      <select id="defLine3RD"></select>
+    </div>
   </div>
 
-  <div id="sabres-container">
-    <h2>Sabres</h2>
-    <div id="sabres-forward-lines"></div>
-    <div id="sabres-defense-lines"></div>
-    <div id="sabres-goalie"></div>
+  <!-- Goalie Assignment -->
+  <div id="goalieAssignment">
+    <h2>Goalies</h2>
+    <label for="starter">Starter:</label>
+    <select id="starter"></select>
+    <br>
+    <label for="backup">Backup:</label>
+    <select id="backup"></select>
   </div>
+
+  <!-- Save Button -->
+  <button id="saveLinesBtn">Save Line Assignments</button>
 
   <script src="../js/assign_lines.js"></script>
 </body>
