@@ -195,6 +195,8 @@ function renderLineSection(title, lines, team, type) {
                     className: "player-image"
                 });
 
+                console.log(playerImage);
+
                 const playerPosition = createElement("p", { textContent: position });
                 const playerNameElement = createElement("p", { textContent: playerName });
 
