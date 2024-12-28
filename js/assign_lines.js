@@ -215,8 +215,14 @@ function renderLineSection(title, lines, team, type) {
 
             if (playerName) {
                 const player = allPlayers.find(p => p.name === playerName);
-                dropZone.innerHTML = '';
-                dropZone.appendChild(createPlayerCard(playerName, player.image, position));
+            
+                if (player) {
+                    dropZone.innerHTML = '';
+                    dropZone.appendChild(createPlayerCard(playerName, player.image, position));
+                } else {
+                    console.warn(`Player not found in allPlayers: ${playerName}`);
+                    dropZone.textContent = `Player not found: ${playerName}`;
+                }
             }
 
             lineContainer.appendChild(dropZone);
