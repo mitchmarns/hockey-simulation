@@ -1,5 +1,7 @@
 let teams = [];
 let allPlayers = [];
+const normalizedPlayerName = playerName.trim().toLowerCase();
+const player = allPlayers.find(p => p.name.trim().toLowerCase() === normalizedPlayerName);
 
 // Utility function to get data from localStorage
 function getFromLocalStorage(key) {
