@@ -86,15 +86,15 @@ function onLineDrop(event, teamName, lineIndex, position) {
     }
 
     let line;
-    // Check which line (forward, defense, goalie) is being targeted
+    // Check which line (forward, defense, goalie) is being targeted based on the type of line
     if (position.includes('F')) {
-        // Forward Lines
+        // Forward Lines (Check if forward line)
         line = team.lines.forwardLines[lineIndex];
     } else if (position.includes('D')) {
-        // Defense Lines
+        // Defense Lines (Check if defense line)
         line = team.lines.defenseLines[lineIndex];
     } else if (position === 'starter' || position === 'backup') {
-        // Goalies
+        // Goalies (Check if it's goalie position)
         line = team.lines.goalies;
     }
 
@@ -149,6 +149,7 @@ function renderLineSection(title, lines, team, type) {
                 textContent: player || `Drag ${position} here`,
             });
 
+            // Add the correct drop logic to differentiate between forward, defense, and goalie positions
             dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
             dropZone.ondragover = allowDrop;
 
