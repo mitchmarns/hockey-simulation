@@ -131,34 +131,35 @@ autoAssignBtn.addEventListener("click", () => {
   }
 
   // Function to populate player options based on team
-  function populatePlayerOptions(players, team) {
-    const positions = {
-      "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
-      "C": ["line1C", "line2C", "line3C", "line4C"],
-      "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
-      "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
-      "Starter": ["starter"],
-      "Backup": ["backup"]
-    };
+function populatePlayerOptions(players, team) {
+  const positions = {
+    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
+    "C": ["line1C", "line2C", "line3C", "line4C"],
+    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
+    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
+    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
+    "Starter": ["starter"],
+    "Backup": ["backup"]
+  };
 
-    // Clear all select options first
-    Object.values(positions).flat().forEach(selector => {
-      const selectElement = document.getElementById(selector);
-      selectElement.innerHTML = "";  // Clear options
-    });
+  // Clear all select options first
+  Object.values(positions).flat().forEach(selector => {
+    const selectElement = document.getElementById(selector);
+    selectElement.innerHTML = ""; // Clear existing options
 
     // Always add the "None" option
     const noneOption = document.createElement("option");
-    noneOption.value = null;
+    noneOption.value = ""; // Use empty string for "None"
     noneOption.text = "None";
     selectElement.appendChild(noneOption);
   });
 
-    // Filter players by team and position
+  // Filter players by team and position
   const playersByPosition = {};
   Object.keys(positions).forEach(position => {
-    playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
+    playersByPosition[position] = players.filter(
+      player => player.position === position && (player.team === team || player.team === null)
+    );
   });
 
   // Populate the dropdowns for each position
