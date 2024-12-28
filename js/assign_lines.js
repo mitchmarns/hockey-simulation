@@ -116,6 +116,14 @@ autoAssignBtn.addEventListener("click", () => {
       lineIndex++; // Move to the next line position
     });
 
+    // Fill any remaining empty slots with "None"
+    positions.forwardLines.concat(positions.defenseLines, positions.goalies).forEach(slot => {
+      const element = document.getElementById(slot);
+      if (element.value === "") { // Check if the slot is empty
+        element.value = ""; // Default to "None"
+      }
+    });
+
     console.log("Auto-assigned players for", selectedTeam);
 
     // Ensure that players are populated in dropdowns after assignment
