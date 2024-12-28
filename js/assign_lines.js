@@ -80,18 +80,37 @@ function onLineDrop(event, teamName, lineIndex, position) {
     const playerName = event.dataTransfer.getData("playerName");
     const team = teams.find(t => t.name === teamName);
 
-    if (!team) return;
+    if (!team) {
+        console.log(`Team ${teamName} not found.`);
+        return;
+    }
 
-    const line = lineIndex >= 0 ? team.lines.forwardLines[lineIndex] : team.lines.goalies;
+    let line;
+    // Check which line (forward, defense, goalie) is being targeted
+    if (position.includes('F')) {
+        // Forward Lines
+        line = team.lines.forwardLines[lineIndex];
+    } else if (position.includes('D')) {
+        // Defense Lines
+        line = team.lines.defenseLines[lineIndex];
+    } else if (position === 'starter' || position === 'backup') {
+        // Goalies
+        line = team.lines.goalies;
+    }
 
-    // If position is occupied, do nothing
-    if (line[position]) return;
+    // If position is already filled, do nothing
+    if (line[position]) {
+        console.log(`${position} on ${teamName} is already occupied.`);
+        return;
+    }
 
-    // Assign player to line
+    // Assign the player to the correct position
     line[position] = playerName;
 
-    updateTeams(); // Save changes and re-render
+    // Update teams data and re-render
+    updateTeams();
 }
+
 
 // Allow drop
 function allowDrop(event) {
