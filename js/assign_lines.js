@@ -148,6 +148,13 @@ autoAssignBtn.addEventListener("click", () => {
       selectElement.innerHTML = "";  // Clear options
     });
 
+    // Always add the "None" option
+    const noneOption = document.createElement("option");
+    noneOption.value = null;
+    noneOption.text = "None";
+    selectElement.appendChild(noneOption);
+  });
+
     // Filter players by team and position
   const playersByPosition = {};
   Object.keys(positions).forEach(position => {
