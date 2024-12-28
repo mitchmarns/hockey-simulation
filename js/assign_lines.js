@@ -3,6 +3,7 @@ let teams = JSON.parse(localStorage.getItem("teams")) || [];
 document.addEventListener("DOMContentLoaded", () => {
   const teamSelect = document.getElementById("teamSelect");
   const saveLinesBtn = document.getElementById("saveLinesBtn");
+  const autoAssignBtn = document.getElementById("autoAssignBtn");
 
   // Load teams from localStorage (or initialize if empty)
   loadTeamsFromLocalStorage();
@@ -72,6 +73,56 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Line Assignments Saved:", lineAssignments);
   });
 
+  // Handle Auto-Assign button click
+  autoAssignBtn.addEventListener("click", () => {
+    const selectedTeam = teamSelect.value;
+    const team = teams.find(t => t.name === selectedTeam); // Get the team data
+    if (team) {
+      const players = team.players; // Reference players from the team
+      autoAssignPlayers(players, selectedTeam); // Auto-assign players to lines
+    }
+  });
+
+  // Function to auto-assign players to lines
+  function autoAssignPlayers(players, team) {
+    const forwardLines = ["line1", "line2", "line3", "line4"];
+    const defenseLines = ["defLine1", "defLine2", "defLine3"];
+    const goalies = ["starter", "backup"];
+
+    let forwards = players.filter(player => player.position === "LW" || player.position === "C" || player.position === "RW");
+    let defense = players.filter(player => player.position === "LD" || player.position === "RD");
+    let goaliesList = players.filter(player => player.position === "Starter" || player.position === "Backup");
+
+    // Shuffle players for randomness (Fisher-Yates shuffle)
+    shuffle(forwards);
+    shuffle(defense);
+    shuffle(goaliesList);
+
+    // Assign players to lines
+    forwardLines.forEach((line, i) => {
+      document.getElementById(`${line}LW`).value = forwards[i * 3]?.id || null;
+      document.getElementById(`${line}C`).value = forwards[i * 3 + 1]?.id || null;
+      document.getElementById(`${line}RW`).value = forwards[i * 3 + 2]?.id || null;
+    });
+
+    defenseLines.forEach((line, i) => {
+      document.getElementById(`${line}LD`).value = defense[i * 2]?.id || null;
+      document.getElementById(`${line}RD`).value = defense[i * 2 + 1]?.id || null;
+    });
+
+    // Assign goalies
+    document.getElementById("starter").value = goaliesList[0]?.id || null;
+    document.getElementById("backup").value = goaliesList[1]?.id || null;
+  }
+
+  // Fisher-Yates Shuffle for randomness
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+  }
+
   // Function to populate player options based on team
   function populatePlayerOptions(players, team) {
     const positions = {
@@ -90,15 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
       selectElement.innerHTML = "";  // Clear options
     });
 
-    // Filter players by team and position
-    const playersByPosition = {};
-    Object.keys(positions).forEach(position => {
-      playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
-    });
-
     players.forEach(player => {
       if (player.team === team || player.team === null) { // Filter by team
-        // Add the player to the correct dropdown based on their position
         if (positions[player.position]) {
           const option = document.createElement("option");
           option.value = player.id;
@@ -112,12 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Add "None" option to each dropdown if there are not enough players for that position
+    // Add "None" option if there are not enough players for a position
     Object.keys(positions).forEach(position => {
       positions[position].forEach(selector => {
         const selectElement = document.getElementById(selector);
-
-        if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
+        if (selectElement.options.length === 0) {
           const noneOption = document.createElement("option");
           noneOption.value = null;
           noneOption.text = "None";
