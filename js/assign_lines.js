@@ -153,6 +153,24 @@ function renderLineSection(title, lines, team, type) {
             dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
             dropZone.ondragover = allowDrop;
 
+            // Add player cards with images if assigned
+            if (player) {
+                const playerCard = createElement("div", { className: "player-card" });
+                const playerImage = createElement("img", {
+                    src: getPlayerImage(player), // Use player image from player data
+                    alt: `${player}'s Image`,
+                    className: "player-image"
+                });
+                const playerName = createElement("p", { textContent: player });
+                const playerPosition = createElement("p", { textContent: position });
+
+                playerCard.appendChild(playerImage);
+                playerCard.appendChild(playerName);
+                playerCard.appendChild(playerPosition);
+
+                dropZone.appendChild(playerCard);
+            }
+
             lineContainer.appendChild(dropZone);
         });
 
