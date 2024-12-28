@@ -13,10 +13,38 @@ function saveToLocalStorage(key, data) {
 
 // Load data from localStorage
 function loadData() {
+    // Check if players data exists in localStorage
+    const storedPlayers = getFromLocalStorage("players");
+
+    if (storedPlayers.length === 0) {
+        // Fetch players from players.json
+        fetch('/data/players.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load players.json");
+                }
+                return response.json();
+            })
+            .then(data => {
+                allPlayers = data;
+                saveToLocalStorage("players", allPlayers); // Save to localStorage for future use
+                console.log("Players loaded from JSON:", allPlayers);
+                renderAll();
+            })
+            .catch(error => {
+                console.error("Error loading players:", error);
+            });
+    } else {
+        // Use players from localStorage
+        allPlayers = storedPlayers;
+        console.log("Players loaded from localStorage:", allPlayers);
+        renderAll();
+    }
+
+    // Load teams from localStorage
     teams = getFromLocalStorage("teams");
-    allPlayers = getFromLocalStorage("players");
-    renderAll();
 }
+
 
 // Save updated teams to localStorage and re-render
 function updateTeams() {
