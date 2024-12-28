@@ -1,6 +1,15 @@
-let teams = JSON.parse(localStorage.getItem("teams"));
+// Function to save the teams data back to localStorage
+function saveTeamsToLocalStorage() {
+  localStorage.setItem("teams", JSON.stringify(teams));  // Save directly from the in-memory 'teams' variable
+}
 
-// Function to populate lines for a given team
+// Function to handle saving the team lines (triggered by the Save button)
+function saveTeamLines() {
+  saveTeamsToLocalStorage();  // Save teams to localStorage
+  alert("Team lines have been saved!");  // Alert message confirming save
+}
+
+// Populate lines for a given team
 function populateLines(team) {
   const teamName = team.name.toLowerCase();
   let assignedPlayers = new Set(); // Track assigned players for this team
@@ -123,6 +132,7 @@ function handleDrop(event, teamName, lineIndex, position) {
 }
 
 // Populate lines for each team
+let teams = JSON.parse(localStorage.getItem("teams"));
 teams.forEach(team => populateLines(team));
 
 // Event listener for the Save button
