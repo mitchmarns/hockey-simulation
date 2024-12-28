@@ -1,159 +1,190 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const teamsData = localStorage.getItem('teams');
-    if (!teamsData) {
-        console.error("No teams data found in localStorage.");
-        return;
+document.addEventListener("DOMContentLoaded", async () => {
+  const playersContainer = document.getElementById("players");
+  const slots = document.querySelectorAll(".line-slot");
+  const teamName = document.getElementById("team").textContent;
+
+  // Load saved assignments from localStorage
+  const assignments = JSON.parse(localStorage.getItem("lineAssignments")) || {};
+
+  // Load players from localStorage
+  const loadPlayers = () => {
+    const playersData = JSON.parse(localStorage.getItem("playersData"));
+    if (playersData && playersData.players) {
+      return playersData.players;
+    }
+    return [];
+  };
+
+  // Apply the assignment to the player and update the stored players data
+  const updatePlayerAssignment = (playerId, slotPosition) => {
+    const playersData = JSON.parse(localStorage.getItem("playersData"));
+    const teamsData = JSON.parse(localStorage.getItem("teams"));
+
+    if (!playersData || !playersData.players) {
+      return;
     }
 
-    // Parse the JSON string into an array of teams
-    const teams = JSON.parse(teamsData);
-    console.log("Parsed teams data:", teams); // Debugging log
-
-    const teamSelect = document.getElementById('teamSelect');
-    teams.forEach(team => {
-        const option = document.createElement('option');
-        option.value = team.name; // Use team name as the value
-        option.textContent = team.name; // Display team name in dropdown
-        teamSelect.appendChild(option);
+    playersData.players.forEach((player) => {
+      if (player.id === parseInt(playerId)) {
+        player.lineAssigned = slotPosition;
+      }
     });
 
-    teamSelect.addEventListener('change', function () {
-        loadPlayers(teams);
+    const [teamName, lineType, lineNumber, position] = slotPosition.split("-");
+    const team = teamsData.find((t) => t.name === teamName);
+
+    if (team && team.lines[lineType]) {
+      const lineIndex = parseInt(lineNumber) - 1;
+      const line = team.lines[lineType][lineIndex];
+
+      if (line) {
+        line[position] = parseInt(playerId);
+      }
+    }
+
+    localStorage.setItem("playersData", JSON.stringify(playersData));
+    localStorage.setItem("teams", JSON.stringify(teamsData));
+  };
+
+  // Get players from localStorage
+  const players = loadPlayers();
+
+  // Populate the "Available Players" section with unassigned players
+  const populateAvailablePlayers = (players) => {
+    playersContainer.innerHTML = "";
+    const unassignedPlayers = players.filter(
+      (player) => !player.lineAssigned
+    );
+
+    unassignedPlayers.forEach((player) => {
+      const playerDiv = document.createElement("div");
+      playerDiv.className = "player";
+      playerDiv.draggable = true;
+      playerDiv.dataset.id = player.id;
+      playerDiv.dataset.team = player.team;
+      playerDiv.dataset.position = player.position;
+
+      if (player.injured) {
+        playerDiv.classList.add("injured");
+        playerDiv.draggable = false;
+      } else if (player.healthyScratch) {
+        playerDiv.classList.add("healthy-scratch");
+        playerDiv.draggable = false;
+      }
+
+      const playerImg = document.createElement("img");
+      playerImg.src = player.image;
+      playerImg.alt = player.name;
+      playerImg.className = "player-image";
+
+      const playerName = document.createElement("span");
+      playerName.textContent = `${player.name} #${player.id} ${player.team || "Unassigned"} ${player.position}`;
+
+      playerDiv.appendChild(playerImg);
+      playerDiv.appendChild(playerName);
+
+      playersContainer.appendChild(playerDiv);
+
+      playerDiv.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("playerId", player.id);
+      });
     });
+  };
+
+  // Apply assignments to slots
+  const applyAssignmentsToSlots = (players) => {
+    for (const [slotId, playerId] of Object.entries(assignments)) {
+      const slot = document.querySelector(`[data-position="${slotId}"]`);
+      const player = players.find((p) => p.id === parseInt(playerId));
+
+      if (slot && player) {
+        const existingPlayerImg = slot.querySelector("img");
+        if (existingPlayerImg) {
+          existingPlayerImg.remove();
+        }
+
+        const playerImg = document.createElement("img");
+        playerImg.src = player.image;
+        playerImg.alt = player.name;
+        playerImg.className = "player-image";
+
+        const playerName = document.createElement("span");
+        playerName.textContent = `${player.name} (#${player.id})`;
+
+        slot.classList.add('slot-content');
+        slot.textContent = '';
+        slot.appendChild(playerImg);
+        slot.appendChild(playerName);
+
+        slot.dataset.assignedPlayer = playerId;
+      }
+    }
+  };
+
+  // Handle drop events on slots
+  const addDropEventsToSlots = () => {
+    slots.forEach((slot) => {
+      slot.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+
+      slot.addEventListener("drop", (e) => {
+        e.preventDefault();
+
+        const playerId = e.dataTransfer.getData("playerId");
+        const playerDiv = document.querySelector(`[data-id="${playerId}"]`);
+        const player = players.find((p) => p.id == playerId);
+
+        if (!player) {
+          alert("Error: Player data not found.");
+          return;
+        }
+
+        if (player.injured || player.healthyScratch) {
+          alert(`${player.name} cannot be assigned to a line because they are either injured or a healthy scratch.`);
+          return;
+        }
+
+        const slotPosition = slot.dataset.position;
+        const [slotTeam, slotLineType, slotLineNumber, slotPositionType] = slotPosition.split("-");
+
+        if (player.team === slotTeam && 
+            ((player.position === slotPosition) || 
+             (slotLineType === 'goalies' && (slotPosition === 'Starter' || slotPosition === 'Backup') && 
+              (player.position === 'Starter' || player.position === 'Backup')))) {
+
+          const playerImg = document.createElement("img");
+          playerImg.src = player.image;
+          playerImg.alt = player.name;
+          playerImg.className = "player-image";
+
+          const playerName = document.createElement("span");
+          playerName.textContent = `${player.name} (#${player.id})`;
+
+          slot.classList.add('slot-content');
+          slot.textContent = ''; 
+          slot.appendChild(playerImg);
+          slot.appendChild(playerName);
+
+          slot.dataset.assignedPlayer = playerId;
+
+          assignments[slot.dataset.position] = playerId;
+          localStorage.setItem("lineAssignments", JSON.stringify(assignments));
+          updatePlayerAssignment(playerId, slotPosition);
+          populateAvailablePlayers(players);
+        } else {
+          alert("The player cannot be assigned to this slot because either the position or team does not match.");
+        }
+      });
+    });
+  };
+
+  // Initialize the page
+  const init = () => {
+    populateAvailablePlayers(players);
+    applyAssignmentsToSlots(players);
+    addDropEventsToSlots();
+  };
+
+  init();
 });
-
-function loadPlayers(teams) {
-    const teamSelect = document.getElementById('teamSelect');
-    const selectedTeamName = teamSelect.value;
-
-    // Find the selected team by name
-    const selectedTeam = teams.find(team => team.name === selectedTeamName);
-    if (!selectedTeam) {
-        console.error(`Team not found: ${selectedTeamName}`);
-        return;
-    }
-
-    const players = selectedTeam.players;
-
-    // Ensure players is an array
-    if (!Array.isArray(players)) {
-        console.error(`Players for ${selectedTeamName} is not an array`, players);
-        return;
-    }
-
-    const playerList = document.getElementById('playerList');
-    playerList.innerHTML = ''; // Clear the previous list of players
-
-    // Display players for the selected team
-    players.forEach(player => {
-        const playerCard = document.createElement('div');
-        playerCard.classList.add('player-card');
-        playerCard.innerHTML = `
-            <p>${player.name} - ${player.position}</p>
-            <button onclick="assignPlayer('${selectedTeamName}', ${player.id})">Assign to Line</button>
-        `;
-        playerList.appendChild(playerCard);
-    });
-
-    loadLineAssignments(selectedTeamName, players); // Call to load the lines
-}
-
-function loadLineAssignments(teamName, players) {
-    const lineAssignmentDiv = document.getElementById('lineAssignment');
-    lineAssignmentDiv.innerHTML = ''; // Clear previous line assignments
-
-    // Group players by their positions
-    const forwards = players.filter(p => p.position === 'LW' || p.position === 'C' || p.position === 'RW');
-    const defensemen = players.filter(p => p.position === 'LD' || p.position === 'RD');
-    const goalies = players.filter(p => p.position === 'G');
-
-    // Generate forward lines
-    for (let i = 0; i < 4; i++) {
-        const forwardLine = forwards.slice(i * 3, (i + 1) * 3); // Each line should have 3 forwards
-        const forwardLineDiv = document.createElement('div');
-        forwardLineDiv.classList.add('line');
-        forwardLineDiv.innerHTML = `
-            <label for="forwardLine${i}">Forward Line ${i + 1}</label>
-            <select id="forwardLine${i}" onchange="assignToLine('${teamName}', 'Forward', ${i})">
-                <option value="">Select Forward Line ${i + 1}</option>
-                ${forwardLine.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
-            </select>
-        `;
-        lineAssignmentDiv.appendChild(forwardLineDiv);
-    }
-
-    // Generate defensive pairings (assuming you have enough defensemen)
-    for (let i = 0; i < 3; i++) {
-        const defenseLine = defensemen.slice(i * 2, (i + 1) * 2); // Each pair should have 2 defensemen
-        const defenseLineDiv = document.createElement('div');
-        defenseLineDiv.classList.add('line');
-        defenseLineDiv.innerHTML = `
-            <label for="defenseLine${i}">Defense Line ${i + 1}</label>
-            <select id="defenseLine${i}" onchange="assignToLine('${teamName}', 'Defense', ${i})">
-                <option value="">Select Defense Line ${i + 1}</option>
-                ${defenseLine.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
-            </select>
-        `;
-        lineAssignmentDiv.appendChild(defenseLineDiv);
-    }
-
-    // Generate goalie line (assuming you have goalies)
-    const goalieLineDiv = document.createElement('div');
-    goalieLineDiv.classList.add('line');
-    goalieLineDiv.innerHTML = `
-        <label for="goalieLine">Goalie Line</label>
-        <select id="goalieLine" onchange="assignToLine('${teamName}', 'Goalie')">
-            <option value="">Select Goalie</option>
-            ${goalies.map(player => `<option value="${player.id}">${player.name} (${player.position})</option>`).join('')}
-        </select>
-    `;
-    lineAssignmentDiv.appendChild(goalieLineDiv);
-}
-
-function assignPlayer(teamName, playerId, lineIndex = null) {
-    const teams = JSON.parse(localStorage.getItem('teams'));
-    const team = teams.find(t => t.name === teamName);
-    
-    if (!team) {
-        console.error("Team not found!");
-        return;
-    }
-
-    // Find the player by ID in the selected team's players array
-    const player = team.players.find(p => p.id === playerId);
-    if (!player) {
-        console.error(`Player with ID ${playerId} not found in team ${teamName}`);
-        return;
-    }
-
-    // Example logic for assigning to lines (ensure to define lineType and role clearly)
-    if (lineIndex === null) {
-        // Assign to a goalie line or another line type here based on your role and line type logic
-    } else {
-        // Assign to specific line (e.g., Forward, Defense)
-    }
-
-    player.lineAssigned = true;
-    localStorage.setItem("teams", JSON.stringify(teams));
-    updateUI();
-}
-
-function assignToLine(teamName, lineType, lineIndex) {
-    const lineSelect = document.getElementById(`${lineType}Line${lineIndex}`);
-    const playerId = lineSelect.value;
-
-    if (playerId) {
-        const teams = JSON.parse(localStorage.getItem('teams'));  // Parse teams data
-        const team = teams.find(t => t.name === teamName);
-        const player = team.players.find(p => p.id === parseInt(playerId));
-
-        console.log(`Assigned ${player.name} to ${lineType} Line ${lineIndex + 1}`);
-
-        // Store or update the line assignment as needed
-        // You can also store this back into localStorage or update the UI accordingly
-    }
-}
-
-function updateUI() {
-    // Any necessary UI updates after line assignment or player assignment
-}
