@@ -81,7 +81,6 @@ autoAssignBtn.addEventListener("click", () => {
 
   if (team) {
     const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
-    const usedPlayers = new Set(); // Track used players
 
     // Get available positions
     const positions = {
@@ -104,7 +103,6 @@ autoAssignBtn.addEventListener("click", () => {
     // Assign players to the lines sequentially
     let lineIndex = 0;
     allRankedPlayers.forEach(player => {
-      if (usedPlayers.has(player.id)) return; // Skip if already assigned
 
       // Assign the player to the next available slot
       if (lineIndex < positions.forwardLines.length) {
@@ -115,7 +113,6 @@ autoAssignBtn.addEventListener("click", () => {
         document.getElementById(positions.goalies[lineIndex - positions.forwardLines.length - positions.defenseLines.length]).value = player.id;
       }
 
-      usedPlayers.add(player.id); // Mark the player as used
       lineIndex++; // Move to the next line position
     });
 
