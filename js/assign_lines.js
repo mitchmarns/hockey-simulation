@@ -103,14 +103,19 @@ autoAssignBtn.addEventListener("click", () => {
     // Assign players to the lines sequentially
     let lineIndex = 0;
     allRankedPlayers.forEach(player => {
-
       // Assign the player to the next available slot
+      let element;
       if (lineIndex < positions.forwardLines.length) {
-        document.getElementById(positions.forwardLines[lineIndex]).value = player.id;
+        element = document.getElementById(positions.forwardLines[lineIndex]);
       } else if (lineIndex < positions.forwardLines.length + positions.defenseLines.length) {
-        document.getElementById(positions.defenseLines[lineIndex - positions.forwardLines.length]).value = player.id;
+        element = document.getElementById(positions.defenseLines[lineIndex - positions.forwardLines.length]);
       } else {
-        document.getElementById(positions.goalies[lineIndex - positions.forwardLines.length - positions.defenseLines.length]).value = player.id;
+        element = document.getElementById(positions.goalies[lineIndex - positions.forwardLines.length - positions.defenseLines.length]);
+      }
+
+      // Check if the element exists before setting its value
+      if (element) {
+        element.value = player.id;
       }
 
       lineIndex++; // Move to the next line position
@@ -119,7 +124,7 @@ autoAssignBtn.addEventListener("click", () => {
     // Fill any remaining empty slots with "None"
     positions.forwardLines.concat(positions.defenseLines, positions.goalies).forEach(slot => {
       const element = document.getElementById(slot);
-      if (element.value === "") { // Check if the slot is empty
+      if (element && element.value === "") { // Check if the slot is empty
         element.value = ""; // Default to "None"
       }
     });
@@ -130,7 +135,7 @@ autoAssignBtn.addEventListener("click", () => {
     populatePlayerOptions(players, selectedTeam);
   }
 });
-
+  
   // Function to get position based on line index
   function getPositionForLine(idx) {
     if (idx % 3 === 0) return "LW";
