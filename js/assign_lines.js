@@ -10,6 +10,9 @@ function populateLines(team) {
   team.lines.forwardLines.forEach((line, index) => {
     const lineElement = document.createElement('div');
     lineElement.classList.add('line');
+    lineElement.setAttribute('draggable', true);
+    lineElement.setAttribute('data-line-index', index);  // Store the line index in the element
+    lineElement.addEventListener('dragstart', handleDragStart);  // Add dragstart event listener
 
     // Assign players to the line, ensuring no duplicate assignments
     const LW = team.players.find(player => player.position === 'LW' && player.team === team.name && !assignedPlayers.has(player.name));
@@ -46,6 +49,9 @@ function populateLines(team) {
   team.lines.defenseLines.forEach((line, index) => {
     const lineElement = document.createElement('div');
     lineElement.classList.add('line');
+    lineElement.setAttribute('draggable', true);
+    lineElement.setAttribute('data-line-index', index);  // Store the line index in the element
+    lineElement.addEventListener('dragstart', handleDragStart);  // Add dragstart event listener
 
     // Assign players to the defense line, ensuring no duplicate assignments
     const LD = team.players.find(player => player.position === 'LD' && player.team === team.name && !assignedPlayers.has(player.name));
@@ -78,6 +84,8 @@ function populateLines(team) {
 
   const goalieElement = document.createElement('div');
   goalieElement.classList.add('line');
+  goalieElement.setAttribute('draggable', true);
+  goalieElement.addEventListener('dragstart', handleDragStart); // Add dragstart event listener
   goalieElement.innerHTML = `
     Starter: ${starter ? starter.name : 'N/A'} | 
     Backup: ${backup ? backup.name : 'N/A'}
@@ -95,23 +103,32 @@ function populateLines(team) {
 
   goalieContainer.appendChild(goalieElement);
 
-// Save the updated team lineup to localStorage
+  // Save the updated team lineup to localStorage
   saveTeamsToLocalStorage();
+}
+
+// Handle dragstart event
+function handleDragStart(event) {
+  event.dataTransfer.setData('text/plain', event.target.getAttribute('data-line-index'));
+}
+
+// Handle drop event (on a target element)
+function handleDrop(event, teamName, lineIndex, position) {
+  const lineIndexToUpdate = event.dataTransfer.getData('text/plain');
+  const targetLine = document.querySelector(`#${teamName}-line-${lineIndex}`);
+
+  // Your logic for updating the lines goes here (e.g., swapping players or assigning them)
+
+  saveTeamsToLocalStorage();  // Save updated team after handling drop
 }
 
 // Function to save the teams data back to localStorage
 function saveTeamsToLocalStorage() {
-  const teams = JSON.parse(localStorage.getItem("teams"));
-  localStorage.setItem("teams", JSON.stringify(teams));
+  localStorage.setItem("teams", JSON.stringify(teams));  // Save directly from the in-memory 'teams' variable
 }
-
-function saveTeamLines() {
-  const teams = JSON.parse(localStorage.getItem("teams"));
-  localStorage.setItem("teams", JSON.stringify(teams));
-  alert("Team lines have been saved!");
-}
-
-document.getElementById("saveLinesBtn").addEventListener("click", saveTeamLines);
 
 // Populate lines for each team
 teams.forEach(team => populateLines(team));
+
+// Event listener for the Save button
+document.getElementById("saveLinesBtn").addEventListener("click", saveTeamLines);
