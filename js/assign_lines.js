@@ -79,6 +79,11 @@ autoAssignBtn.addEventListener("click", () => {
     const team = teams.find(t => t.name === selectedTeam); // Get the team data
 
     if (team) {
+    // Reset `lineAssigned` for all players in the team
+    team.players.forEach(player => {
+      player.lineAssigned = false;
+    });
+
       const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
 
       // Get available positions
@@ -206,6 +211,7 @@ function populatePlayerOptions(players, team) {
 
   function rankPlayersForPosition(players, position) {
   return players
+    .filter(player => !player.lineAssigned) // Exclude already assigned players
     .map(player => {
       const { skills } = player;
       let score = 0;
