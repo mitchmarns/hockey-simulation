@@ -27,7 +27,10 @@ function updateTeams() {
 // Render all dynamic content
 function renderAll() {
     renderUnassignedPlayers();
-    renderTeamLines();
+    // Loop through all teams and render their lines
+    teams.forEach(team => {
+        renderTeamLines(team);
+    });
 }
 
 // Get players assigned to lines
@@ -142,7 +145,6 @@ function onLineDrop(event, teamName, lineIndex, position) {
     lineContainer.innerHTML = ''; // Clear previous content
     lineContainer.appendChild(playerCard);
 }
-
 
 // Allow drop
 function allowDrop(event) {
