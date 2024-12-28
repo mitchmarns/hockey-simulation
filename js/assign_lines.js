@@ -1,49 +1,49 @@
-// Fetch teams data from localStorage
-let teams = JSON.parse(localStorage.getItem("teams"));
+// Function to populate lines for a given team
+function populateLines(team) {
+  const teamName = team.name.toLowerCase();
 
-// Function to assign players to lines based on position
-function assignPlayersToLines() {
-  // Iterate through each team
-  teams.forEach(team => {
-    // Separate players by position
-    let forwards = team.players.filter(player => player.position === "C" || player.position === "LW" || player.position === "RW");
-    let defensemen = team.players.filter(player => player.position === "LD" || player.position === "RD");
-    let goalies = team.players.filter(player => player.position === "Starter" || player.position === "Backup");
+  // Forward Lines
+  const forwardLinesContainer = document.getElementById(`${teamName}-forward-lines`);
+  team.lines.forwardLines.forEach((line, index) => {
+    const lineElement = document.createElement('div');
+    lineElement.classList.add('line');
 
-    // Assign forwards to forward lines (Line 1 to 4)
-    team.lines.forwardLines.forEach((line, index) => {
-      if (index < forwards.length) {
-        // Try to assign left wing (LW), center (C), and right wing (RW)
-        if (!line.LW && forwards[index].position === "LW") {
-          line.LW = forwards[index];
-        } else if (!line.C && forwards[index].position === "C") {
-          line.C = forwards[index];
-        } else if (!line.RW && forwards[index].position === "RW") {
-          line.RW = forwards[index];
-        }
-      }
-    });
+    // Retrieve player names from the team’s players array for the positions
+    const LW = team.players.find(player => player.name === line.LW);
+    const C = team.players.find(player => player.name === line.C);
+    const RW = team.players.find(player => player.name === line.RW);
 
-    // Assign defensemen to defense lines (Line 1 to 3)
-    team.lines.defenseLines.forEach((line, index) => {
-      if (index < defensemen.length) {
-        // Try to assign left defense (LD) and right defense (RD)
-        if (!line.LD && defensemen[index].position === "LD") {
-          line.LD = defensemen[index];
-        } else if (!line.RD && defensemen[index].position === "RD") {
-          line.RD = defensemen[index];
-        }
-      }
-    });
-
-    // Assign goalies to the starter and backup positions
-    team.lines.goalies.starter = goalies.find(g => g.position === "Starter") || null;
-    team.lines.goalies.backup = goalies.find(g => g.position === "Backup") || null;
+    lineElement.innerHTML = `<strong>Line ${index + 1}:</strong> LW: ${LW ? LW.name : 'N/A'} | C: ${C ? C.name : 'N/A'} | RW: ${RW ? RW.name : 'N/A'}`;
+    forwardLinesContainer.appendChild(lineElement);
   });
 
-  // Save the updated teams data back to localStorage
-  localStorage.setItem("teams", JSON.stringify(teams));
+  // Defense Lines
+  const defenseLinesContainer = document.getElementById(`${teamName}-defense-lines`);
+  team.lines.defenseLines.forEach((line, index) => {
+    const lineElement = document.createElement('div');
+    lineElement.classList.add('line');
+    
+    // Retrieve player names for defense positions
+    const LD = team.players.find(player => player.name === line.LD);
+    const RD = team.players.find(player => player.name === line.RD);
+
+    lineElement.innerHTML = `<strong>Line ${index + 1}:</strong> LD: ${LD ? LD.name : 'N/A'} | RD: ${RD ? RD.name : 'N/A'}`;
+    defenseLinesContainer.appendChild(lineElement);
+  });
+
+  // Goalies
+  const goalieContainer = document.getElementById(`${teamName}-goalie`);
+  const starter = team.players.find(player => player.name === team.lines.goalies.starter);
+  const backup = team.players.find(player => player.name === team.lines.goalies.backup);
+  
+  const goalieElement = document.createElement('div');
+  goalieElement.classList.add('line');
+  goalieElement.innerHTML = `Starter: ${starter ? starter.name : 'N/A'} | Backup: ${backup ? backup.name : 'N/A'}`;
+  goalieContainer.appendChild(goalieElement);
 }
 
-// Call the function to assign players to lines
-assignPlayersToLines();
+// Ensure the teams are loaded from localStorage
+const teams = JSON.parse(localStorage.getItem("teams"));
+
+// Populate lines for each team
+teams.forEach(team => populateLines(team));
