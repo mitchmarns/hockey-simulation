@@ -1,24 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Check if the teams data exists in localStorage
-    if (localStorage.getItem('teams') === null) {
-        console.log("No teams data found in localStorage.");
+    const teamsData = localStorage.getItem('teams');
+    if (!teamsData) {
+        console.error("No teams data found in localStorage.");
         return;
     }
 
-    // Load the teams data from localStorage
-    const teams = JSON.parse(localStorage.getItem('teams'));
+    // Parse the JSON string into an array of teams
+    const teams = JSON.parse(teamsData);
+    console.log("Parsed teams data:", teams); // Debugging log
 
     const teamSelect = document.getElementById('teamSelect');
-
-    // Populate the team select dropdown with team names
-    Object.keys(teams).forEach(teamName => {
+    teams.forEach(team => {
         const option = document.createElement('option');
-        option.value = teamName;
-        option.textContent = teamName;
+        option.value = team.name; // Use team name as the value
+        option.textContent = team.name; // Display team name in dropdown
         teamSelect.appendChild(option);
     });
 
-    // Load the players when a team is selected
     teamSelect.addEventListener('change', function () {
         loadPlayers(teams);
     });
@@ -26,8 +24,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadPlayers(teams) {
     const teamSelect = document.getElementById('teamSelect');
-    const selectedTeam = teamSelect.value;
-    const players = teams[selectedTeam];
+    const selectedTeamName = teamSelect.value;
+
+    // Find the selected team by name
+    const selectedTeam = teams.find(team => team.name === selectedTeamName);
+    if (!selectedTeam) {
+        console.error(`Team not found: ${selectedTeamName}`);
+        return;
+    }
+
+    const players = selectedTeam.players;
+
+    // Ensure players is an array
+    if (!Array.isArray(players)) {
+        console.error(`Players for ${selectedTeamName} is not an array`, players);
+        return;
+    }
 
     const playerList = document.getElementById('playerList');
     playerList.innerHTML = ''; // Clear the previous list of players
@@ -38,12 +50,12 @@ function loadPlayers(teams) {
         playerCard.classList.add('player-card');
         playerCard.innerHTML = `
             <p>${player.name} - ${player.position}</p>
-            <button onclick="assignPlayer('${selectedTeam}', ${player.id})">Assign to Line</button>
+            <button onclick="assignPlayer('${selectedTeamName}', ${player.id})">Assign to Line</button>
         `;
         playerList.appendChild(playerCard);
     });
 
-    loadLineAssignments(selectedTeam, players); // Call to load the lines
+    loadLineAssignments(selectedTeamName, players); // Call to load the lines
 }
 
 function loadLineAssignments(team, players) {
