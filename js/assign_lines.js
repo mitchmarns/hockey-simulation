@@ -20,9 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const playersData = JSON.parse(localStorage.getItem("playersData"));
     const teamsData = JSON.parse(localStorage.getItem("teams"));
 
-    if (!playersData || !playersData.players) {
-      return;
-    }
+    if (!playersData || !playersData.players) return;
 
     playersData.players.forEach((player) => {
       if (player.id === parseInt(playerId)) {
@@ -52,9 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Populate the "Available Players" section with unassigned players
   const populateAvailablePlayers = (players) => {
     playersContainer.innerHTML = "";
-    const unassignedPlayers = players.filter(
-      (player) => !player.lineAssigned
-    );
+    const unassignedPlayers = players.filter((player) => !player.lineAssigned);
 
     unassignedPlayers.forEach((player) => {
       const playerDiv = document.createElement("div");
@@ -93,15 +89,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Apply assignments to slots
   const applyAssignmentsToSlots = (players) => {
-    for (const [slotId, playerId] of Object.entries(assignments)) {
+    Object.entries(assignments).forEach(([slotId, playerId]) => {
       const slot = document.querySelector(`[data-position="${slotId}"]`);
       const player = players.find((p) => p.id === parseInt(playerId));
 
       if (slot && player) {
         const existingPlayerImg = slot.querySelector("img");
-        if (existingPlayerImg) {
-          existingPlayerImg.remove();
-        }
+        if (existingPlayerImg) existingPlayerImg.remove();
 
         const playerImg = document.createElement("img");
         playerImg.src = player.image;
@@ -112,25 +106,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         playerName.textContent = `${player.name} (#${player.id})`;
 
         slot.classList.add('slot-content');
-        slot.textContent = '';
         slot.appendChild(playerImg);
         slot.appendChild(playerName);
 
         slot.dataset.assignedPlayer = playerId;
       }
-    }
+    });
   };
 
   // Handle drop events on slots
   const addDropEventsToSlots = () => {
     slots.forEach((slot) => {
-      slot.addEventListener("dragover", (e) => {
-        e.preventDefault();
-      });
+      slot.addEventListener("dragover", (e) => e.preventDefault());
 
       slot.addEventListener("drop", (e) => {
         e.preventDefault();
-
         const playerId = e.dataTransfer.getData("playerId");
         const playerDiv = document.querySelector(`[data-id="${playerId}"]`);
         const player = players.find((p) => p.id == playerId);
@@ -148,11 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const slotPosition = slot.dataset.position;
         const [slotTeam, slotLineType, slotLineNumber, slotPositionType] = slotPosition.split("-");
 
-        if (player.team === slotTeam && 
-            ((player.position === slotPosition) || 
-             (slotLineType === 'goalies' && (slotPosition === 'Starter' || slotPosition === 'Backup') && 
-              (player.position === 'Starter' || player.position === 'Backup')))) {
-
+        if (player.team === slotTeam && (player.position === slotPosition || (slotLineType === 'goalies' && (player.position === 'Starter' || player.position === 'Backup')))) {
           const playerImg = document.createElement("img");
           playerImg.src = player.image;
           playerImg.alt = player.name;
