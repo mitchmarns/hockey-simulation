@@ -101,16 +101,16 @@ function renderUnassignedPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = ""; // Clear list
 
-    const unassigned = allPlayers.filter(player => !player.assigned);
+    const assigned = allPlayers.filter(player => player.assigned && player.team);
 
-    if (unassigned.length > 0) {
-        unassigned.forEach(player => {
+    if (assigned.length > 0) {
+        assigned.forEach(player => {
             const li = createElement("li", { textContent: player.name, draggable: true });
             li.addEventListener("dragstart", e => onPlayerDragStart(e, player.name));
             playersList.appendChild(li);
         });
     } else {
-        playersList.textContent = "All players are assigned to lines.";
+        playersList.textContent = "No players are assigned to teams yet.";
     }
 }
 
