@@ -1,3 +1,11 @@
+function loadTeamsFromLocalStorage() {
+  const savedTeams = localStorage.getItem('teams');
+  if (savedTeams) {
+    // Parse the teams and assign it back to the teams variable
+    teams = JSON.parse(savedTeams);
+  }
+}
+
 // Function to save the teams data back to localStorage
 function saveTeamsToLocalStorage() {
   localStorage.setItem("teams", JSON.stringify(teams));  // Save directly from the in-memory 'teams' variable
