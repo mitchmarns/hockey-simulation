@@ -1,201 +1,139 @@
-const teams = JSON.parse(localStorage.getItem("teams")) || [];
+let teams = [];
 let allPlayers = [];
 
-// Load data from localStorage and initialize
-function loadFromLocalStorage() {
-    const savedTeams = localStorage.getItem("teams");
-    const savedPlayers = localStorage.getItem("players");
-
-    if (savedTeams) {
-        const parsedTeams = JSON.parse(savedTeams);
-        teams.length = 0; // Clear existing array
-        teams.push(...parsedTeams); // Populate with new data
-        console.log("Loaded teams from localStorage.");
-    } else {
-        console.log("No teams data found in localStorage.");
-    }
-
-    if (savedPlayers) {
-        allPlayers = JSON.parse(savedPlayers);
-        console.log("Loaded players from localStorage.");
-    } else {
-        console.log("No players data found in localStorage.");
-    }
-
-    renderUnassignedPlayers(); // Render unassigned players
-    renderTeamLines();         // Render team lines
+// Utility function to get data from localStorage
+function getFromLocalStorage(key) {
+    return JSON.parse(localStorage.getItem(key)) || [];
 }
 
-// Save teams data to localStorage
-function saveTeamsToLocalStorage() {
-    localStorage.setItem("teams", JSON.stringify(teams));
+// Utility function to save data to localStorage
+function saveToLocalStorage(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
 }
 
-// Extract players assigned to lines
+// Load data from localStorage
+function loadData() {
+    teams = getFromLocalStorage("teams");
+    allPlayers = getFromLocalStorage("players");
+    renderAll();
+}
+
+// Save updated teams to localStorage and re-render
+function updateTeams() {
+    saveToLocalStorage("teams", teams);
+    renderAll();
+}
+
+// Render all dynamic content
+function renderAll() {
+    renderUnassignedPlayers();
+    renderTeamLines();
+}
+
+// Get players assigned to lines
 function getPlayersAssignedToLines() {
-    const assignedToLines = [];
-
-    teams.forEach(team => {
-        // Check forward lines
-        team.lines.forwardLines.forEach(line => {
-            Object.values(line).forEach(player => {
-                if (player) assignedToLines.push(player);
-            });
-        });
-
-        // Check defense lines
-        team.lines.defenseLines.forEach(line => {
-            Object.values(line).forEach(player => {
-                if (player) assignedToLines.push(player);
-            });
-        });
-
-        // Check goalies
-        if (team.lines.goalies) {
-            const { starter, backup } = team.lines.goalies;
-            if (starter) assignedToLines.push(starter);
-            if (backup) assignedToLines.push(backup);
-        }
-    });
-
-    return assignedToLines.map(player => player.name); // Return player names
-}
-
-// Get players assigned to a team but not yet to a line
-function getUnassignedLinePlayers() {
-    const playersAssignedToLines = getPlayersAssignedToLines();
-    const playersAssignedToTeams = teams.flatMap(team =>
-        team.players.filter(player => player.assigned).map(player => player.name)
+    return teams.flatMap(team =>
+        [
+            ...team.lines.forwardLines.flatMap(line => Object.values(line).filter(Boolean)),
+            ...team.lines.defenseLines.flatMap(line => Object.values(line).filter(Boolean)),
+            team.lines.goalies.starter,
+            team.lines.goalies.backup,
+        ].filter(Boolean)
     );
-
-    // Players in a team but not yet in a line
-    return playersAssignedToTeams.filter(playerName => !playersAssignedToLines.includes(playerName));
 }
 
-// Render players assigned to a team but not yet to a line
+// Get players assigned to teams but not yet to a line
+function getUnassignedLinePlayers() {
+    const assignedToLines = getPlayersAssignedToLines();
+    return teams.flatMap(team =>
+        team.players.filter(player => player.assigned && !assignedToLines.includes(player.name))
+    ).map(player => player.name);
+}
+
+// Render unassigned players
 function renderUnassignedPlayers() {
     const playersList = document.getElementById("players-list");
-    playersList.innerHTML = ""; // Clear the existing list
+    playersList.innerHTML = ""; // Clear list
 
-    const unassignedLinePlayers = getUnassignedLinePlayers();
+    const unassigned = getUnassignedLinePlayers();
 
-    if (unassignedLinePlayers.length > 0) {
-        unassignedLinePlayers.forEach(playerName => {
-            const playerItem = document.createElement("li");
-            playerItem.textContent = playerName;
-
-            playerItem.setAttribute("draggable", "true");
-            playerItem.addEventListener("dragstart", (e) => onPlayerDragStart(e, { name: playerName }));
-
-            playersList.appendChild(playerItem);
+    if (unassigned.length > 0) {
+        unassigned.forEach(playerName => {
+            const li = createElement("li", { textContent: playerName, draggable: true });
+            li.addEventListener("dragstart", e => onPlayerDragStart(e, playerName));
+            playersList.appendChild(li);
         });
     } else {
-        const noPlayersMessage = document.createElement("p");
-        noPlayersMessage.textContent = "All players are assigned to lines.";
-        playersList.appendChild(noPlayersMessage);
+        playersList.textContent = "All players are assigned to lines.";
     }
 }
 
-// Handle drag start event for a player
-function onPlayerDragStart(event, player) {
-    event.dataTransfer.setData("player", JSON.stringify(player));
-    event.target.style.opacity = 0.5;
-
-    event.target.addEventListener("dragend", () => {
-        event.target.style.opacity = 1;
-    });
+// Handle drag start
+function onPlayerDragStart(event, playerName) {
+    event.dataTransfer.setData("playerName", playerName);
 }
 
 // Handle dropping a player onto a line
 function onLineDrop(event, teamName, lineIndex, position) {
-    const playerData = JSON.parse(event.dataTransfer.getData("player"));
     event.preventDefault();
 
+    const playerName = event.dataTransfer.getData("playerName");
     const team = teams.find(t => t.name === teamName);
 
-    if (!team) {
-        console.log(`Team ${teamName} not found.`);
-        return;
-    }
+    if (!team) return;
 
-    // Check if the position is already filled in the line
     const line = lineIndex >= 0 ? team.lines.forwardLines[lineIndex] : team.lines.goalies;
 
-    if (line[position]) {
-        console.log(`${position} on ${teamName} Line ${lineIndex + 1} is already occupied.`);
-        return;
-    }
+    // If position is occupied, do nothing
+    if (line[position]) return;
 
-    // Assign player to the correct position
-    line[position] = playerData.name;
+    // Assign player to line
+    line[position] = playerName;
 
-    // Update teams data
-    saveTeamsToLocalStorage();
-    renderUnassignedPlayers(); // Re-render the unassigned players list
-    renderTeamLines();         // Re-render lines to reflect the changes
+    updateTeams(); // Save changes and re-render
 }
 
-// Allow dropping a player on a line position
+// Allow drop
 function allowDrop(event) {
     event.preventDefault();
 }
 
-// Render team lines dynamically
+// Render team lines
 function renderTeamLines() {
-    const teamLinesContainer = document.getElementById("team-lines");
-    teamLinesContainer.innerHTML = ""; // Clear existing content
+    const container = document.getElementById("team-lines");
+    container.innerHTML = ""; // Clear container
 
     teams.forEach(team => {
-        const teamSection = document.createElement("div");
-        teamSection.classList.add("team-section");
+        const section = createElement("div", { className: "team-section" });
+        section.appendChild(createElement("h2", { textContent: `${team.name} Line Assignment` }));
 
-        const teamName = document.createElement("h2");
-        teamName.textContent = `${team.name} Line Assignment`;
-        teamSection.appendChild(teamName);
+        section.appendChild(renderLineSection("Forward Lines", team.lines.forwardLines, team, "forward"));
+        section.appendChild(renderLineSection("Defense Lines", team.lines.defenseLines, team, "defense"));
+        section.appendChild(renderLineSection("Goalies", [team.lines.goalies], team, "goalie"));
 
-        // Render Forward Lines
-        if (team.lines && team.lines.forwardLines) {
-            teamSection.appendChild(createLineSection("Forward Lines", team.lines.forwardLines, team, "forward"));
-        }
-
-        // Render Defense Lines
-        if (team.lines && team.lines.defenseLines) {
-            teamSection.appendChild(createLineSection("Defense Lines", team.lines.defenseLines, team, "defense"));
-        }
-
-        // Render Goalies
-        if (team.lines && team.lines.goalies) {
-            teamSection.appendChild(createLineSection("Goalies", [team.lines.goalies], team, "goalie"));
-        }
-
-        teamLinesContainer.appendChild(teamSection);
+        container.appendChild(section);
     });
 }
 
-// Create the line sections (Forward, Defense, Goalies)
-function createLineSection(title, lines, team, type) {
-    const section = document.createElement("div");
-    section.classList.add("line-section");
-
-    const sectionTitle = document.createElement("h3");
-    sectionTitle.textContent = title;
-    section.appendChild(sectionTitle);
+// Render a line section (Forward, Defense, Goalies)
+function renderLineSection(title, lines, team, type) {
+    const section = createElement("div", { className: "line-section" });
+    section.appendChild(createElement("h3", { textContent: title }));
 
     lines.forEach((line, index) => {
-        const lineContainer = document.createElement("div");
-        lineContainer.classList.add("line-container");
+        const lineContainer = createElement("div", { className: "line-container" });
 
         Object.keys(line).forEach(position => {
             const player = line[position];
-            const playerElement = document.createElement("div");
+            const dropZone = createElement("div", {
+                className: "player-drop-zone",
+                textContent: player || `Drag ${position} here`,
+            });
 
-            playerElement.classList.add("player-drop-zone");
-            playerElement.setAttribute("ondrop", `onLineDrop(event, '${team.name}', ${index}, '${position}')`);
-            playerElement.setAttribute("ondragover", "allowDrop(event)");
+            dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
+            dropZone.ondragover = allowDrop;
 
-            playerElement.textContent = player || `Drag ${position} here`;
-
-            lineContainer.appendChild(playerElement);
+            lineContainer.appendChild(dropZone);
         });
 
         section.appendChild(lineContainer);
@@ -204,4 +142,12 @@ function createLineSection(title, lines, team, type) {
     return section;
 }
 
-document.addEventListener("DOMContentLoaded", loadFromLocalStorage);
+// Helper to create elements with attributes
+function createElement(tag, attributes) {
+    const element = document.createElement(tag);
+    Object.assign(element, attributes);
+    return element;
+}
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", loadData);
