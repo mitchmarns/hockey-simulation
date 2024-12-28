@@ -1,4 +1,4 @@
-
+let teams = JSON.parse(localStorage.getItem("teams"));
 
 // Function to populate lines for a given team
 function populateLines(team) {
