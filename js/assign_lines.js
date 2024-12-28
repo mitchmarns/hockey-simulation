@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const teamSelect = document.getElementById("teamSelect");
   const saveLinesBtn = document.getElementById("saveLinesBtn");
 
-  // Get teams from localStorage (or initialize if empty)
-  let teams = JSON.parse(localStorage.getItem("teams")) || [];
+  // Load teams from localStorage (or initialize if empty)
+  loadTeamsFromLocalStorage();
 
   // Fetch the players based on the selected team from the local teams data
   teamSelect.addEventListener("change", () => {
@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (team) {
       const players = team.players; // Reference players from the team
       populatePlayerOptions(players, selectedTeam);
+      loadLineAssignments(team); // Load previously saved line assignments
     }
   });
 
@@ -73,75 +74,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to populate player options based on team
   function populatePlayerOptions(players, team) {
-  const positions = {
-    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
-    "C": ["line1C", "line2C", "line3C", "line4C"],
-    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
-    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
-    "Starter": ["starter"],
-    "Backup": ["backup"]
-  };
-
-  // Clear all select options first
-  Object.values(positions).flat().forEach(selector => {
-    const selectElement = document.getElementById(selector);
-    selectElement.innerHTML = "";  // Clear options
-  });
-
-  // Filter players by team and position
-  const playersByPosition = {};
-  Object.keys(positions).forEach(position => {
-    playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
-  });
-
-  players.forEach(player => {
-    if (player.team === team || player.team === null) { // Filter by team
-      // Add the player to the correct dropdown based on their position
-      if (positions[player.position]) {
-        const option = document.createElement("option");
-        option.value = player.id;
-        option.text = player.name;
-
-        positions[player.position].forEach(selector => {
-          const selectElement = document.getElementById(selector);
-          selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
-        });
-      }
-    }
-  });
-
-  // Add "None" option to each dropdown if there are not enough players for that position
-  Object.keys(positions).forEach(position => {
-    positions[position].forEach(selector => {
-      const selectElement = document.getElementById(selector);
-
-      if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
-        const noneOption = document.createElement("option");
-        noneOption.value = null;
-        noneOption.text = "None";
-        selectElement.appendChild(noneOption);
-      }
-    });
-  });
-}
-
-  // Helper function to add player to the appropriate line dropdowns
-  function addOptionToLines(option, position) {
-    const lineSelectors = {
+    const positions = {
       "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
       "C": ["line1C", "line2C", "line3C", "line4C"],
       "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
       "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"]
+      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
+      "Starter": ["starter"],
+      "Backup": ["backup"]
     };
 
-    // Add the player option to the respective line positions
-    if (lineSelectors[position]) {
-      lineSelectors[position].forEach(line => {
-        const lineElement = document.getElementById(line);
-        lineElement.appendChild(option.cloneNode(true));
+    // Clear all select options first
+    Object.values(positions).flat().forEach(selector => {
+      const selectElement = document.getElementById(selector);
+      selectElement.innerHTML = "";  // Clear options
+    });
+
+    // Filter players by team and position
+    const playersByPosition = {};
+    Object.keys(positions).forEach(position => {
+      playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
+    });
+
+    players.forEach(player => {
+      if (player.team === team || player.team === null) { // Filter by team
+        // Add the player to the correct dropdown based on their position
+        if (positions[player.position]) {
+          const option = document.createElement("option");
+          option.value = player.id;
+          option.text = player.name;
+
+          positions[player.position].forEach(selector => {
+            const selectElement = document.getElementById(selector);
+            selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
+          });
+        }
+      }
+    });
+
+    // Add "None" option to each dropdown if there are not enough players for that position
+    Object.keys(positions).forEach(position => {
+      positions[position].forEach(selector => {
+        const selectElement = document.getElementById(selector);
+
+        if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
+          const noneOption = document.createElement("option");
+          noneOption.value = null;
+          noneOption.text = "None";
+          selectElement.appendChild(noneOption);
+        }
       });
+    });
+  }
+
+  // Function to load the line assignments into the dropdowns
+  function loadLineAssignments(team) {
+    const lineAssignments = team.lineAssignments || {};
+    if (lineAssignments.forwardLines) {
+      Object.keys(lineAssignments.forwardLines).forEach(line => {
+        const lineData = lineAssignments.forwardLines[line];
+        if (lineData.LW) document.getElementById(`${line}LW`).value = lineData.LW;
+        if (lineData.C) document.getElementById(`${line}C`).value = lineData.C;
+        if (lineData.RW) document.getElementById(`${line}RW`).value = lineData.RW;
+      });
+    }
+    if (lineAssignments.defenseLines) {
+      Object.keys(lineAssignments.defenseLines).forEach(line => {
+        const lineData = lineAssignments.defenseLines[line];
+        if (lineData.LD) document.getElementById(`${line}LD`).value = lineData.LD;
+        if (lineData.RD) document.getElementById(`${line}RD`).value = lineData.RD;
+      });
+    }
+    if (lineAssignments.goalies) {
+      if (lineAssignments.goalies.starter) document.getElementById("starter").value = lineAssignments.goalies.starter;
+      if (lineAssignments.goalies.backup) document.getElementById("backup").value = lineAssignments.goalies.backup;
     }
   }
 
@@ -155,7 +161,4 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("No teams found in localStorage.");
     }
   }
-
-  // Call the function to load teams
-  loadTeamsFromLocalStorage();
 });
