@@ -120,6 +120,10 @@ function renderAssignedPlayers() {
     }
 }
 
+function onPlayerDragStart(event, playerName) {
+    event.dataTransfer.setData("playerName", playerName);
+    event.target.style.opacity = "0.5"; 
+}
 
 // Handle drag start
 function onLineDrop(event, teamName, lineIndex, position) {
