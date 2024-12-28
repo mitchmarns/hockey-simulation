@@ -114,6 +114,12 @@ function onLineDrop(event, teamName, lineIndex, position) {
         return; // Player is not on the correct team, do not assign
     }
 
+    // Ensure the player can only be assigned to the correct position
+    if (playerData.position !== position) {
+        console.log(`${playerData.name} cannot be assigned to ${position} as their position is ${playerData.position}.`);
+        return; // Player's position doesn't match the drop zone
+    }
+
     // Check if the position is available on the line
     const line = team.lines.forwardLines[lineIndex];  // For forward lines
     if (line[position]) {
@@ -123,6 +129,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Assign player to the correct position
     line[position] = playerData.name;  // Assign player by name
+    playerData.lineAssigned = position;
 
     saveTeamsToLocalStorage(); // Save updated teams to localStorage
     renderAssignedPlayers(); // Re-render the players list
