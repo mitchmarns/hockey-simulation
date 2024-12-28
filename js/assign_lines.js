@@ -1,4 +1,4 @@
-let teams = [];
+const teams = JSON.parse(localStorage.getItem("teams")) || [];
 let allPlayers = [];
 
 // Load data from localStorage and initialize
@@ -28,9 +28,6 @@ function loadFromLocalStorage() {
 function saveTeamsToLocalStorage() {
     localStorage.setItem("teams", JSON.stringify(teams));
 }
-
-// Parse the teams array from localStorage
-const teams = JSON.parse(localStorage.getItem("teams")) || [];
 
 // Extract players assigned to lines
 function getPlayersAssignedToLines() {
