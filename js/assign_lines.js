@@ -1,3 +1,5 @@
+let teams = JSON.parse(localStorage.getItem("teams")) || [];
+
 document.addEventListener("DOMContentLoaded", () => {
   const teamSelect = document.getElementById("teamSelect");
   const saveLinesBtn = document.getElementById("saveLinesBtn");
@@ -125,3 +127,17 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(err => console.error('Error loading player data:', err));
 });
+
+// Function to load teams from localStorage
+function loadTeamsFromLocalStorage() {
+  if (teams.length > 0) {
+    // Process the teams data
+    console.log("Teams loaded:", teams);
+    // Continue with any other logic you need
+  } else {
+    console.log("No teams found in localStorage.");
+  }
+}
+
+// Call the function to load teams
+loadTeamsFromLocalStorage();
