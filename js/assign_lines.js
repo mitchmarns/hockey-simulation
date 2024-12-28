@@ -11,42 +11,56 @@ function saveToLocalStorage(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
-// Load data from localStorage
+// Load data from localStorage or JSON
 function loadData() {
-    // Check if players data exists in localStorage
+    const storedTeams = getFromLocalStorage("teams");
     const storedPlayers = getFromLocalStorage("players");
 
-    if (storedPlayers.length === 0) {
-        // Fetch players from players.json
-        fetch('/data/players.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to load players.json");
-                }
-                return response.json();
-            })
-            .then(data => {
-                allPlayers = data;
-                saveToLocalStorage("players", allPlayers); // Save to localStorage for future use
-                console.log("Players loaded from JSON:", allPlayers);
-                renderAll();
-            })
-            .catch(error => {
-                console.error("Error loading players:", error);
-            });
-    } else {
-        // Use players from localStorage
+    if (storedTeams.length > 0 && storedPlayers.length > 0) {
+        teams = storedTeams;
         allPlayers = storedPlayers;
-        console.log("Players loaded from localStorage:", allPlayers);
+        console.log("Loaded data from localStorage.");
         renderAll();
+    } else {
+        console.log("No data in localStorage, loading from JSON...");
+        loadDataFromJSON();
     }
-
-    // Load teams from localStorage
-    teams = getFromLocalStorage("teams");
 }
 
+// Fetch player and team data from JSON
+function loadDataFromJSON() {
+    fetch('/data/players.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load players.json");
+            }
+            return response.json();
+        })
+        .then(data => {
+            allPlayers = data;
+            saveToLocalStorage("players", allPlayers);
+            console.log("Players loaded from JSON:", allPlayers);
+            renderAll();
+        })
+        .catch(error => console.error("Error loading players:", error));
 
-// Save updated teams to localStorage and re-render
+    fetch('/data/teams.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load teams.json");
+            }
+            return response.json();
+        })
+        .then(data => {
+            teams = data;
+            saveToLocalStorage("teams", teams);
+            console.log("Teams loaded from JSON:", teams);
+            renderAll();
+        })
+        .catch(error => console.error("Error loading teams:", error));
+}
+
+// Save updated teams to localStorage
 function updateTeams() {
     saveToLocalStorage("teams", teams);
     renderAll();
@@ -55,10 +69,7 @@ function updateTeams() {
 // Render all dynamic content
 function renderAll() {
     renderUnassignedPlayers();
-    // Loop through all teams and render their lines
-    teams.forEach(team => {
-        renderTeamLines(team);
-    });
+    teams.forEach(team => renderTeamLines(team));
 }
 
 // Get players assigned to lines
@@ -119,59 +130,49 @@ function onLineDrop(event, teamName, lineIndex, position) {
     let line;
     let lineContainer;
 
-    // Check which line (forward, defense, goalie) is being targeted
+    // Determine line type
     if (position.includes('F')) {
-        // Forward Lines
         line = team.lines.forwardLines[lineIndex];
         lineContainer = document.getElementById(`${teamName}-forward-line-${lineIndex}-${position}`);
     } else if (position.includes('D')) {
-        // Defense Lines
         line = team.lines.defenseLines[lineIndex];
         lineContainer = document.getElementById(`${teamName}-defense-line-${lineIndex}-${position}`);
     } else if (position === 'starter' || position === 'backup') {
-        // Goalies
         line = team.lines.goalies;
         lineContainer = document.getElementById(`${teamName}-goalie-${position}`);
     }
 
-    // If position is already filled, do nothing
     if (line[position]) {
         console.log(`${position} on ${teamName} is already occupied.`);
         return;
     }
 
-    // Assign the player to the correct position
     line[position] = playerName;
-
-    // Update teams data and re-render
     updateTeams();
 
-    // Update the drop zone to show the player's image and name
     const player = allPlayers.find(p => p.name === playerName);
     if (!player) {
         console.log("Player not found:", playerName);
         return;
     }
-    
+
+    const playerCard = createPlayerCard(playerName, player.image, position);
+    lineContainer.innerHTML = '';
+    lineContainer.appendChild(playerCard);
+}
+
+// Create player card
+function createPlayerCard(playerName, imageSrc, position) {
     const playerCard = createElement("div", { className: "player-card" });
-
-    const img = document.createElement("img");
-    img.src = player ? player.image : 'https://via.placeholder.com/50'; // Default image if no player found
-    img.alt = `${playerName}'s Image`;
-    img.className = "player-image";
-
-    const playerPosition = document.createElement("p");
-    playerPosition.textContent = position;
-    const playerNameElement = document.createElement("p");
-    playerNameElement.textContent = playerName;
+    const img = createElement("img", { src: imageSrc || 'https://via.placeholder.com/50', alt: `${playerName}'s Image`, className: "player-image" });
+    const playerPosition = createElement("p", { textContent: position });
+    const playerNameElement = createElement("p", { textContent: playerName });
 
     playerCard.appendChild(img);
     playerCard.appendChild(playerNameElement);
     playerCard.appendChild(playerPosition);
 
-    // Append the player card to the drop zone
-    lineContainer.innerHTML = ''; // Clear previous content
-    lineContainer.appendChild(playerCard);
+    return playerCard;
 }
 
 // Allow drop
@@ -180,34 +181,20 @@ function allowDrop(event) {
 }
 
 // Render team lines
-function renderTeamLines() {
+function renderTeamLines(team) {
     const container = document.getElementById("teams-container");
-    container.innerHTML = "";  // Clear container
+    const teamContainer = createElement("div", { className: "team-container" });
 
-    teams.forEach(team => {
-        const teamContainer = createElement("div", { className: "team-container" });
+    teamContainer.appendChild(createElement("h3", { textContent: team.name }));
 
-        // Add Team Name
-        const teamHeading = createElement("h3", { textContent: team.name });
-        teamContainer.appendChild(teamHeading);
+    teamContainer.appendChild(renderLineSection("Forward Lines", team.lines.forwardLines, team, "forward"));
+    teamContainer.appendChild(renderLineSection("Defense Lines", team.lines.defenseLines, team, "defense"));
+    teamContainer.appendChild(renderLineSection("Goalies", [team.lines.goalies], team, "goalie"));
 
-        // Render Forward Lines
-        const forwardSection = renderLineSection("Forward Lines", team.lines.forwardLines, team, "forward");
-        teamContainer.appendChild(forwardSection);
-
-        // Render Defense Lines
-        const defenseSection = renderLineSection("Defense Lines", team.lines.defenseLines, team, "defense");
-        teamContainer.appendChild(defenseSection);
-
-        // Render Goalies
-        const goalieSection = renderLineSection("Goalies", [team.lines.goalies], team, "goalie");
-        teamContainer.appendChild(goalieSection);
-
-        container.appendChild(teamContainer);  // Append the team container to the main container
-    });
+    container.appendChild(teamContainer);
 }
 
-// Render a line section (Forward, Defense, Goalies)
+// Render a line section
 function renderLineSection(title, lines, team, type) {
     const section = createElement("div", { className: "line-section" });
     section.appendChild(createElement("h3", { textContent: title }));
@@ -220,7 +207,7 @@ function renderLineSection(title, lines, team, type) {
             const dropZone = createElement("div", {
                 className: "player-drop-zone",
                 id: `${team.name}-${type}-line-${index}-${position}`,
-                textContent: playerName ? `${playerName}` : `Drag ${position} here`,
+                textContent: playerName || `Drag ${position} here`,
             });
 
             dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
@@ -228,22 +215,8 @@ function renderLineSection(title, lines, team, type) {
 
             if (playerName) {
                 const player = allPlayers.find(p => p.name === playerName);
-                const playerCard = createElement("div", { className: "player-card" });
-
-                const playerImage = createElement("img", {
-                    src: player ? player.image : 'https://via.placeholder.com/50', // Default image if no player found
-                    alt: `${playerName}'s Image`,
-                    className: "player-image"
-                });
-
-                const playerPosition = createElement("p", { textContent: position });
-                const playerNameElement = createElement("p", { textContent: playerName });
-
-                playerCard.appendChild(playerImage);
-                playerCard.appendChild(playerNameElement);
-                playerCard.appendChild(playerPosition);
-
-                dropZone.appendChild(playerCard);
+                dropZone.innerHTML = '';
+                dropZone.appendChild(createPlayerCard(playerName, player.image, position));
             }
 
             lineContainer.appendChild(dropZone);
@@ -255,12 +228,12 @@ function renderLineSection(title, lines, team, type) {
     return section;
 }
 
-// Helper to create elements with attributes
+// Helper to create elements
 function createElement(tag, attributes) {
     const element = document.createElement(tag);
     Object.assign(element, attributes);
     return element;
 }
 
-// Initialize on page load
+// Initialize
 document.addEventListener("DOMContentLoaded", loadData);
