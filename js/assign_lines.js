@@ -1,7 +1,5 @@
 let teams = [];
 let allPlayers = [];
-const normalizedPlayerName = playerName.trim().toLowerCase();
-const player = allPlayers.find(p => p.name.trim().toLowerCase() === normalizedPlayerName);
 
 // Utility function to get data from localStorage
 function getFromLocalStorage(key) {
@@ -122,6 +120,7 @@ function onLineDrop(event, teamName, lineIndex, position) {
     event.preventDefault();
 
     const playerName = event.dataTransfer.getData("playerName");
+    const normalizedPlayerName = playerName.trim().toLowerCase();
     const team = teams.find(t => t.name === teamName);
 
     if (!team) {
