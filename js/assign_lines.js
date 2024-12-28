@@ -7,7 +7,9 @@ function loadFromLocalStorage() {
     const savedPlayers = localStorage.getItem("players");
 
     if (savedTeams) {
-        teams = JSON.parse(savedTeams);
+        const parsedTeams = JSON.parse(savedTeams);
+        teams.length = 0; // Clear existing array
+        teams.push(...parsedTeams); // Populate with new data
         console.log("Loaded teams from localStorage.");
     } else {
         console.log("No teams data found in localStorage.");
