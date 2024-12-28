@@ -50,10 +50,16 @@ function renderAssignedPlayers() {
     const playersList = document.getElementById("players-list");
     playersList.innerHTML = '';  // Clear existing list
 
+    // Log the players to check if the team and lineAssigned properties are correctly set
+    console.log("All Players: ", players);
+
     // Filter players who are assigned to a team but not yet assigned to a line
     const unassignedPlayers = players.filter(player => 
         player.team && player.lineAssigned === null // Assigned to a team but no line assigned
     );
+
+    // Log the filtered players
+    console.log("Unassigned Players: ", unassignedPlayers);
 
     // Check if there are any unassigned players
     if (unassignedPlayers.length > 0) {
