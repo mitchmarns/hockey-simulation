@@ -86,16 +86,21 @@ function onLineDrop(event, teamName, lineIndex, position) {
     }
 
     let line;
-    // Check which line (forward, defense, goalie) is being targeted based on the type of line
+    let lineContainer;
+
+    // Check which line (forward, defense, goalie) is being targeted
     if (position.includes('F')) {
-        // Forward Lines (Check if forward line)
+        // Forward Lines
         line = team.lines.forwardLines[lineIndex];
+        lineContainer = document.getElementById(`${teamName}-forward-line-${lineIndex}-${position}`);
     } else if (position.includes('D')) {
-        // Defense Lines (Check if defense line)
+        // Defense Lines
         line = team.lines.defenseLines[lineIndex];
+        lineContainer = document.getElementById(`${teamName}-defense-line-${lineIndex}-${position}`);
     } else if (position === 'starter' || position === 'backup') {
-        // Goalies (Check if it's goalie position)
+        // Goalies
         line = team.lines.goalies;
+        lineContainer = document.getElementById(`${teamName}-goalie-${position}`);
     }
 
     // If position is already filled, do nothing
@@ -109,6 +114,27 @@ function onLineDrop(event, teamName, lineIndex, position) {
 
     // Update teams data and re-render
     updateTeams();
+
+    // Update the drop zone to show the player's image and name
+    const player = allPlayers.find(p => p.name === playerName);
+    const playerCard = createElement("div", { className: "player-card" });
+
+    const playerImage = createElement("img", {
+        src: player ? player.image : 'https://via.placeholder.com/50',
+        alt: `${playerName}'s Image`,
+        className: "player-image"
+    });
+
+    const playerPosition = createElement("p", { textContent: position });
+    const playerNameElement = createElement("p", { textContent: playerName });
+
+    playerCard.appendChild(playerImage);
+    playerCard.appendChild(playerNameElement);
+    playerCard.appendChild(playerPosition);
+
+    // Append the player card to the drop zone
+    lineContainer.innerHTML = ''; // Clear previous content
+    lineContainer.appendChild(playerCard);
 }
 
 
@@ -144,21 +170,19 @@ function renderLineSection(title, lines, team, type) {
 
         Object.keys(line).forEach(position => {
             const playerName = line[position];
-
             const dropZone = createElement("div", {
                 className: "player-drop-zone",
+                id: `${team.name}-${type}-line-${index}-${position}`,
                 textContent: playerName ? `${playerName}` : `Drag ${position} here`,
             });
 
             dropZone.ondrop = e => onLineDrop(e, team.name, index, position);
             dropZone.ondragover = allowDrop;
 
-            // Add player cards with images if assigned
             if (playerName) {
                 const player = allPlayers.find(p => p.name === playerName);
                 const playerCard = createElement("div", { className: "player-card" });
 
-                // Add image if it exists
                 const playerImage = createElement("img", {
                     src: player ? player.image : 'https://via.placeholder.com/50', // Default image if no player found
                     alt: `${playerName}'s Image`,
