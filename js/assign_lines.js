@@ -100,15 +100,33 @@ function onPlayerDragStart(event, player) {
 function onLineDrop(event, teamName, lineIndex, position) {
     const playerData = JSON.parse(event.dataTransfer.getData("player"));
     event.preventDefault();
+    
     const team = teams.find(t => t.name === teamName);
 
-    // Assign player to the correct position in the team lines
+    if (!team) {
+        console.log(`Team ${teamName} not found.`);
+        return;
+    }
+
+    // Ensure the player is assigned to the team
+    if (playerData.team !== teamName) {
+        console.log(`${playerData.name} is not assigned to ${teamName}.`);
+        return; // Player is not on the correct team, do not assign
+    }
+
+    // Check if the position is available on the line
     const line = team.lines.forwardLines[lineIndex];  // For forward lines
+    if (line[position]) {
+        console.log(`${position} on ${teamName} Line ${lineIndex + 1} is already occupied.`);
+        return; // Position is already filled, don't allow assignment
+    }
+
+    // Assign player to the correct position
     line[position] = playerData.name;  // Assign player by name
 
     saveTeamsToLocalStorage(); // Save updated teams to localStorage
-    renderAssignedPlayers();
-    renderTeamLines();  // Re-render lines to reflect the changes
+    renderAssignedPlayers(); // Re-render the players list
+    renderTeamLines(); // Re-render lines to reflect the changes
 }
 
 // Allow dropping a player on a line position
