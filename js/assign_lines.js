@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadPlayers(teams) {
     const teamSelect = document.getElementById('teamSelect');
     const selectedTeam = teamSelect.value;
-    const players = teams[selectedTeam].players;
+    const players = teams[selectedTeam];
 
     const playerList = document.getElementById('playerList');
     playerList.innerHTML = ''; // Clear the previous list of players
@@ -42,6 +42,8 @@ function loadPlayers(teams) {
         `;
         playerList.appendChild(playerCard);
     });
+
+    loadLineAssignments(selectedTeam, players); // Call to load the lines
 }
 
 function loadLineAssignments(team, players) {
@@ -55,7 +57,7 @@ function loadLineAssignments(team, players) {
 
     // Generate forward lines
     for (let i = 0; i < 4; i++) {
-        const forwardLine = forwards.slice(i * 3, (i + 1) * 3);
+        const forwardLine = forwards.slice(i * 3, (i + 1) * 3); // Each line should have 3 forwards
         const forwardLineDiv = document.createElement('div');
         forwardLineDiv.classList.add('line');
         forwardLineDiv.innerHTML = `
@@ -70,7 +72,7 @@ function loadLineAssignments(team, players) {
 
     // Generate defensive pairings (assuming you have enough defensemen)
     for (let i = 0; i < 3; i++) {
-        const defenseLine = defensemen.slice(i * 2, (i + 1) * 2);
+        const defenseLine = defensemen.slice(i * 2, (i + 1) * 2); // Each pair should have 2 defensemen
         const defenseLineDiv = document.createElement('div');
         defenseLineDiv.classList.add('line');
         defenseLineDiv.innerHTML = `
@@ -98,7 +100,7 @@ function loadLineAssignments(team, players) {
 
 function assignPlayer(team, playerId) {
     const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
-    const player = teams[team].players.find(p => p.id === playerId);
+    const player = teams[team].find(p => p.id === playerId);
 
     // Store the player's line assignment here
     console.log(`Assigned ${player.name} to a line for ${team}`);
@@ -110,7 +112,7 @@ function assignToLine(team, lineType, lineIndex) {
 
     if (playerId) {
         const teams = JSON.parse(localStorage.getItem('teams'));  // Use teams, not teamsData
-        const player = teams[team].players.find(p => p.id === playerId);
+        const player = teams[team].find(p => p.id === playerId);
         console.log(`Assigned ${player.name} to ${lineType} Line ${lineIndex + 1}`);
         // You can also store this information back into localStorage or update the UI accordingly
     }
