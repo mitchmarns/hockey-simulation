@@ -138,31 +138,36 @@ header p {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: center;
+    padding: 20px;
 }
 
 .team-section {
-    width: 45%;
-    padding: 20px;
-    background-color: #ffffff;
+    width: 300px;
+    background-color: #f4f4f4;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .team-section h2 {
-    font-size: 1.8em;
-    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: bold;
     text-align: center;
+    margin-bottom: 10px;
     color: #333;
 }
+
 
 .line-section {
     margin-bottom: 20px;
 }
 
-.line-section h3 {
-    font-size: 1.4em;
+.line-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-bottom: 10px;
-    text-align: center;
 }
 
 .line-placeholder {
@@ -177,6 +182,72 @@ header p {
     margin-bottom: 10px;
     cursor: pointer;
 }
+
+.player-drop-zone {
+    width: 80px;
+    height: 100px;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.player-drop-zone:hover {
+    background-color: #cccccc;
+}
+
+.player-drop-zone p {
+    margin: 5px 0;
+}
+
+.player-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.player-card p {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+.player-card p:last-child {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Add styles for unassigned players list */
+#players-list {
+    list-style: none;
+    padding: 0;
+}
+
+#players-list li {
+    padding: 10px;
+    background-color: #e0e0e0;
+    margin: 5px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#players-list li:hover {
+    background-color: #cccccc;
+}
+
 
 /* Draggable Player Styling */
 .player-draggable {
