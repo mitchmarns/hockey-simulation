@@ -7,25 +7,28 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>Hockey Line Assignment</h1>
-        </header>
+    <h1>Assign Players to Lines</h1>
 
-        <!-- Unassigned Players Section -->
-        <section id="unassigned-players-section">
-            <h2>Unassigned Players</h2>
-            <ul id="players-list"></ul>
-        </section>
+    <div id="teamSelection">
+        <label for="teamSelect">Select Team:</label>
+        <select id="teamSelect" onchange="loadPlayers()">
+            <option value="">Choose a team</option>
+            <option value="Rangers">Rangers</option>
+            <option value="Devils">Devils</option>
+            <option value="Islanders">Islanders</option>
+            <option value="Sabres">Sabres</option>
+        </select>
+    </div>
 
-        <!-- Teams Section -->
-        <section id="teams-container">
-            <!-- Teams and lines will be dynamically rendered here -->
-        </section>
+    <div id="playerList" class="team-players">
+        <!-- Player list will be loaded here dynamically -->
+    </div>
+
+    <div id="lineAssignment">
+        <h3>Assign to Lines</h3>
+        <!-- Line assignment sections will be dynamically added here -->
     </div>
 
         <script src="../js/assign_lines.js"></script>
-    </div>
 </body>
 </html>
