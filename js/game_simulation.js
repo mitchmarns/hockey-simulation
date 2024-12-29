@@ -105,8 +105,31 @@ function simulatePeriod() {
     // Simulate events like goals, assists, and penalties
     simulateGoal(homeTeam);
     simulateGoal(awayTeam);
-    if (Math.random() < 0.5) playByPlay.push(simulatePenalty(homeTeam, playByPlay)); // 50% chance
-    if (Math.random() < 0.5) playByPlay.push(simulatePenalty(awayTeam, playByPlay)); // 50% chance
+    
+    // Simulate a penalty and add the result to playByPlay if it's not null
+    const homePenaltyMessage = simulatePenalty(homeTeam);
+    if (homePenaltyMessage) {
+        playByPlay.push(homePenaltyMessage);
+    }
+
+    const awayPenaltyMessage = simulatePenalty(awayTeam);
+    if (awayPenaltyMessage) {
+        playByPlay.push(awayPenaltyMessage);
+    }
+
+    // Handle power play and penalty kill units
+    if (homeTeam.penaltyBox.length > 0) {
+        playByPlay.push("Power play for " + awayTeam.name);
+        // Simulate power play events for the away team
+        simulatePowerPlay(awayTeam);
+        simulatePenaltyKill(homeTeam);
+    }
+    if (awayTeam.penaltyBox.length > 0) {
+        playByPlay.push("Power play for " + homeTeam.name);
+        // Simulate power play events for the home team
+        simulatePowerPlay(homeTeam);
+        simulatePenaltyKill(awayTeam);
+    }
 
     // Update score
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
@@ -176,6 +199,67 @@ function simulateGoal(team) {
         playByPlay.push(goalMessage);
     }
 }
+
+// Function to simulate a penalty
+function simulatePenalty(team) {
+    const penalizedPlayer = getRandomPlayer(team); // Pick a random player to be penalized
+    team.penaltyBox.push(penalizedPlayer); // Add the player to the penalty box
+
+    // Log the penalty in play-by-play
+    playByPlay.push(`${penalizedPlayer.name} from ${team.name} is penalized!`);
+
+    // Determine the power play/penalty kill units
+    if (team === homeTeam) {
+        // Away team gets power play, home team gets penalty kill
+        playByPlay.push(`${awayTeam.name} goes on a power play!`);
+        // Activate the penalty kill units for home team
+        updatePenaltyKillUnits(homeTeam);
+    } else {
+        // Home team gets power play, away team gets penalty kill
+        playByPlay.push(`${homeTeam.name} goes on a power play!`);
+        // Activate the penalty kill units for away team
+        updatePenaltyKillUnits(awayTeam);
+    }
+    
+    updatePlayByPlay();
+}
+
+// Helper function to update penalty kill units based on the current penalty box
+function updatePenaltyKillUnits(team) {
+    const penaltyKillUnit = team.lines.penaltyKillUnits[0]; // Get the first penalty kill unit
+
+    // Check if any player in the penalty box is part of the penalty kill unit
+    let penaltyKillPlayers = [];
+    penaltyKillUnit.F1 = team.players.find(player => player.id === penaltyKillUnit.F1);
+    penaltyKillUnit.F2 = team.players.find(player => player.id === penaltyKillUnit.F2);
+    penaltyKillUnit.D1 = team.players.find(player => player.id === penaltyKillUnit.D1);
+    penaltyKillUnit.D2 = team.players.find(player => player.id === penaltyKillUnit.D2);
+
+    // If no players available for penalty kill, randomly assign others to penalty kill unit
+    if (!penaltyKillUnit.F1 || !penaltyKillUnit.F2 || !penaltyKillUnit.D1 || !penaltyKillUnit.D2) {
+        // Example of handling fallback if no players are assigned
+        console.log("Penalty kill unit is incomplete, assigning remaining players.");
+    }
+}
+
+// Update the play-by-play list
+function updatePlayByPlay() {
+    playByPlayList.innerHTML = '';
+    playByPlay.forEach(event => {
+        let li = document.createElement('li');
+        li.textContent = event;
+        playByPlayList.appendChild(li);
+    });
+
+    // Display penalty box information
+    homeTeam.penaltyBox.forEach(player => {
+        playByPlay.push(`${player.name} is in the penalty box for ${homeTeam.name}`);
+    });
+    awayTeam.penaltyBox.forEach(player => {
+        playByPlay.push(`${player.name} is in the penalty box for ${awayTeam.name}`);
+    });
+}
+
 
 // Function to simulate an overtime period
 function simulateOvertime() {
