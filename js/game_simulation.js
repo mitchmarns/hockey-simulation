@@ -75,18 +75,23 @@ simulatePeriodBtn.addEventListener('click', () => {
         return;
     }
 
-    // Simulate a period, and if it's the 3rd period and the game is tied, go to overtime
     if (period <= 3) {
         simulatePeriod();
         period++;
-        periodElement.textContent = period;
 
-        // After the 3rd period, check if the score is tied
-        if (period > 3 && homeScore === awayScore && !overtime) {
+        // Update the period display unless the game ends
+        if (period > 3 && homeScore !== awayScore) {
+            playByPlay.push("The game is over!");
+            updatePlayByPlay();
+            simulatePeriodBtn.disabled = true; // Disable further simulation
+        } else if (period > 3 && homeScore === awayScore && !overtime) {
+            // Check for overtime if the game is tied
             overtime = true;
-            periodElement.textContent = "OT"; // Indicate that we're in overtime
+            periodElement.textContent = "OT"; // Show overtime
             playByPlay.push("Overtime! Sudden death period begins.");
             updatePlayByPlay();
+        } else {
+            periodElement.textContent = period;
         }
     } else if (overtime) {
         simulateOvertime();
