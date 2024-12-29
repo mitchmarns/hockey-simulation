@@ -47,8 +47,8 @@ export function simulatePowerPlay(team) {
     let goalChance = 0;
 
     team.lines.powerplayUnits.forEach(unit => {
-    Object.values(unit).forEach(player => {
-            if (player) {
+        Object.values(unit).forEach(player => {
+            if (player && player.skills) {
                 goalChance += player.skills.wristShotAccuracy * 0.5;
             }
         });
