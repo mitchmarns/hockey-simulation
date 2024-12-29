@@ -159,7 +159,7 @@ function simulateAssist(team, scorer) {
     return Math.random() * 50 < assistChance ? assister : null;
 }
 
-function simulateGoal(team) {
+export function simulateGoal(team) {
     let scorer = getRandomPlayer(team);
 
     // Scoring probability is influenced by shooting and puck control skills
