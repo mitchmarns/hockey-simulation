@@ -7,9 +7,29 @@ const teams = JSON.parse(localStorage.getItem('teams')) || []; // Default to an 
 
 // Function to get a random player from a team's line (using lineAssignments)
 function getRandomPlayerFromLine(team, positionType) {
-  const playersInLine = team.players.filter(player => 
-    player.lineAssignments && player.lineAssignments[positionType]
-  );
+  const playersInLine = [];
+
+  // Depending on the positionType, look for the correct line and position
+  if (['LW', 'C', 'RW'].includes(positionType)) {
+    // Forward lines (LW, C, RW)
+    team.lines.forwardLines.forEach(line => {
+      if (line[positionType]) {
+        playersInLine.push(line[positionType]);
+      }
+    });
+  } else if (['LD', 'RD'].includes(positionType)) {
+    // Defense lines (LD, RD)
+    team.lines.defenseLines.forEach(line => {
+      if (line[positionType]) {
+        playersInLine.push(line[positionType]);
+      }
+    });
+  } else if (positionType === 'Starter' || positionType === 'Backup') {
+    // Goalies (Starter, Backup)
+    if (team.lines.goalies[positionType]) {
+      playersInLine.push(team.lines.goalies[positionType]);
+    }
+  }
 
   console.log(`Players for position ${positionType}:`, playersInLine); // Log players for debugging
 
@@ -51,8 +71,8 @@ function simulatePeriod(period) {
   console.log('Away Team:', awayTeam);
 
   // Select random players for a scoring opportunity (home team's forward, away team's goalie)
-  const homeForward = getRandomPlayerFromLine(homeTeam, 'center'); // Example: Get center for home team
-  const awayGoalie = awayTeam.lines.goalies.starter; // Starter goalie for away team
+  const homeForward = getRandomPlayerFromLine(homeTeam, 'C'); // Example: Get center for home team
+  const awayGoalie = awayTeam.lines.goalies.Starter; // Starter goalie for away team
 
   console.log("Home Forward:", homeForward); // Log to check if forward is selected correctly
   console.log("Away Goalie:", awayGoalie); // Log to check if goalie is selected correctly
