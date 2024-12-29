@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.keys(positions).forEach(position => {
       positions[position].forEach(selector => {
         const selectElement = document.getElementById(selector);
-  
+
         // Check if "None" option already exists, if not, create it
         if (![...selectElement.options].some(option => option.value === "")) {
           const noneOption = document.createElement("option");
@@ -157,7 +157,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (teams.length > 0) {
       // Process the teams data
       console.log("Teams loaded:", teams);
-      // Continue with any other logic you need
+
+      // Populate team selection dropdown with the teams' names
+      teams.forEach(team => {
+        const option = document.createElement("option");
+        option.value = team.name;
+        option.text = team.name;
+        teamSelect.appendChild(option);
+      });
+
+      // If a team is already selected, populate the dropdowns with that team's players
+      const selectedTeam = teamSelect.value;
+      if (selectedTeam) {
+        const team = teams.find(t => t.name === selectedTeam);
+        if (team) {
+          populatePlayerOptions(team.players, selectedTeam);
+          loadLineAssignments(team);
+        }
+      }
     } else {
       console.log("No teams found in localStorage.");
     }
