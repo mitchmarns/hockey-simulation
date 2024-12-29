@@ -146,7 +146,7 @@ function simulateAssist(team, scorer) {
     );
 
     // Return the assister if the assist chance meets the threshold
-    return Math.random() * 150 < assistChance ? assister : null;
+    return Math.random() * 50 < assistChance ? assister : null;
 }
 
 function simulateGoal(team) {
@@ -161,7 +161,7 @@ function simulateGoal(team) {
     ) * Math.random();
 
     // Adjust the threshold for a goal
-    if (goalChance > 120) {
+    if (goalChance > 50) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
