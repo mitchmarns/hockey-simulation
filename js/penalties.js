@@ -21,6 +21,7 @@ export function simulatePenalty(team) {
         const penalty = penaltyTypes[Math.floor(Math.random() * penaltyTypes.length)];
 
         // Add player to the penalty box
+        if (!team.penaltyBox) team.penaltyBox = []; // Initialize if undefined
         team.penaltyBox.push(penalizedPlayer);
         
         // Determine the powerplay and penalty kill
