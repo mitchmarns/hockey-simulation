@@ -45,15 +45,16 @@ function getRandomPlayer(team) {
 export function simulatePowerPlay(team) {
     // Power play teams have a higher chance of scoring
     let goalChance = 0;
+
     team.lines.powerplayUnits.forEach(unit => {
-        unit.forEach(player => {
+    Object.values(unit).forEach(player => {
             if (player) {
                 goalChance += player.skills.wristShotAccuracy * 0.5;
             }
         });
     });
+
     if (Math.random() < goalChance / 100) {
-        // Simulate goal
         simulateGoal(team);
     }
 }
