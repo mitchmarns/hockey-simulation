@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Teams Assignment</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Special Teams Assignment</h1>
+  </header>
+
+  <main>
+    <section>
+      <label for="teamSelect">Select Team:</label>
+      <select id="teamSelect">
+        <option value="" disabled selected>Select a team</option>
+      </select>
+    </section>
+
+    <section id="specialTeamsSection">
+      <h2>Powerplay Units</h2>
+      <div>
+        <h3>Unit 1</h3>
+        <label>LW: <select id="pp1LW"></select></label>
+        <label>C: <select id="pp1C"></select></label>
+        <label>RW: <select id="pp1RW"></select></label>
+        <label>LD: <select id="pp1LD"></select></label>
+        <label>RD: <select id="pp1RD"></select></label>
+      </div>
+      <div>
+        <h3>Unit 2</h3>
+        <label>LW: <select id="pp2LW"></select></label>
+        <label>C: <select id="pp2C"></select></label>
+        <label>RW: <select id="pp2RW"></select></label>
+        <label>LD: <select id="pp2LD"></select></label>
+        <label>RD: <select id="pp2RD"></select></label>
+      </div>
+
+      <h2>Penalty Kill Units</h2>
+      <div>
+        <h3>Unit 1</h3>
+        <label>F1: <select id="pk1F1"></select></label>
+        <label>F2: <select id="pk1F2"></select></label>
+        <label>D1: <select id="pk1D1"></select></label>
+        <label>D2: <select id="pk1D2"></select></label>
+      </div>
+      <div>
+        <h3>Unit 2</h3>
+        <label>F1: <select id="pk2F1"></select></label>
+        <label>F2: <select id="pk2F2"></select></label>
+        <label>D1: <select id="pk2D1"></select></label>
+        <label>D2: <select id="pk2D2"></select></label>
+      </div>
+
+      <button id="saveSpecialTeamsBtn">Save Special Teams</button>
+    </section>
+  </main>
+
+  <script src="../js/special_teams.js"></script>
+</body>
+</html>
