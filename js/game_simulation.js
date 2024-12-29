@@ -128,18 +128,43 @@ function simulateOvertime() {
     }
 }
 
-// Function to simulate a goal
+function simulateAssist(team, scorer) {
+    // Get a potential assister from the same team, excluding the scorer
+    let possibleAssisters = team.players.filter(player => player.id !== scorer.id);
+    if (possibleAssisters.length === 0) return null; // No other players available
+
+    let assister = possibleAssisters[Math.floor(Math.random() * possibleAssisters.length)];
+
+    // Assisting probability based on passing, vision, and creativity
+    let assistChance = (
+        assister.skills.passing * 0.5 +
+        assister.skills.vision * 0.3 +
+        assister.skills.creativity * 0.2
+    ) * Math.random();
+
+    // Return assister if chance is above threshold, otherwise null
+    return assistChance > 100 ? assister : null;
+}
+
 function simulateGoal(team) {
     let scorer = getRandomPlayer(team);
-    let assist = getRandomPlayer(team);
 
-    // Calculate the chance of scoring based on player skills
-    let goalChance = scorer.skills.glove * Math.random();
-    if (goalChance > 75) {
+    // Scoring probability is influenced by shooting and puck control skills
+    let goalChance = (
+        scorer.skills.wristShotAccuracy * 0.4 +
+        scorer.skills.wristShotPower * 0.3 +
+        scorer.skills.puckControl * 0.2 +
+        scorer.skills.creativity * 0.1
+    ) * Math.random();
+
+    // Adjust the threshold for a goal (calibrated based on max possible skill sum)
+    if (goalChance > 120) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
-        let goalMessage = `${scorer.name} scores for ${team.name}! Assist by ${assist.name}`;
+        let assister = simulateAssist(team, scorer);
+        let assistMessage = assister ? `Assist by ${assister.name}` : "Unassisted";
+        let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
         playByPlay.push(goalMessage);
     }
 }
