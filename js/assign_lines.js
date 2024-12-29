@@ -115,8 +115,11 @@ autoAssignBtn.addEventListener("click", () => {
 
       // Check if the element exists before setting its value
       if (element) {
-        console.log(`Assigning ${player.name} to ${element.id}`);
-        element.value = player.id;
+        // Only update the value if the current value is "None"
+        if (element.value === "") {
+          console.log(`Assigning ${player.name} to ${element.id}`);
+          element.value = player.id;
+        }
       } else {
         console.log(`Element not found for ${player.name} at index ${lineIndex}`);
       }
