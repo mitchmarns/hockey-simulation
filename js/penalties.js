@@ -1,10 +1,8 @@
-// Import necessary functions
-
 // Function to simulate a penalty for a given team
-function simulatePenalty(team, playByPlay) {
+function simulatePenalty(team) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
-    if (!penalizedPlayer) return; // Handle edge cases where no players are available
+    if (!penalizedPlayer) return null; // Handle edge cases where no players are available
 
     // Calculate the penalty likelihood based on player skills
     let penaltyChance = (
@@ -22,12 +20,8 @@ function simulatePenalty(team, playByPlay) {
         ];
         const penalty = penaltyTypes[Math.floor(Math.random() * penaltyTypes.length)];
 
-        // Log penalty event
-        const penaltyMessage = `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}.`;
-
-        // Add the penalty to the play-by-play (you can modify this according to your simulation)
-        playByPlay.push(penaltyMessage);
-        return penaltyMessage;
+        // Return the penalty message instead of pushing it to playByPlay
+        return `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}.`;
     }
 
     return null; // No penalty occurred
@@ -38,5 +32,5 @@ function getRandomPlayer(team) {
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
-// Export the functions to be used in other files
+// Export the function to be used in other files
 export { simulatePenalty };
