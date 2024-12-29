@@ -42,7 +42,7 @@ function getRandomPlayer(team) {
 }
 
 // Function to simulate a power play (team with advantage)
-function simulatePowerPlay(team) {
+export function simulatePowerPlay(team) {
     // Power play teams have a higher chance of scoring
     let goalChance = 0;
     team.lines.powerplayUnits.forEach(unit => {
@@ -59,7 +59,7 @@ function simulatePowerPlay(team) {
 }
 
 // Function to simulate penalty kill (team with disadvantage)
-function simulatePenaltyKill(team) {
+export function simulatePenaltyKill(team) {
     // Penalty kill teams have a reduced chance of letting a goal
     let saveChance = 0;
     team.lines.penaltyKillUnits.forEach(unit => {
