@@ -22,9 +22,9 @@ function getRandomPlayerFromLine(team, positionType) {
     // Forward lines (LW, C, RW)
     Object.values(team.lineAssignments.forwardLines).forEach(line => {
       if (line[positionType]) {
-        const playerId = line[positionType];
-        const player = getPlayerById(playerId);
-        if (player) playersInLine.push(player);
+        const playerId = line[positionType];  // Get the player ID from the position
+        const player = getPlayerById(playerId);  // Retrieve the player by ID
+        if (player) playersInLine.push(player);  // Add to the list if the player exists
       }
     });
   } else if (['LD', 'RD'].includes(positionType)) {
