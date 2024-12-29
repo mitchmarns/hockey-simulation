@@ -73,60 +73,56 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Function to populate player options based on team
-  function populatePlayerOptions(players, team) {
-    const positions = {
-      "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
-      "C": ["line1C", "line2C", "line3C", "line4C"],
-      "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
-      "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
-      "Starter": ["starter"],
-      "Backup": ["backup"]
-    };
+function populatePlayerOptions(players, team) {
+  const positions = {
+    LW: ["line1LW", "line2LW", "line3LW", "line4LW"],
+    C: ["line1C", "line2C", "line3C", "line4C"],
+    RW: ["line1RW", "line2RW", "line3RW", "line4RW"],
+    LD: ["defLine1LD", "defLine2LD", "defLine3LD"],
+    RD: ["defLine1RD", "defLine2RD", "defLine3RD"],
+    Starter: ["starter"],
+    Backup: ["backup"],
+  };
 
-    // Clear all select options first
-    Object.values(positions).flat().forEach(selector => {
+  // Clear all select options first
+  Object.values(positions)
+    .flat()
+    .forEach((selector) => {
       const selectElement = document.getElementById(selector);
-      selectElement.innerHTML = "";  // Clear options
+      selectElement.innerHTML = ""; // Clear options
+
+      // Add "None" option as the first option
+      const noneOption = document.createElement("option");
+      noneOption.value = "None"; // Ensure a unique value for "None"
+      noneOption.text = "None";
+      selectElement.appendChild(noneOption);
     });
 
-    // Filter players by team and position
-    const playersByPosition = {};
-    Object.keys(positions).forEach(position => {
-      playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
-    });
+  // Filter players by team and position
+  const playersByPosition = {};
+  Object.keys(positions).forEach((position) => {
+    playersByPosition[position] = players.filter(
+      (player) =>
+        player.position === position && (player.team === team || player.team === null)
+    );
+  });
 
-    players.forEach(player => {
-      if (player.team === team || player.team === null) { // Filter by team
-        // Add the player to the correct dropdown based on their position
-        if (positions[player.position]) {
-          const option = document.createElement("option");
-          option.value = player.id;
-          option.text = player.name;
+  // Populate the dropdowns with players
+  players.forEach((player) => {
+    if (player.team === team || player.team === null) {
+      if (positions[player.position]) {
+        const option = document.createElement("option");
+        option.value = player.id;
+        option.text = player.name;
 
-          positions[player.position].forEach(selector => {
-            const selectElement = document.getElementById(selector);
-            selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
-          });
-        }
+        positions[player.position].forEach((selector) => {
+          const selectElement = document.getElementById(selector);
+          selectElement.appendChild(option.cloneNode(true)); // Add player to relevant dropdown
+        });
       }
-    });
-
-    // Ensure that "None" option is always available in every dropdown
-    Object.keys(positions).forEach(position => {
-      positions[position].forEach(selector => {
-        const selectElement = document.getElementById(selector);
-
-        // Check if "None" option already exists, if not, create it
-        if (![...selectElement.options].some(option => option.value === "")) {
-          const noneOption = document.createElement("option");
-          noneOption.value = "";
-          noneOption.text = "None";
-          selectElement.appendChild(noneOption);
-        }
-      });
-    });
-  }
+    }
+  });
+}
 
   // Function to load the line assignments into the dropdowns
   function loadLineAssignments(team) {
