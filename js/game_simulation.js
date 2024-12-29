@@ -59,16 +59,15 @@ startGameBtn.addEventListener('click', () => {
     homeScore = 0;
     awayScore = 0;
     playByPlay = [];
-    simulatePeriodBtn.disabled = false; // Enable the simulate button for the new game
-    teamSelect1.disabled = true; // Lock team selection
-    teamSelect2.disabled = true; // Lock team selection
+    simulatePeriodBtn.disabled = false; 
+    teamSelect1.disabled = true; 
+    teamSelect2.disabled = true; 
 
     // Update UI
     periodElement.textContent = period;
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
     updatePlayByPlay();
 });
-
 
 // Event listener for simulating a period
 simulatePeriodBtn.addEventListener('click', () => {
@@ -106,30 +105,16 @@ function simulatePeriod() {
     simulateGoal(homeTeam);
     simulateGoal(awayTeam);
     
-    // Simulate a penalty and add the result to playByPlay if it's not null
-    const homePenaltyMessage = simulatePenalty(homeTeam);
-    if (homePenaltyMessage) {
-        playByPlay.push(homePenaltyMessage);
-    }
+    // Simulate penalties
+    const homePenaltyMessage = simulatePenalty(homeTeam, homeTeam, awayTeam);
+    if (homePenaltyMessage) playByPlay.push(homePenaltyMessage);
 
-    const awayPenaltyMessage = simulatePenalty(awayTeam);
-    if (awayPenaltyMessage) {
-        playByPlay.push(awayPenaltyMessage);
-    }
+    const awayPenaltyMessage = simulatePenalty(awayTeam, homeTeam, awayTeam);
+    if (awayPenaltyMessage) playByPlay.push(awayPenaltyMessage);
 
-    // Handle power play and penalty kill units
-    if (homeTeam.penaltyBox.length > 0) {
-        playByPlay.push("Power play for " + awayTeam.name);
-        // Simulate power play events for the away team
-        simulatePowerPlay(awayTeam);
-        simulatePenaltyKill(homeTeam);
-    }
-    if (awayTeam.penaltyBox.length > 0) {
-        playByPlay.push("Power play for " + homeTeam.name);
-        // Simulate power play events for the home team
-        simulatePowerPlay(homeTeam);
-        simulatePenaltyKill(awayTeam);
-    }
+    // Handle power plays
+    if (homeTeam.penaltyBox?.length > 0) simulatePowerPlay(awayTeam);
+    if (awayTeam.penaltyBox?.length > 0) simulatePowerPlay(homeTeam);
 
     // Update score
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
