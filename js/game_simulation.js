@@ -2,6 +2,33 @@ import { checkPenalties } from './penalties.js';
 import { checkInjuries } from './injuries.js';
 import { updatePlayByPlay } from './play_by_play.js';
 
+// Retrieve teams from localStorage (assuming they are stored there)
+const teams = JSON.parse(localStorage.getItem('teams')) || []; // Default to an empty array if no teams are found
+
+// Populate team dropdowns in the HTML
+function populateTeamDropdowns() {
+  const teamSelect1 = document.getElementById('teamSelect1');
+  const teamSelect2 = document.getElementById('teamSelect2');
+
+  // Clear existing options
+  teamSelect1.innerHTML = '<option value="" disabled selected>Select a team</option>';
+  teamSelect2.innerHTML = '<option value="" disabled selected>Select a team</option>';
+
+  // Populate options with teams from localStorage
+  teams.forEach(team => {
+    const option1 = document.createElement('option');
+    option1.value = team.name;
+    option1.textContent = team.name;
+    teamSelect1.appendChild(option1);
+
+    const option2 = document.createElement('option');
+    option2.value = team.name;
+    option2.textContent = team.name;
+    teamSelect2.appendChild(option2);
+  });
+}
+
+// Simulate the game
 function simulateGame() {
   // Initialize game state
   let period = 1;
@@ -28,3 +55,21 @@ function simulateGame() {
     }
   }
 }
+
+// Event listener to start the game simulation
+document.getElementById('startGameBtn').addEventListener('click', () => {
+  const homeTeam = document.getElementById('teamSelect1').value;
+  const awayTeam = document.getElementById('teamSelect2').value;
+
+  if (!homeTeam || !awayTeam) {
+    alert('Please select both home and away teams!');
+  } else {
+    document.getElementById('homeTeamName').textContent = homeTeam;
+    document.getElementById('awayTeamName').textContent = awayTeam;
+
+    simulateGame();
+  }
+});
+
+// Call this function on page load to populate the team dropdowns
+populateTeamDropdowns();
