@@ -1,10 +1,8 @@
 let teams = JSON.parse(localStorage.getItem("teams")) || [];
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const teamSelect = document.getElementById("teamSelect");
   const saveLinesBtn = document.getElementById("saveLinesBtn");
-  const autoAssignBtn = document.getElementById("autoAssignBtn");
 
   // Load teams from localStorage (or initialize if empty)
   loadTeamsFromLocalStorage();
@@ -74,120 +72,60 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Line Assignments Saved:", lineAssignments);
   });
 
-  // Handle Auto-Assign button click
-autoAssignBtn.addEventListener("click", () => {
-  const selectedTeam = teamSelect.value;
-  const team = teams.find(t => t.name === selectedTeam); // Get the team data
-
-  if (team) {
-    const players = team.players.filter(player => player.team === selectedTeam || player.team === null);
-
-    // Get available positions
+  // Function to populate player options based on team
+  function populatePlayerOptions(players, team) {
     const positions = {
-      forwardLines: ["line1LW", "line1C", "line1RW", "line2LW", "line2C", "line2RW", "line3LW", "line3C", "line3RW", "line4LW", "line4C", "line4RW"],
-      defenseLines: ["defLine1LD", "defLine1RD", "defLine2LD", "defLine2RD", "defLine3LD", "defLine3RD"],
-      goalies: ["starter", "backup"]
+      "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
+      "C": ["line1C", "line2C", "line3C", "line4C"],
+      "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
+      "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
+      "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
+      "Starter": ["starter"],
+      "Backup": ["backup"]
     };
 
-    // Rank all players for each position
-    const rankedForwards = rankPlayersForPosition(players, "LW")
-      .concat(rankPlayersForPosition(players, "C"))
-      .concat(rankPlayersForPosition(players, "RW"));
-    const rankedDefense = rankPlayersForPosition(players, "LD")
-      .concat(rankPlayersForPosition(players, "RD"));
-    const rankedGoalies = rankPlayersForPosition(players, "Starter")
-      .concat(rankPlayersForPosition(players, "Backup"));
-    
-    const allRankedPlayers = [...rankedForwards, ...rankedDefense, ...rankedGoalies];
-
-    // Assign players to the lines sequentially
-    let lineIndex = 0;
-    allRankedPlayers.forEach(player => {
-      // Assign the player to the next available slot
-      let element;
-      if (lineIndex < positions.forwardLines.length) {
-        element = document.getElementById(positions.forwardLines[lineIndex]);
-      } else if (lineIndex < positions.forwardLines.length + positions.defenseLines.length) {
-        element = document.getElementById(positions.defenseLines[lineIndex - positions.forwardLines.length]);
-      } else {
-        element = document.getElementById(positions.goalies[lineIndex - positions.forwardLines.length - positions.defenseLines.length]);
-      }
-
-      // Check if the element exists before setting its value
-      if (element) {
-        // Only update the value if the current value is "None"
-        if (element.value === "") {
-          console.log(`Assigning ${player.name} to ${element.id}`);
-          element.value = player.id;
-        }
-      } else {
-        console.log(`Element not found for ${player.name} at index ${lineIndex}`);
-      }
-
-      lineIndex++; // Move to the next line position
+    // Clear all select options first
+    Object.values(positions).flat().forEach(selector => {
+      const selectElement = document.getElementById(selector);
+      selectElement.innerHTML = "";  // Clear options
     });
 
-    console.log("Auto-assigned players for", selectedTeam);
+    // Filter players by team and position
+    const playersByPosition = {};
+    Object.keys(positions).forEach(position => {
+      playersByPosition[position] = players.filter(player => player.position === position && (player.team === team || player.team === null));
+    });
 
-    // Ensure that players are populated in dropdowns after assignment
-    populatePlayerOptions(players, selectedTeam);
-  }
-});
-  
-  // Function to get position based on line index
-  function getPositionForLine(idx) {
-    if (idx % 3 === 0) return "LW";
-    if (idx % 3 === 1) return "C";
-    if (idx % 3 === 2) return "RW";
-  }
+    players.forEach(player => {
+      if (player.team === team || player.team === null) { // Filter by team
+        // Add the player to the correct dropdown based on their position
+        if (positions[player.position]) {
+          const option = document.createElement("option");
+          option.value = player.id;
+          option.text = player.name;
 
-  // Function to populate player options based on team
-function populatePlayerOptions(players, team) {
-  const positions = {
-    "LW": ["line1LW", "line2LW", "line3LW", "line4LW"],
-    "C": ["line1C", "line2C", "line3C", "line4C"],
-    "RW": ["line1RW", "line2RW", "line3RW", "line4RW"],
-    "LD": ["defLine1LD", "defLine2LD", "defLine3LD"],
-    "RD": ["defLine1RD", "defLine2RD", "defLine3RD"],
-    "Starter": ["starter"],
-    "Backup": ["backup"]
-  };
+          positions[player.position].forEach(selector => {
+            const selectElement = document.getElementById(selector);
+            selectElement.appendChild(option.cloneNode(true)); // Add option to relevant line dropdowns
+          });
+        }
+      }
+    });
 
-  // Clear all select options first
-  Object.values(positions).flat().forEach(selector => {
-    const selectElement = document.getElementById(selector);
-    selectElement.innerHTML = ""; // Clear existing options
+    // Add "None" option to each dropdown if there are not enough players for that position
+    Object.keys(positions).forEach(position => {
+      positions[position].forEach(selector => {
+        const selectElement = document.getElementById(selector);
 
-    // Always add the "None" option
-    const noneOption = document.createElement("option");
-    noneOption.value = ""; // Use empty string for "None"
-    noneOption.text = "None";
-    selectElement.appendChild(noneOption);
-  });
-
-  // Filter players by team and position
-  const playersByPosition = {};
-  Object.keys(positions).forEach(position => {
-    playersByPosition[position] = players.filter(
-      player => player.position === position && (player.team === team || player.team === null)
-    );
-  });
-
-  // Populate the dropdowns for each position
-  Object.keys(positions).forEach(position => {
-    positions[position].forEach(selector => {
-      const selectElement = document.getElementById(selector);
-
-      // Add players to the dropdown for each position
-      playersByPosition[position].forEach(player => {
-        const option = document.createElement("option");
-        option.value = player.id;
-        option.text = player.name;
-        selectElement.appendChild(option);
+        if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
+          const noneOption = document.createElement("option");
+          noneOption.value = null;
+          noneOption.text = "None";
+          selectElement.appendChild(noneOption);
+        }
       });
     });
-  });
-}
+  }
 
   // Function to load the line assignments into the dropdowns
   function loadLineAssignments(team) {
@@ -213,27 +151,6 @@ function populatePlayerOptions(players, team) {
     }
   }
 
-function rankPlayersForPosition(players, position) {
-  return players
-    .map(player => {
-      const { skills } = player;
-      let score = 0;
-
-      if (position === "LW" || position === "RW") {
-        score = (skills.speed || 0) * 0.4 + (skills.shooting || 0) * 0.4 + (skills.awareness || 0) * 0.2;
-      } else if (position === "C") {
-        score = (skills.faceoffs || 0) * 0.5 + (skills.passing || 0) * 0.3 + (skills.awareness || 0) * 0.2;
-      } else if (position === "LD" || position === "RD") {
-        score = (skills.defense || 0) * 0.5 + (skills.strength || 0) * 0.3 + (skills.shotBlocking || 0) * 0.2;
-      } else if (position === "Starter" || position === "Backup") {
-        score = (skills.glove || 0) * 0.4 + (skills.stick || 0) * 0.4 + (skills.reactions || 0) * 0.2;
-      }
-
-      return { ...player, score };
-    })
-    .sort((a, b) => b.score - a.score); // Higher scores first
-}
-  
   // Function to load teams from localStorage
   function loadTeamsFromLocalStorage() {
     if (teams.length > 0) {
