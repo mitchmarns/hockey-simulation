@@ -1,10 +1,11 @@
 // Function to simulate a penalty for a given team
+// Function to simulate a penalty for a given team
 function simulatePenalty(team) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
     if (!penalizedPlayer) return null; // Handle edge cases where no players are available
 
-    // Calculate the penalty likelihood based on player skills
+    // Calculate the penalty likelihood based on player skills (same as before)
     let penaltyChance = (
         penalizedPlayer.skills.aggression * 0.4 - // Aggression increases penalty chance
         penalizedPlayer.skills.poise * 0.3 +     // Poise decreases penalty chance
@@ -20,8 +21,14 @@ function simulatePenalty(team) {
         ];
         const penalty = penaltyTypes[Math.floor(Math.random() * penaltyTypes.length)];
 
-        // Return the penalty message instead of pushing it to playByPlay
-        return `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}.`;
+        // Add player to the penalty box
+        team.penaltyBox.push(penalizedPlayer);
+        
+        // Determine the powerplay and penalty kill
+        let opponent = team === homeTeam ? awayTeam : homeTeam;
+        
+        // Log penalty event
+        return `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}. ${opponent.name} gets a power play!`;
     }
 
     return null; // No penalty occurred
