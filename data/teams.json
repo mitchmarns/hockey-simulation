@@ -16,7 +16,15 @@
                 { "LD": null, "RD": null },
                 { "LD": null, "RD": null }
             ],
-            "goalies": { "starter": null, "backup": null }
+            "goalies": { "starter": null, "backup": null },
+              "powerplayUnits": [
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null },
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null }
+              ],
+              "penaltyKillUnits": [
+                { "F1": null, "F2": null, "D1": null, "D2": null },
+                { "F1": null, "F2": null, "D1": null, "D2": null }
+              ]
         }
     },
     {
@@ -36,7 +44,15 @@
                 { "LD": null, "RD": null },
                 { "LD": null, "RD": null }
             ],
-            "goalies": { "starter": null, "backup": null }
+            "goalies": { "starter": null, "backup": null },
+              "powerplayUnits": [
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null },
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null }
+              ],
+              "penaltyKillUnits": [
+                { "F1": null, "F2": null, "D1": null, "D2": null },
+                { "F1": null, "F2": null, "D1": null, "D2": null }
+              ]
         }
     },
     {
@@ -56,7 +72,15 @@
                 { "LD": null, "RD": null },
                 { "LD": null, "RD": null }
             ],
-            "goalies": { "starter": null, "backup": null }
+            "goalies": { "starter": null, "backup": null },
+              "powerplayUnits": [
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null },
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null }
+              ],
+              "penaltyKillUnits": [
+                { "F1": null, "F2": null, "D1": null, "D2": null },
+                { "F1": null, "F2": null, "D1": null, "D2": null }
+              ]
         }
     },
     {
@@ -76,7 +100,15 @@
                 { "LD": null, "RD": null },
                 { "LD": null, "RD": null }
             ],
-            "goalies": { "starter": null, "backup": null }
+            "goalies": { "starter": null, "backup": null },
+              "powerplayUnits": [
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null },
+                { "LW": null, "C": null, "RW": null, "LD": null, "RD": null }
+              ],
+              "penaltyKillUnits": [
+                { "F1": null, "F2": null, "D1": null, "D2": null },
+                { "F1": null, "F2": null, "D1": null, "D2": null }
+              ]
         }
     }
 ]
