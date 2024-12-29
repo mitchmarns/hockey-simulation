@@ -1,3 +1,5 @@
+import { simulateGoal } from './game_simulation.js';
+
 // Function to simulate a penalty for a given team
 export function simulatePenalty(team) {
     // Pick a random player from the team
@@ -39,3 +41,36 @@ function getRandomPlayer(team) {
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
+// Function to simulate a power play (team with advantage)
+function simulatePowerPlay(team) {
+    // Power play teams have a higher chance of scoring
+    let goalChance = 0;
+    team.lines.powerplayUnits.forEach(unit => {
+        unit.forEach(player => {
+            if (player) {
+                goalChance += player.skills.wristShotAccuracy * 0.5;
+            }
+        });
+    });
+    if (Math.random() < goalChance / 100) {
+        // Simulate goal
+        simulateGoal(team);
+    }
+}
+
+// Function to simulate penalty kill (team with disadvantage)
+function simulatePenaltyKill(team) {
+    // Penalty kill teams have a reduced chance of letting a goal
+    let saveChance = 0;
+    team.lines.penaltyKillUnits.forEach(unit => {
+        unit.forEach(player => {
+            if (player) {
+                saveChance += player.skills.stickChecking * 0.4;
+            }
+        });
+    });
+    if (Math.random() > saveChance / 100) {
+        // If save chance is low, allow a goal
+        simulateGoal(team === homeTeam ? awayTeam : homeTeam);
+    }
+}
