@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Simulation</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Game Simulation</h1>
+  </header>
+
+  <main>
+    <section>
+      <label for="teamSelect1">Select Home Team:</label>
+      <select id="teamSelect1">
+        <option value="" disabled selected>Select a team</option>
+      </select>
+    </section>
+
+    <section>
+      <label for="teamSelect2">Select Away Team:</label>
+      <select id="teamSelect2">
+        <option value="" disabled selected>Select a team</option>
+      </select>
+    </section>
+
+    <section>
+      <button id="startGameBtn">Start Game</button>
+    </section>
+
+    <section id="gameDetails">
+      <h2>Game Details</h2>
+      <p><strong>Home Team:</strong> <span id="homeTeamName"></span></p>
+      <p><strong>Away Team:</strong> <span id="awayTeamName"></span></p>
+      <p><strong>Period:</strong> <span id="period">1</span></p>
+      <p><strong>Score:</strong> <span id="score"></span></p>
+      <h3>Play-by-Play:</h3>
+      <ul id="playByPlay"></ul>
+    </section>
+    
+    <section>
+      <button id="simulatePeriodBtn">Simulate Period</button>
+    </section>
+  </main>
+
+  <script src="../js/game_simulation.js"></script>
+</body>
+</html>
