@@ -1,6 +1,5 @@
 // Function to simulate a penalty for a given team
-// Function to simulate a penalty for a given team
-function simulatePenalty(team) {
+export function simulatePenalty(team) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
     if (!penalizedPlayer) return null; // Handle edge cases where no players are available
