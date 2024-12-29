@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const team = teams.find(t => t.name === selectedTeam);
     if (team) {
       const players = team.players;
-      populatePlayerOptions(players, selectedTeam);
+      populatePlayerOptions(players, selectedTeam);  // Populate players for PP and PK units
       loadSpecialTeamAssignments(team);
     }
   });
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Populate dropdowns with player options
+  // Populate dropdowns with player options for powerplay and penalty kill
   function populatePlayerOptions(players, teamName) {
     const positions = {
       "LW": ["pp1LW", "pp2LW"],
@@ -109,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = player.id;
         option.text = player.name;
 
+        // Handle PP positions
         Object.entries(positions).forEach(([pos, selectors]) => {
           if (player.position === pos) {
             selectors.forEach(selector => {
@@ -118,6 +119,32 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       }
+    });
+
+    // Handle penalty kill units (forwards and defensemen)
+    const forwards = players.filter(player => player.position === "LW" || player.position === "C" || player.position === "RW");
+    const defensemen = players.filter(player => player.position === "LD" || player.position === "RD");
+
+    // Add forwards to pk dropdowns
+    forwards.forEach(player => {
+      const option = document.createElement("option");
+      option.value = player.id;
+      option.text = player.name;
+      ["pk1F1", "pk1F2", "pk2F1", "pk2F2"].forEach(id => {
+        const dropdown = document.getElementById(id);
+        dropdown.appendChild(option.cloneNode(true));
+      });
+    });
+
+    // Add defensemen to pk dropdowns
+    defensemen.forEach(player => {
+      const option = document.createElement("option");
+      option.value = player.id;
+      option.text = player.name;
+      ["pk1D1", "pk1D2", "pk2D1", "pk2D2"].forEach(id => {
+        const dropdown = document.getElementById(id);
+        dropdown.appendChild(option.cloneNode(true));
+      });
     });
 
     // Add "None" option to each dropdown
