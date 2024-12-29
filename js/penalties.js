@@ -38,5 +38,3 @@ function getRandomPlayer(team) {
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
-// Export the function to be used in other files
-export { simulatePenalty };
