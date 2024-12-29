@@ -20,7 +20,7 @@ function getRandomPlayerFromLine(team, positionType) {
   // Depending on the positionType, look for the correct line and position
   if (['LW', 'C', 'RW'].includes(positionType)) {
     // Forward lines (LW, C, RW)
-    team.lineAssignments.forwardLines.forEach(line => {
+    Object.values(team.lineAssignments.forwardLines).forEach(line => {
       if (line[positionType]) {
         const playerId = line[positionType];
         const player = getPlayerById(playerId);
@@ -29,7 +29,7 @@ function getRandomPlayerFromLine(team, positionType) {
     });
   } else if (['LD', 'RD'].includes(positionType)) {
     // Defense lines (LD, RD)
-    team.lineAssignments.defenseLines.forEach(line => {
+    Object.values(team.lineAssignments.defenseLines).forEach(line => {
       if (line[positionType]) {
         const playerId = line[positionType];
         const player = getPlayerById(playerId);
