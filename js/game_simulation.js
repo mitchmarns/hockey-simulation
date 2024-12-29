@@ -1,4 +1,4 @@
-import { simulatePenalty } from './penalties.js';
+import { simulatePenalty, simulatePowerPlay, simulatePenaltyKill } from './penalties.js';
 
 // Retrieve the teams from localStorage
 let teams = JSON.parse(localStorage.getItem('teams'));
