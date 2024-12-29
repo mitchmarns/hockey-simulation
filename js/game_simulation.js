@@ -5,6 +5,14 @@ import { updatePlayByPlay } from './play_by_play.js';
 // Retrieve teams from localStorage (assuming they are stored there)
 const teams = JSON.parse(localStorage.getItem('teams')) || []; // Default to an empty array if no teams are found
 
+// Retrieve players from localStorage or a default empty array
+const players = JSON.parse(localStorage.getItem('players')) || []; // You should have players data stored here
+
+// Function to get a player by their ID
+function getPlayerById(playerId) {
+  return players.find(player => player.id === playerId);
+}
+
 // Function to get a random player from a team's line (using lineAssignments)
 function getRandomPlayerFromLine(team, positionType) {
   const playersInLine = [];
@@ -12,22 +20,28 @@ function getRandomPlayerFromLine(team, positionType) {
   // Depending on the positionType, look for the correct line and position
   if (['LW', 'C', 'RW'].includes(positionType)) {
     // Forward lines (LW, C, RW)
-    team.lines.forwardLines.forEach(line => {
+    team.lineAssignments.forwardLines.forEach(line => {
       if (line[positionType]) {
-        playersInLine.push(line[positionType]);
+        const playerId = line[positionType];
+        const player = getPlayerById(playerId);
+        if (player) playersInLine.push(player);
       }
     });
   } else if (['LD', 'RD'].includes(positionType)) {
     // Defense lines (LD, RD)
-    team.lines.defenseLines.forEach(line => {
+    team.lineAssignments.defenseLines.forEach(line => {
       if (line[positionType]) {
-        playersInLine.push(line[positionType]);
+        const playerId = line[positionType];
+        const player = getPlayerById(playerId);
+        if (player) playersInLine.push(player);
       }
     });
   } else if (positionType === 'Starter' || positionType === 'Backup') {
     // Goalies (Starter, Backup)
-    if (team.lines.goalies[positionType]) {
-      playersInLine.push(team.lines.goalies[positionType]);
+    const playerId = team.lineAssignments.goalies[positionType];
+    if (playerId) {
+      const player = getPlayerById(playerId);
+      if (player) playersInLine.push(player);
     }
   }
 
@@ -72,7 +86,7 @@ function simulatePeriod(period) {
 
   // Select random players for a scoring opportunity (home team's forward, away team's goalie)
   const homeForward = getRandomPlayerFromLine(homeTeam, 'C'); // Example: Get center for home team
-  const awayGoalie = awayTeam.lines.goalies.Starter; // Starter goalie for away team
+  const awayGoalie = awayTeam.lineAssignments.goalies.Starter; // Starter goalie for away team
 
   console.log("Home Forward:", homeForward); // Log to check if forward is selected correctly
   console.log("Away Goalie:", awayGoalie); // Log to check if goalie is selected correctly
