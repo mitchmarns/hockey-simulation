@@ -105,8 +105,8 @@ function simulatePeriod() {
     // Simulate events like goals, assists, and penalties
     simulateGoal(homeTeam);
     simulateGoal(awayTeam);
-    playByPlay.push(simulatePenalty(homeTeam));
-    playByPlay.push(simulatePenalty(awayTeam));
+    if (Math.random() < 0.5) playByPlay.push(simulatePenalty(homeTeam)); // 50% chance
+    if (Math.random() < 0.5) playByPlay.push(simulatePenalty(awayTeam)); // 50% chance
 
     // Update score
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
