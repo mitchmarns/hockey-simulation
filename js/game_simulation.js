@@ -5,19 +5,18 @@ import { updatePlayByPlay } from './play_by_play.js';
 // Retrieve teams from localStorage (assuming they are stored there)
 const teams = JSON.parse(localStorage.getItem('teams')) || []; // Default to an empty array if no teams are found
 
-// Function to get a random player from a team's forward or defense lines
-function getRandomPlayerFromLine(team, lineType) {
-  const line = team.lines[lineType]; // forwardLines, defenseLines, etc.
-  const allPlayers = [];
+// Function to get a random player from a team's line (using lineAssignments)
+function getRandomPlayerFromLine(team, positionType) {
+  const playersInLine = team.players.filter(player => 
+    player.lineAssignments && player.lineAssignments[positionType]
+  );
 
-  line.forEach(position => {
-    Object.values(position).forEach(player => {
-      if (player) allPlayers.push(player);
-    });
-  });
+  if (playersInLine.length === 0) {
+    console.error(`No players found for position type: ${positionType}`);
+    return null;
+  }
 
-  console.log(allPlayers); // Log players to see if we are getting them correctly
-  return allPlayers[Math.floor(Math.random() * allPlayers.length)];
+  return playersInLine[Math.floor(Math.random() * playersInLine.length)];
 }
 
 // Function to simulate a goal chance based on shooter and goalie skills
@@ -39,15 +38,15 @@ function attemptGoal(shooter, goalie) {
 
 // Function to simulate a period of the game
 function simulatePeriod(period) {
-  const homeTeam = document.getElementById('teamSelect1').value;
-  const awayTeam = document.getElementById('teamSelect2').value;
+  const homeTeamName = document.getElementById('teamSelect1').value;
+  const awayTeamName = document.getElementById('teamSelect2').value;
 
-  const homeTeamData = teams.find(team => team.name === homeTeam);
-  const awayTeamData = teams.find(team => team.name === awayTeam);
+  const homeTeam = teams.find(team => team.name === homeTeamName);
+  const awayTeam = teams.find(team => team.name === awayTeamName);
 
-  // Select random players for a scoring opportunity
-  const homeForward = getRandomPlayerFromLine(homeTeamData, 'forwardLines');
-  const awayGoalie = awayTeamData.lines.goalies.starter;
+  // Select random players for a scoring opportunity (home team's forward, away team's goalie)
+  const homeForward = getRandomPlayerFromLine(homeTeam, 'center'); // Example: Get center for home team
+  const awayGoalie = awayTeam.lines.goalies.starter; // Starter goalie for away team
 
   console.log(homeForward, awayGoalie); // Log to verify player data
 
@@ -58,7 +57,7 @@ function simulatePeriod(period) {
   const awayScore = Math.floor(Math.random() * 5); // Random away team score for simplicity
 
   // Update the score display
-  document.getElementById('score').textContent = `${homeTeam} ${homeScore} - ${awayScore} ${awayTeam}`;
+  document.getElementById('score').textContent = `${homeTeamName} ${homeScore} - ${awayScore} ${awayTeamName}`;
 
   // Update play-by-play
   updatePlayByPlay(period, goalScored, homeForward, awayGoalie);
