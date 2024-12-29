@@ -28,6 +28,25 @@ function populateTeamDropdowns() {
   });
 }
 
+// Simulate the game for a single period
+function simulatePeriod(period) {
+  // Get the home and away teams from the dropdowns
+  const homeTeam = document.getElementById('teamSelect1').value;
+  const awayTeam = document.getElementById('teamSelect2').value;
+
+  // Generate random events for the period (e.g., scoring, penalties)
+  const homeScore = Math.floor(Math.random() * 5); // Random home team score (0-4)
+  const awayScore = Math.floor(Math.random() * 5); // Random away team score (0-4)
+
+  // Update the score on the page
+  document.getElementById('score').textContent = `${homeTeam} ${homeScore} - ${awayScore} ${awayTeam}`;
+
+  // Update play-by-play
+  updatePlayByPlay(period);
+
+  // more logic here
+}
+
 // Simulate the game
 function simulateGame() {
   // Initialize game state
