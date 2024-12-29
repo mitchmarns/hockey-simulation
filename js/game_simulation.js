@@ -11,6 +11,8 @@ function getRandomPlayerFromLine(team, positionType) {
     player.lineAssignments && player.lineAssignments[positionType]
   );
 
+  console.log(`Players for position ${positionType}:`, playersInLine); // Log players for debugging
+
   if (playersInLine.length === 0) {
     console.error(`No players found for position type: ${positionType}`);
     return null;
@@ -44,11 +46,22 @@ function simulatePeriod(period) {
   const homeTeam = teams.find(team => team.name === homeTeamName);
   const awayTeam = teams.find(team => team.name === awayTeamName);
 
+  // Log teams and players for debugging
+  console.log('Home Team:', homeTeam);
+  console.log('Away Team:', awayTeam);
+
   // Select random players for a scoring opportunity (home team's forward, away team's goalie)
   const homeForward = getRandomPlayerFromLine(homeTeam, 'center'); // Example: Get center for home team
   const awayGoalie = awayTeam.lines.goalies.starter; // Starter goalie for away team
 
-  console.log(homeForward, awayGoalie); // Log to verify player data
+  console.log("Home Forward:", homeForward); // Log to check if forward is selected correctly
+  console.log("Away Goalie:", awayGoalie); // Log to check if goalie is selected correctly
+
+  // If either the forward or goalie is undefined, return early
+  if (!homeForward || !awayGoalie) {
+    console.error("Invalid player data. Cannot simulate goal.");
+    return;
+  }
 
   // Simulate a goal attempt
   const goalScored = attemptGoal(homeForward, awayGoalie);
