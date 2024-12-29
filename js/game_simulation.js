@@ -14,45 +14,53 @@ function getPlayerById(playerId) {
 }
 
 // Function to get a random player from a team's line (using lineAssignments)
-function getRandomPlayerFromLine(team, positionType) {
-  const playersInLine = [];
+function getRandomSkaterFromLine(team) {
+  const skaters = [];
 
-  // Depending on the positionType, look for the correct line and position
-  if (['LW', 'C', 'RW'].includes(positionType)) {
-    // Forward lines (LW, C, RW)
-    Object.values(team.lineAssignments.forwardLines).forEach(line => {
-      if (line[positionType]) {
-        const playerId = line[positionType];  // Get the player ID from the position
-        const player = getPlayerById(playerId);  // Retrieve the player by ID
-        if (player) playersInLine.push(player);  // Add to the list if the player exists
-      }
-    });
-  } else if (['LD', 'RD'].includes(positionType)) {
-    // Defense lines (LD, RD)
-    Object.values(team.lineAssignments.defenseLines).forEach(line => {
-      if (line[positionType]) {
-        const playerId = line[positionType];
-        const player = getPlayerById(playerId);
-        if (player) playersInLine.push(player);
-      }
-    });
-  } else if (positionType === 'Starter' || positionType === 'Backup') {
-    // Goalies (Starter, Backup)
-    const playerId = team.lineAssignments.goalies[positionType];
-    if (playerId) {
-      const player = getPlayerById(playerId);
-      if (player) playersInLine.push(player);
+  // Add all forwards (LW, C, RW) to the skaters array
+  Object.values(team.lineAssignments.forwardLines).forEach(line => {
+    if (line.LW) {
+      const player = getPlayerById(line.LW);
+      if (player) skaters.push(player);
     }
-  }
+    if (line.C) {
+      const player = getPlayerById(line.C);
+      if (player) skaters.push(player);
+    }
+    if (line.RW) {
+      const player = getPlayerById(line.RW);
+      if (player) skaters.push(player);
+    }
+  });
 
-  console.log(`Players for position ${positionType}:`, playersInLine); // Log players for debugging
+  // Add all defensemen (LD, RD) to the skaters array
+  Object.values(team.lineAssignments.defenseLines).forEach(line => {
+    if (line.LD) {
+      const player = getPlayerById(line.LD);
+      if (player) skaters.push(player);
+    }
+    if (line.RD) {
+      const player = getPlayerById(line.RD);
+      if (player) skaters.push(player);
+    }
+  });
 
-  if (playersInLine.length === 0) {
-    console.error(`No players found for position type: ${positionType}`);
+  // Exclude the goalie (Starter or Backup)
+  const homeGoalieIds = [
+    team.lineAssignments.goalies.Starter,
+    team.lineAssignments.goalies.Backup
+  ];
+
+  // Filter out goalies from the skaters array
+  const skatersWithoutGoalie = skaters.filter(player => !homeGoalieIds.includes(player.id));
+
+  // Return a random skater from the filtered list
+  if (skatersWithoutGoalie.length === 0) {
+    console.error("No skaters found (excluding goalie).");
     return null;
   }
 
-  return playersInLine[Math.floor(Math.random() * playersInLine.length)];
+  return skatersWithoutGoalie[Math.floor(Math.random() * skatersWithoutGoalie.length)];
 }
 
 // Function to simulate a goal chance based on shooter and goalie skills
@@ -84,18 +92,31 @@ function simulatePeriod(period) {
   console.log('Home Team:', homeTeam);
   console.log('Away Team:', awayTeam);
 
-  // Select random players for a scoring opportunity (home team's forward, away team's goalie)
-  const homeForward = getRandomPlayerFromLine(homeTeam, 'C'); // Example: Get center for home team
-  const awayGoalie = awayTeam.lineAssignments.goalies.Starter; // Starter goalie for away team
+  // Select random skater for home team (excluding goalie)
+  const homeForward = getRandomSkaterFromLine(homeTeam); // Get a random skater (not the goalie) for the home team
+  const awayGoalie = getRandomPlayerFromLine(awayTeam, 'Starter'); // Starter goalie for away team
 
   console.log("Home Forward:", homeForward); // Log to check if forward is selected correctly
   console.log("Away Goalie:", awayGoalie); // Log to check if goalie is selected correctly
 
-  // If either the forward or goalie is undefined, return early
+  // Check if either homeForward or awayGoalie is missing
   if (!homeForward || !awayGoalie) {
     console.error("Invalid player data. Cannot simulate goal.");
-    return;
+    return; // Exit early if invalid player data
   }
+
+  // Simulate a goal attempt
+  const goalScored = attemptGoal(homeForward, awayGoalie);
+
+  const homeScore = goalScored ? 1 : 0;
+  const awayScore = Math.floor(Math.random() * 5); // Random away team score for simplicity
+
+  // Update the score display
+  document.getElementById('score').textContent = `${homeTeamName} ${homeScore} - ${awayScore} ${awayTeamName}`;
+
+  // Update play-by-play
+  updatePlayByPlay(period, goalScored, homeForward, awayGoalie);
+}
 
   // Simulate a goal attempt
   const goalScored = attemptGoal(homeForward, awayGoalie);
