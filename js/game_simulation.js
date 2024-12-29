@@ -138,7 +138,7 @@ function simulateGoal(team) {
     ) * Math.random();
 
     // Adjust the threshold for a goal (calibrated based on max possible skill sum)
-    if (goalChance > 80) {
+    if (goalChance > 50) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
