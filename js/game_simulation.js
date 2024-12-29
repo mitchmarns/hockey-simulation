@@ -5,56 +5,63 @@ import { updatePlayByPlay } from './play_by_play.js';
 // Retrieve teams from localStorage (assuming they are stored there)
 const teams = JSON.parse(localStorage.getItem('teams')) || []; // Default to an empty array if no teams are found
 
-// Populate team dropdowns in the HTML
-function populateTeamDropdowns() {
-  const teamSelect1 = document.getElementById('teamSelect1');
-  const teamSelect2 = document.getElementById('teamSelect2');
+// Function to get a random player from a team's forward or defense lines
+function getRandomPlayerFromLine(team, lineType) {
+  const line = team.lines[lineType]; // forwardLines, defenseLines, etc.
+  const allPlayers = [];
 
-  // Clear existing options
-  teamSelect1.innerHTML = '<option value="" disabled selected>Select a team</option>';
-  teamSelect2.innerHTML = '<option value="" disabled selected>Select a team</option>';
-
-  // Populate options with teams from localStorage
-  teams.forEach(team => {
-    const option1 = document.createElement('option');
-    option1.value = team.name;
-    option1.textContent = team.name;
-    teamSelect1.appendChild(option1);
-
-    const option2 = document.createElement('option');
-    option2.value = team.name;
-    option2.textContent = team.name;
-    teamSelect2.appendChild(option2);
+  line.forEach(position => {
+    Object.values(position).forEach(player => {
+      if (player) allPlayers.push(player);
+    });
   });
+
+  return allPlayers[Math.floor(Math.random() * allPlayers.length)];
 }
 
-// Simulate the game for a single period
+// Function to simulate a goal chance based on shooter and goalie skills
+function attemptGoal(shooter, goalie) {
+  // Calculate a chance of scoring based on shooter and goalie skills
+  const shooterSkill = shooter.skills.stick + shooter.skills.speed;
+  const goalieSkill = goalie.skills.glove + goalie.skills.legs;
+  
+  const chanceToScore = shooterSkill - goalieSkill;
+  const randomChance = Math.random() * 100;
+
+  return randomChance < chanceToScore; // If random chance is lower than the scoring chance, it's a goal
+}
+
+// Function to simulate a period of the game
 function simulatePeriod(period) {
-  // Get the home and away teams from the dropdowns
   const homeTeam = document.getElementById('teamSelect1').value;
   const awayTeam = document.getElementById('teamSelect2').value;
 
-  // Generate random events for the period (e.g., scoring, penalties)
-  const homeScore = Math.floor(Math.random() * 5); // Random home team score (0-4)
-  const awayScore = Math.floor(Math.random() * 5); // Random away team score (0-4)
+  const homeTeamData = teams.find(team => team.name === homeTeam);
+  const awayTeamData = teams.find(team => team.name === awayTeam);
 
-  // Update the score on the page
+  // Select random players for a scoring opportunity
+  const homeForward = getRandomPlayerFromLine(homeTeamData, 'forwardLines');
+  const awayGoalie = awayTeamData.lines.goalies.starter;
+
+  // Simulate a goal attempt
+  const goalScored = attemptGoal(homeForward, awayGoalie);
+
+  const homeScore = goalScored ? 1 : 0;
+  const awayScore = Math.floor(Math.random() * 5); // Random away team score for simplicity
+
+  // Update the score display
   document.getElementById('score').textContent = `${homeTeam} ${homeScore} - ${awayScore} ${awayTeam}`;
 
   // Update play-by-play
-  updatePlayByPlay(period);
-
-  // more logic here
+  updatePlayByPlay(period, goalScored, homeForward, awayGoalie);
 }
 
-// Simulate the game
+// Function to simulate the entire game
 function simulateGame() {
-  // Initialize game state
   let period = 1;
   let gameOver = false;
 
   while (!gameOver) {
-    // Simulate period
     simulatePeriod(period);
 
     // Check penalties
@@ -66,13 +73,33 @@ function simulateGame() {
     // Update play-by-play
     updatePlayByPlay(period);
 
-    // Check if game is over
     if (period >= 3) {
       gameOver = true;
     } else {
       period++;
     }
   }
+}
+
+// Function to populate the team dropdowns
+function populateTeamDropdowns() {
+  const teamSelect1 = document.getElementById('teamSelect1');
+  const teamSelect2 = document.getElementById('teamSelect2');
+
+  teamSelect1.innerHTML = '<option value="" disabled selected>Select a team</option>';
+  teamSelect2.innerHTML = '<option value="" disabled selected>Select a team</option>';
+
+  teams.forEach(team => {
+    const option1 = document.createElement('option');
+    option1.value = team.name;
+    option1.textContent = team.name;
+    teamSelect1.appendChild(option1);
+
+    const option2 = document.createElement('option');
+    option2.value = team.name;
+    option2.textContent = team.name;
+    teamSelect2.appendChild(option2);
+  });
 }
 
 // Event listener to start the game simulation
@@ -90,5 +117,5 @@ document.getElementById('startGameBtn').addEventListener('click', () => {
   }
 });
 
-// Call this function on page load to populate the team dropdowns
+// Call to populate the team dropdowns when the page loads
 populateTeamDropdowns();
