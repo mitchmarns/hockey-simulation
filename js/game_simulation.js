@@ -281,13 +281,3 @@ function simulateOvertime() {
 function getRandomPlayer(team) {
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
-
-// Function to update the play-by-play list
-function updatePlayByPlay() {
-    playByPlayList.innerHTML = '';
-    playByPlay.forEach(event => {
-        let li = document.createElement('li');
-        li.textContent = event;
-        playByPlayList.appendChild(li);
-    });
-}
