@@ -94,7 +94,7 @@ function simulatePeriod(period) {
 
   // Select random skater for home team (excluding goalie)
   const homeForward = getRandomSkaterFromLine(homeTeam); // Get a random skater (not the goalie) for the home team
-  const awayGoalie = getRandomPlayerFromLine(awayTeam, 'Starter'); // Starter goalie for away team
+  const awayGoalie = getPlayerById(awayTeam.lineAssignments.goalies.Starter); // Starter goalie for away team
 
   console.log("Home Forward:", homeForward); // Log to check if forward is selected correctly
   console.log("Away Goalie:", awayGoalie); // Log to check if goalie is selected correctly
@@ -104,20 +104,6 @@ function simulatePeriod(period) {
     console.error("Invalid player data. Cannot simulate goal.");
     return; // Exit early if invalid player data
   }
-
-  // Simulate a goal attempt
-  const goalScored = attemptGoal(homeForward, awayGoalie);
-
-  const homeScore = goalScored ? 1 : 0;
-  const awayScore = Math.floor(Math.random() * 5); // Random away team score for simplicity
-
-  // Update the score display
-  document.getElementById('score').textContent = `${homeTeamName} ${homeScore} - ${awayScore} ${awayTeamName}`;
-
-  // Update play-by-play
-  updatePlayByPlay(period, goalScored, homeForward, awayGoalie);
-}
-
 
   // Simulate a goal attempt
   const goalScored = attemptGoal(homeForward, awayGoalie);
