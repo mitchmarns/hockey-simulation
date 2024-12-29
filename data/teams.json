@@ -3,6 +3,7 @@
         "name": "Rangers",
         "players": [],
         "maxPlayers": 23,
+        "penaltyBox": [],
         "lines": {
             "forwardLines": [
                 { "LW": null, "C": null, "RW": null },
@@ -22,6 +23,7 @@
         "name": "Devils",
         "players": [],
         "maxPlayers": 23,
+        "penaltyBox": [],
         "lines": {
             "forwardLines": [
                 { "LW": null, "C": null, "RW": null },
@@ -41,6 +43,7 @@
         "name": "Islanders",
         "players": [],
         "maxPlayers": 23,
+        "penaltyBox": [],
         "lines": {
             "forwardLines": [
                 { "LW": null, "C": null, "RW": null },
@@ -60,6 +63,7 @@
         "name": "Sabres",
         "players": [],
         "maxPlayers": 23,
+        "penaltyBox": [],
         "lines": {
             "forwardLines": [
                 { "LW": null, "C": null, "RW": null },
