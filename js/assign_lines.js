@@ -112,14 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Add "None" option to each dropdown if there are not enough players for that position
+    // Ensure that "None" option is always available in every dropdown
     Object.keys(positions).forEach(position => {
       positions[position].forEach(selector => {
         const selectElement = document.getElementById(selector);
-
-        if (selectElement.options.length === 0 || selectElement.options.length < 3) { // Adjust this for other positions too, e.g., if there are less than 3 options for RD
+  
+        // Check if "None" option already exists, if not, create it
+        if (![...selectElement.options].some(option => option.value === "")) {
           const noneOption = document.createElement("option");
-          noneOption.value = null;
+          noneOption.value = "";
           noneOption.text = "None";
           selectElement.appendChild(noneOption);
         }
