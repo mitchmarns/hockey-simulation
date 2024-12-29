@@ -114,10 +114,28 @@ function simulatePeriod() {
 }
 
 function simulateAssist(team, scorer) {
-    // Get a potential assister from the same team, excluding the scorer
-    let possibleAssisters = team.players.filter(player => player.id !== scorer.id);
-    if (possibleAssisters.length === 0) return null; // No other players available
+    // Find the scorer's line
+    let scorerLine = team.lines.forwardLines.find(line => 
+        line.LW === scorer.id || line.C === scorer.id || line.RW === scorer.id
+    ) || 
+    team.lines.defenseLines.find(line => 
+        line.LD === scorer.id || line.RD === scorer.id
+    );
 
+    let possibleAssisters = [];
+    
+    if (scorerLine) {
+        // Get players on the same line, excluding the scorer
+        let linePlayerIds = Object.values(scorerLine).filter(id => id !== scorer.id);
+        possibleAssisters = team.players.filter(player => linePlayerIds.includes(player.id));
+    }
+
+    // If no players are found on the same line, consider the rest of the team (excluding the scorer)
+    if (possibleAssisters.length === 0) {
+        possibleAssisters = team.players.filter(player => player.id !== scorer.id);
+    }
+
+    // Randomly select an assister
     let assister = possibleAssisters[Math.floor(Math.random() * possibleAssisters.length)];
 
     // Assisting probability based on passing, vision, and creativity
@@ -125,10 +143,10 @@ function simulateAssist(team, scorer) {
         assister.skills.passing * 0.5 +
         assister.skills.vision * 0.3 +
         assister.skills.creativity * 0.2
-    ) * Math.random();
+    );
 
-    // Return assister if chance is above threshold, otherwise null
-    return assistChance > 50 ? assister : null;
+    // Return the assister if the assist chance meets the threshold
+    return Math.random() * 150 < assistChance ? assister : null;
 }
 
 function simulateGoal(team) {
@@ -142,12 +160,15 @@ function simulateGoal(team) {
         scorer.skills.creativity * 0.1
     ) * Math.random();
 
-    // Adjust the threshold for a goal (calibrated based on max possible skill sum)
-    if (goalChance > 50) {
+    // Adjust the threshold for a goal
+    if (goalChance > 120) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
+        // Attempt to simulate an assist, prioritizing players on the same line
         let assister = simulateAssist(team, scorer);
+
+        // Create play-by-play message with or without assist
         let assistMessage = assister ? `Assist by ${assister.name}` : "Unassisted";
         let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
         playByPlay.push(goalMessage);
