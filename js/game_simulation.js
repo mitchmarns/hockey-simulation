@@ -24,6 +24,7 @@ let period = 1;
 let homeScore = 0;
 let awayScore = 0;
 let playByPlay = [];
+let overtime = false; // Flag to check if the game is in overtime
 
 // DOM Elements
 const startGameBtn = document.getElementById('startGameBtn');
@@ -56,6 +57,15 @@ startGameBtn.addEventListener('click', () => {
     // Disable the team select dropdowns once teams are selected
     teamSelect1.disabled = true;
     teamSelect2.disabled = true;
+
+    // Reset game state
+    period = 1;
+    overtime = false;
+    homeScore = 0;
+    awayScore = 0;
+    playByPlay = [];
+    periodElement.textContent = period;
+    scoreElement.textContent = `${homeScore} - ${awayScore}`;
 });
 
 // Event listener for simulating a period
@@ -65,9 +75,22 @@ simulatePeriodBtn.addEventListener('click', () => {
         return;
     }
 
-    simulatePeriod();
-    period++;
-    periodElement.textContent = period;
+    // Simulate a period, and if it's the 3rd period and the game is tied, go to overtime
+    if (period <= 3) {
+        simulatePeriod();
+        period++;
+        periodElement.textContent = period;
+
+        // After the 3rd period, check if the score is tied
+        if (period > 3 && homeScore === awayScore && !overtime) {
+            overtime = true;
+            periodElement.textContent = "OT"; // Indicate that we're in overtime
+            playByPlay.push("Overtime! Sudden death period begins.");
+            updatePlayByPlay();
+        }
+    } else if (overtime) {
+        simulateOvertime();
+    }
 });
 
 // Function to simulate a period of the game
@@ -83,6 +106,26 @@ function simulatePeriod() {
 
     // Update play-by-play
     updatePlayByPlay();
+}
+
+// Function to simulate an overtime period
+function simulateOvertime() {
+    // Overtime is sudden death, so only one goal will decide the winner
+    simulateGoal(homeTeam);
+    if (homeScore > awayScore) {
+        playByPlay.push(`${homeTeam.name} wins in overtime!`);
+        scoreElement.textContent = `${homeScore} - ${awayScore}`;
+        updatePlayByPlay();
+        return; // End the game
+    }
+
+    simulateGoal(awayTeam);
+    if (awayScore > homeScore) {
+        playByPlay.push(`${awayTeam.name} wins in overtime!`);
+        scoreElement.textContent = `${homeScore} - ${awayScore}`;
+        updatePlayByPlay();
+        return; // End the game
+    }
 }
 
 // Function to simulate a goal
