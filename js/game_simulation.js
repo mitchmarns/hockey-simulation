@@ -108,26 +108,6 @@ function simulatePeriod() {
     updatePlayByPlay();
 }
 
-// Function to simulate an overtime period
-function simulateOvertime() {
-    // Overtime is sudden death, so only one goal will decide the winner
-    simulateGoal(homeTeam);
-    if (homeScore > awayScore) {
-        playByPlay.push(`${homeTeam.name} wins in overtime!`);
-        scoreElement.textContent = `${homeScore} - ${awayScore}`;
-        updatePlayByPlay();
-        return; // End the game
-    }
-
-    simulateGoal(awayTeam);
-    if (awayScore > homeScore) {
-        playByPlay.push(`${awayTeam.name} wins in overtime!`);
-        scoreElement.textContent = `${homeScore} - ${awayScore}`;
-        updatePlayByPlay();
-        return; // End the game
-    }
-}
-
 function simulateAssist(team, scorer) {
     // Get a potential assister from the same team, excluding the scorer
     let possibleAssisters = team.players.filter(player => player.id !== scorer.id);
@@ -158,7 +138,7 @@ function simulateGoal(team) {
     ) * Math.random();
 
     // Adjust the threshold for a goal (calibrated based on max possible skill sum)
-    if (goalChance > 120) {
+    if (goalChance > 80) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
@@ -167,6 +147,38 @@ function simulateGoal(team) {
         let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
         playByPlay.push(goalMessage);
     }
+}
+
+// Function to simulate an overtime period
+function simulateOvertime() {
+    // Overtime is sudden death, so one goal ends the game
+    let overtimeGoalScored = false;
+
+    // Attempt a few rounds to simulate overtime events
+    for (let i = 0; i < 3; i++) { // Small loop for sudden death chances
+        simulateGoal(homeTeam);
+        if (homeScore > awayScore) {
+            playByPlay.push(`${homeTeam.name} wins in overtime!`);
+            overtimeGoalScored = true;
+            break; // End overtime
+        }
+
+        simulateGoal(awayTeam);
+        if (awayScore > homeScore) {
+            playByPlay.push(`${awayTeam.name} wins in overtime!`);
+            overtimeGoalScored = true;
+            break; // End overtime
+        }
+    }
+
+    // If no goal is scored in overtime
+    if (!overtimeGoalScored) {
+        playByPlay.push("Overtime ended with no winner. The game is a tie!");
+    }
+
+    // Update the score and play-by-play
+    scoreElement.textContent = `${homeScore} - ${awayScore}`;
+    updatePlayByPlay();
 }
 
 // Function to simulate a penalty
