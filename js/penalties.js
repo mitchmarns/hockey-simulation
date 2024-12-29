@@ -1,7 +1,7 @@
 import { simulateGoal } from './game_simulation.js';
 
 // Function to simulate a penalty for a given team
-export function simulatePenalty(team) {
+export function simulatePenalty(team, homeTeam, awayTeam) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
     if (!penalizedPlayer) return null; // Handle edge cases where no players are available
