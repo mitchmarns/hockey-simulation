@@ -1,4 +1,7 @@
-function simulatePenalty(team) {
+// Import necessary functions
+
+// Function to simulate a penalty for a given team
+function simulatePenalty(team, playByPlay) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
     if (!penalizedPlayer) return; // Handle edge cases where no players are available
@@ -32,7 +35,6 @@ function simulatePenalty(team) {
 
 // Helper function to get a random player from a team
 function getRandomPlayer(team) {
-    if (!team.players || team.players.length === 0) return null;
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
