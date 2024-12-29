@@ -154,6 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to load teams from localStorage
   function loadTeamsFromLocalStorage() {
+    const teamSelect = document.getElementById("teamSelect");
+    teamSelect.innerHTML = ""; 
+    
     if (teams.length > 0) {
       // Process the teams data
       console.log("Teams loaded:", teams);
