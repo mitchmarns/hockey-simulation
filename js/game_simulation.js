@@ -1,3 +1,5 @@
+import { simulatePenalty } from './penalties.js';
+
 // Retrieve the teams from localStorage
 let teams = JSON.parse(localStorage.getItem('teams'));
 
@@ -103,8 +105,8 @@ function simulatePeriod() {
     // Simulate events like goals, assists, and penalties
     simulateGoal(homeTeam);
     simulateGoal(awayTeam);
-    simulatePenalty(homeTeam);
-    simulatePenalty(awayTeam);
+    playByPlay.push(simulatePenalty(homeTeam));
+    playByPlay.push(simulatePenalty(awayTeam));
 
     // Update score
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
@@ -197,12 +199,6 @@ function simulateOvertime() {
             return;
         }
     }
-}
-
-// Function to simulate a penalty
-function simulatePenalty(team) {
-    let penalizedPlayer = getRandomPlayer(team);
-    playByPlay.push(`${penalizedPlayer.name} from ${team.name} is penalized.`);
 }
 
 // Helper function to get a random player from a team
