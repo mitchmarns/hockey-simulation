@@ -118,6 +118,7 @@ function simulatePeriod(period) {
   updatePlayByPlay(period, goalScored, homeForward, awayGoalie);
 }
 
+
   // Simulate a goal attempt
   const goalScored = attemptGoal(homeForward, awayGoalie);
 
