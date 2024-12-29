@@ -16,11 +16,17 @@ function getRandomPlayerFromLine(team, lineType) {
     });
   });
 
+  console.log(allPlayers); // Log players to see if we are getting them correctly
   return allPlayers[Math.floor(Math.random() * allPlayers.length)];
 }
 
 // Function to simulate a goal chance based on shooter and goalie skills
 function attemptGoal(shooter, goalie) {
+  if (!shooter || !goalie) {
+    console.error("Shooter or Goalie is undefined");
+    return false; // Return false if either the shooter or goalie is undefined
+  }
+
   // Calculate a chance of scoring based on shooter and goalie skills
   const shooterSkill = shooter.skills.stick + shooter.skills.speed;
   const goalieSkill = goalie.skills.glove + goalie.skills.legs;
@@ -42,6 +48,8 @@ function simulatePeriod(period) {
   // Select random players for a scoring opportunity
   const homeForward = getRandomPlayerFromLine(homeTeamData, 'forwardLines');
   const awayGoalie = awayTeamData.lines.goalies.starter;
+
+  console.log(homeForward, awayGoalie); // Log to verify player data
 
   // Simulate a goal attempt
   const goalScored = attemptGoal(homeForward, awayGoalie);
