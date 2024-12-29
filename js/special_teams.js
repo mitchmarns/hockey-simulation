@@ -21,9 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Save the assignments when the save button is clicked
   saveUnitsBtn.addEventListener("click", () => {
     const teamName = teamSelect.value;
-    const team = teams.find(t => t.name === teamName);
-    if (team) {
       const specialTeamAssignments = {
+        team: team,
         powerplayUnits: [
           {
             LW: document.getElementById("pp1LW").value,
