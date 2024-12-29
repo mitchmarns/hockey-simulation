@@ -200,45 +200,37 @@ function simulateGoal(team) {
     }
 }
 
-// Function to simulate a penalty
-function simulatePenalty(team) {
-    const penalizedPlayer = getRandomPlayer(team); // Pick a random player to be penalized
-    team.penaltyBox.push(penalizedPlayer); // Add the player to the penalty box
-
-    // Log the penalty in play-by-play
-    playByPlay.push(`${penalizedPlayer.name} from ${team.name} is penalized!`);
-
-    // Determine the power play/penalty kill units
-    if (team === homeTeam) {
-        // Away team gets power play, home team gets penalty kill
-        playByPlay.push(`${awayTeam.name} goes on a power play!`);
-        // Activate the penalty kill units for home team
-        updatePenaltyKillUnits(homeTeam);
-    } else {
-        // Home team gets power play, away team gets penalty kill
-        playByPlay.push(`${homeTeam.name} goes on a power play!`);
-        // Activate the penalty kill units for away team
-        updatePenaltyKillUnits(awayTeam);
+// Function to simulate a power play (team with advantage)
+function simulatePowerPlay(team) {
+    // Power play teams have a higher chance of scoring
+    let goalChance = 0;
+    team.lines.powerplayUnits.forEach(unit => {
+        unit.forEach(player => {
+            if (player) {
+                goalChance += player.skills.wristShotAccuracy * 0.5;
+            }
+        });
+    });
+    if (Math.random() < goalChance) {
+        // Simulate goal
+        simulateGoal(team);
     }
-    
-    updatePlayByPlay();
 }
 
-// Helper function to update penalty kill units based on the current penalty box
-function updatePenaltyKillUnits(team) {
-    const penaltyKillUnit = team.lines.penaltyKillUnits[0]; // Get the first penalty kill unit
-
-    // Check if any player in the penalty box is part of the penalty kill unit
-    let penaltyKillPlayers = [];
-    penaltyKillUnit.F1 = team.players.find(player => player.id === penaltyKillUnit.F1);
-    penaltyKillUnit.F2 = team.players.find(player => player.id === penaltyKillUnit.F2);
-    penaltyKillUnit.D1 = team.players.find(player => player.id === penaltyKillUnit.D1);
-    penaltyKillUnit.D2 = team.players.find(player => player.id === penaltyKillUnit.D2);
-
-    // If no players available for penalty kill, randomly assign others to penalty kill unit
-    if (!penaltyKillUnit.F1 || !penaltyKillUnit.F2 || !penaltyKillUnit.D1 || !penaltyKillUnit.D2) {
-        // Example of handling fallback if no players are assigned
-        console.log("Penalty kill unit is incomplete, assigning remaining players.");
+// Function to simulate penalty kill (team with disadvantage)
+function simulatePenaltyKill(team) {
+    // Penalty kill teams have a reduced chance of letting a goal
+    let saveChance = 0;
+    team.lines.penaltyKillUnits.forEach(unit => {
+        unit.forEach(player => {
+            if (player) {
+                saveChance += player.skills.stickChecking * 0.4;
+            }
+        });
+    });
+    if (Math.random() > saveChance) {
+        // If save chance is low, allow a goal
+        simulateGoal(team === homeTeam ? awayTeam : homeTeam);
     }
 }
 
