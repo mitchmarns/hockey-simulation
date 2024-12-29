@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teamSelect = document.getElementById("teamSelect");
   const saveUnitsBtn = document.getElementById("saveUnitsBtn");
 
-  // Load teams from localStorage
+  // Load teams from localStorage and populate the dropdown
   loadTeamsFromLocalStorage();
 
   // Populate the dropdowns when a team is selected
@@ -19,54 +19,68 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Save the assignments when the save button is clicked
-saveUnitsBtn.addEventListener("click", () => {
-  const teamName = teamSelect.value;
-  const team = teams.find(t => t.name === teamName);
+  saveUnitsBtn.addEventListener("click", () => {
+    const teamName = teamSelect.value;
+    const team = teams.find(t => t.name === teamName);
 
-  if (team) {
-    const specialTeamAssignments = {
-      team: team,
-      powerplayUnits: [
-        {
-          LW: document.getElementById("pp1LW").value,
-          C: document.getElementById("pp1C").value,
-          RW: document.getElementById("pp1RW").value,
-          LD: document.getElementById("pp1LD").value,
-          RD: document.getElementById("pp1RD").value
-        },
-        {
-          LW: document.getElementById("pp2LW").value,
-          C: document.getElementById("pp2C").value,
-          RW: document.getElementById("pp2RW").value,
-          LD: document.getElementById("pp2LD").value,
-          RD: document.getElementById("pp2RD").value
-        }
-      ],
-      penaltyKillUnits: [
-        {
-          F1: document.getElementById("pk1F1").value,
-          F2: document.getElementById("pk1F2").value,
-          D1: document.getElementById("pk1D1").value,
-          D2: document.getElementById("pk1D2").value
-        },
-        {
-          F1: document.getElementById("pk2F1").value,
-          F2: document.getElementById("pk2F2").value,
-          D1: document.getElementById("pk2D1").value,
-          D2: document.getElementById("pk2D2").value
-        }
-      ]
-    };
+    if (team) {
+      const specialTeamAssignments = {
+        team: team,
+        powerplayUnits: [
+          {
+            LW: document.getElementById("pp1LW").value,
+            C: document.getElementById("pp1C").value,
+            RW: document.getElementById("pp1RW").value,
+            LD: document.getElementById("pp1LD").value,
+            RD: document.getElementById("pp1RD").value
+          },
+          {
+            LW: document.getElementById("pp2LW").value,
+            C: document.getElementById("pp2C").value,
+            RW: document.getElementById("pp2RW").value,
+            LD: document.getElementById("pp2LD").value,
+            RD: document.getElementById("pp2RD").value
+          }
+        ],
+        penaltyKillUnits: [
+          {
+            F1: document.getElementById("pk1F1").value,
+            F2: document.getElementById("pk1F2").value,
+            D1: document.getElementById("pk1D1").value,
+            D2: document.getElementById("pk1D2").value
+          },
+          {
+            F1: document.getElementById("pk2F1").value,
+            F2: document.getElementById("pk2F2").value,
+            D1: document.getElementById("pk2D1").value,
+            D2: document.getElementById("pk2D2").value
+          }
+        ]
+      };
 
-    team.lines.powerplayUnits = specialTeamAssignments.powerplayUnits;
-    team.lines.penaltyKillUnits = specialTeamAssignments.penaltyKillUnits;
-    localStorage.setItem("teams", JSON.stringify(teams));
+      team.lines.powerplayUnits = specialTeamAssignments.powerplayUnits;
+      team.lines.penaltyKillUnits = specialTeamAssignments.penaltyKillUnits;
+      localStorage.setItem("teams", JSON.stringify(teams));
 
-    console.log("Special Team Assignments Saved:", specialTeamAssignments);
-  } else {
-    console.log("Team not found");
+      console.log("Special Team Assignments Saved:", specialTeamAssignments);
+    } else {
+      console.log("Team not found");
+    }
+  });
+
+  // Load teams from localStorage into the team select dropdown
+  function loadTeamsFromLocalStorage() {
+    if (teams.length > 0) {
+      teams.forEach(team => {
+        const option = document.createElement("option");
+        option.value = team.name;
+        option.text = team.name;
+        teamSelect.appendChild(option);
+      });
+    } else {
+      console.log("No teams found in localStorage.");
+    }
   }
-});
 
   // Populate dropdowns with player options
   function populatePlayerOptions(players, teamName) {
@@ -136,15 +150,6 @@ saveUnitsBtn.addEventListener("click", () => {
           if (dropdown) dropdown.value = playerId || "none";
         });
       });
-    }
-  }
-
-  // Load teams from localStorage
-  function loadTeamsFromLocalStorage() {
-    if (teams.length > 0) {
-      console.log("Teams loaded:", teams);
-    } else {
-      console.log("No teams found in localStorage.");
     }
   }
 });
