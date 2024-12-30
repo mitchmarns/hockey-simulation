@@ -122,8 +122,8 @@ function simulatePeriod() {
     }
 
     // Simulate regular gameplay
-    simulateGoal(homeTeam, awayTeam, opponent);
-    simulateGoal(awayTeam, homeTeam, opponent);
+    simulateGoal(homeTeam, awayTeam);
+    simulateGoal(awayTeam, homeTeam);
 
     // Update scoreboard and play-by-play
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
