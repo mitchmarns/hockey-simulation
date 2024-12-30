@@ -168,7 +168,7 @@ export function simulateGoal(team) {
         scorer.skills.wristShotPower * 0.3 +
         scorer.skills.puckControl * 0.2 +
         scorer.skills.creativity * 0.1
-    ) * Math.random();
+        ) * (opponent.penaltyBox.length > 0 ? 1.5 : 1);
 
     // Adjust the threshold for a goal
     if (goalChance > 50) {
