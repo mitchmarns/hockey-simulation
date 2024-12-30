@@ -175,10 +175,11 @@ function simulateAssist(team, scorer) {
 }
 
 export function simulateGoal(team, opponent) {
-    if (!opponent || !opponent.penaltyBox) {
-        console.error("Opponent is undefined or improperly configured");
+    if (!team || !opponent || !opponent.penaltyBox) {
+        console.error("Team or opponent is undefined or improperly configured");
         return;
     }
+    
     let scorer = getRandomPlayer(team);
 
     // Scoring probability is influenced by shooting and puck control skills
