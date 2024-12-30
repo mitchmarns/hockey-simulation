@@ -45,11 +45,14 @@ function getRandomPlayer(team) {
 }
 
 // Function to decrement penalty time for a team
-export function decrementPenaltyTime(team) {
+function decrementPenaltyTime(team) {
     if (!team.penaltyBox) return;
     team.penaltyBox = team.penaltyBox.filter(penalty => {
-        penalty.duration -= 1; // Decrement time
-        return penalty.duration > 0; // Keep active penalties
+        penalty.duration -= 1;
+        if (penalty.duration <= 0) {
+            console.log(`${penalty.player.name} is out of the box for ${team.name}.`);
+        }
+        return penalty.duration > 0;
     });
 }
 
