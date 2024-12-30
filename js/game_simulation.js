@@ -223,7 +223,7 @@ function updatePlayByPlay() {
 function simulateOvertime() {
     // Overtime is sudden death, so only one goal will decide the winner
     if (overtime && !simulatePeriodBtn.disabled) {
-        simulateGoal(homeTeam);
+        simulateGoal(homeTeam, awayTeam);
         if (homeScore > awayScore) {
             playByPlay.push(`${homeTeam.name} wins in overtime!`);
             scoreElement.textContent = `${homeScore} - ${awayScore}`;
@@ -232,7 +232,7 @@ function simulateOvertime() {
             return;
         }
 
-        simulateGoal(awayTeam);
+        simulateGoal(awayTeam, homeTeam);
         if (awayScore > homeScore) {
             playByPlay.push(`${awayTeam.name} wins in overtime!`);
             scoreElement.textContent = `${homeScore} - ${awayScore}`;
