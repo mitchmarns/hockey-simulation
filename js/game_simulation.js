@@ -59,6 +59,8 @@ startGameBtn.addEventListener('click', () => {
     homeScore = 0;
     awayScore = 0;
     playByPlay = [];
+    homeTeam.penaltyBox = [];
+    awayTeam.penaltyBox = [];
     simulatePeriodBtn.disabled = false; 
     teamSelect1.disabled = true; 
     teamSelect2.disabled = true; 
@@ -116,10 +118,12 @@ function simulatePeriod() {
     if (homeTeam.penaltyBox?.length > 0) simulatePowerPlay(awayTeam);
     if (awayTeam.penaltyBox?.length > 0) simulatePowerPlay(homeTeam);
 
-    // Update score
-    scoreElement.textContent = `${homeScore} - ${awayScore}`;
+    // Simulate penalty kills
+    if (homeTeam.penaltyBox?.length > 0) simulatePenaltyKill(homeTeam, awayTeam);
+    if (awayTeam.penaltyBox?.length > 0) simulatePenaltyKill(awayTeam, homeTeam);
 
-    // Update play-by-play
+    // Update score and play-by-play
+    scoreElement.textContent = `${homeScore} - ${awayScore}`;
     updatePlayByPlay();
 }
 
@@ -183,6 +187,11 @@ export function simulateGoal(team) {
         let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
         playByPlay.push(goalMessage);
     }
+}
+
+// Helper function to get a random player
+function getRandomPlayer(team) {
+    return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
 // Update the play-by-play list
