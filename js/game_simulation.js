@@ -116,8 +116,8 @@ function simulatePeriod() {
     updatePenaltyBox(awayTeam);
 
     // Simulate penalties
-    simulatePenalty(homeTeam, homeTeam, awayTeam, awayTeam, opponent);
-    simulatePenalty(awayTeam, awayTeam, homeTeam, homeTeam, opponent);
+    simulatePenalty(homeTeam, awayTeam);
+    simulatePenalty(awayTeam, homeTeam);
 
     // Handle power play and penalty kill scenarios
     if (homeTeam.penaltyBox.length > 0) {
