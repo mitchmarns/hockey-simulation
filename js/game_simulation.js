@@ -114,26 +114,15 @@ function simulateGameTick() {
 function simulatePeriodTick() {
     decrementPenaltyTime(homeTeam);
     decrementPenaltyTime(awayTeam);
-    updatePenaltyBox(homeTeam);
-    updatePenaltyBox(awayTeam);
+    
+    simulatePenalty(homeTeam, awayTeam, homeTeam, awayTeam);
+    simulatePenalty(awayTeam, homeTeam, awayTeam, homeTeam);
 
-    simulatePenalty(homeTeam, awayTeam);
-    simulatePenalty(awayTeam, homeTeam);
+    simulatePowerPlay(homeTeam, awayTeam);
+    simulatePowerPlay(awayTeam, homeTeam);
 
-    if (homeTeam.penaltyBox.length > 0) {
-        simulatePowerPlay(awayTeam, homeTeam);
-        simulatePenaltyKill(homeTeam, awayTeam);
-    }
-    if (awayTeam.penaltyBox.length > 0) {
-        simulatePowerPlay(homeTeam, awayTeam);
-        simulatePenaltyKill(awayTeam, homeTeam);
-    }
-
-    simulateGoal(homeTeam, awayTeam);
+    simulateGoal(homeTeam, awayTeam); 
     simulateGoal(awayTeam, homeTeam);
-
-    scoreElement.textContent = `${homeScore} - ${awayScore}`;
-    updatePlayByPlay();
 }
 
 function simulateAssist(team, scorer) {
@@ -210,10 +199,9 @@ function updatePlayByPlay() {
 }
 
 function endGame() {
-    if (gameTickInterval) clearInterval(gameTickInterval);
+    clearInterval(gameTickInterval);
     simulatePeriodBtn.disabled = true;
-    playByPlay.push("Game ended.");
-    updatePlayByPlay();
+    alert(`Game Over! Final Score: ${homeScore} - ${awayScore}`);
 }
 
 // Function to simulate an overtime period
