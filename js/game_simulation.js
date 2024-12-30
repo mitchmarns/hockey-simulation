@@ -107,12 +107,12 @@ function simulatePeriod() {
     updatePenaltyBox(awayTeam);
 
     if (homeTeam.penaltyBox.length > 0) {
-        simulatePowerPlay(awayTeam, homeTeam, opponent);
-        simulatePenaltyKill(homeTeam, awayTeam, opponent);
+        simulatePowerPlay(awayTeam, homeTeam);
+        simulatePenaltyKill(homeTeam, awayTeam);
     }
     if (awayTeam.penaltyBox.length > 0) {
-        simulatePowerPlay(homeTeam, awayTeam, opponent);
-        simulatePenaltyKill(awayTeam, homeTeam, opponent);
+        simulatePowerPlay(homeTeam, awayTeam);
+        simulatePenaltyKill(awayTeam, homeTeam);
     }
 
     // Simulate regular gameplay
@@ -159,7 +159,7 @@ function simulateAssist(team, scorer) {
     return Math.random() * 50 < assistChance ? assister : null;
 }
 
-export function simulateGoal(team) {
+export function simulateGoal(team, opponent) {
     let scorer = getRandomPlayer(team);
 
     // Scoring probability is influenced by shooting and puck control skills
