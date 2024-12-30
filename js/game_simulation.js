@@ -106,6 +106,10 @@ function simulatePeriod() {
     // Ensure penaltyBox is initialized for both teams
     if (!homeTeam.penaltyBox) homeTeam.penaltyBox = [];
     if (!awayTeam.penaltyBox) awayTeam.penaltyBox = [];
+
+     // Decrement penalty times if necessary (should be called regularly in the game loop)
+    homeTeam.penaltyBox.forEach(player => decrementPenaltyTime(player));
+    awayTeam.penaltyBox.forEach(player => decrementPenaltyTime(player));
     
     // Update penalties
     updatePenaltyBox(homeTeam);
