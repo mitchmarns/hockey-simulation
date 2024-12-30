@@ -1,4 +1,4 @@
-import { simulatePenalty, simulatePowerPlay, simulatePenaltyKill, decrementPenaltyTime } from './penalties.js';
+import { simulatePenalty, simulatePowerPlay, simulatePenaltyKill, decrementPenaltyTime, updatePenaltyBox } from './penalties.js';
 
 // Retrieve the teams from localStorage
 let teams = JSON.parse(localStorage.getItem('teams'));
@@ -103,30 +103,22 @@ simulatePeriodBtn.addEventListener('click', () => {
 
 // Function to simulate a period of the game
 function simulatePeriod() {
-    // Decrement penalty time for both teams
-    decrementPenaltyTime(homeTeam);
-    decrementPenaltyTime(awayTeam);
+    updatePenaltyBox(homeTeam);
+    updatePenaltyBox(awayTeam);
 
-    // Simulate penalties
-    const homePenaltyMessage = simulatePenalty(homeTeam, homeTeam, awayTeam);
-    if (homePenaltyMessage) playByPlay.push(homePenaltyMessage);
+    if (homeTeam.penaltyBox.length > 0) {
+        simulatePowerPlay(awayTeam, homeTeam);
+        simulatePenaltyKill(homeTeam, awayTeam);
+    }
+    if (awayTeam.penaltyBox.length > 0) {
+        simulatePowerPlay(homeTeam, awayTeam);
+        simulatePenaltyKill(awayTeam, homeTeam);
+    }
 
-    const awayPenaltyMessage = simulatePenalty(awayTeam, homeTeam, awayTeam);
-    if (awayPenaltyMessage) playByPlay.push(awayPenaltyMessage);
-
-    // Handle power plays
-    if (homeTeam.penaltyBox?.length > 0) simulatePowerPlay(awayTeam, homeTeam);
-    if (awayTeam.penaltyBox?.length > 0) simulatePowerPlay(homeTeam, awayTeam);
-
-    // Simulate penalty kills
-    if (homeTeam.penaltyBox?.length > 0) simulatePenaltyKill(homeTeam, awayTeam);
-    if (awayTeam.penaltyBox?.length > 0) simulatePenaltyKill(awayTeam, homeTeam);
-
-    // Simulate goals
+    // Simulate regular gameplay
     simulateGoal(homeTeam);
     simulateGoal(awayTeam);
 
-    // Update score and play-by-play
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
     updatePlayByPlay();
 }
