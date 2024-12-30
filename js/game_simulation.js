@@ -175,13 +175,15 @@ function simulateAssist(team, scorer) {
 }
 
 export function simulateGoal(team, opponent) {
-    // Log for debugging
-    console.log("Team:", team);
-    console.log("Opponent:", opponent);
+    // Ensure both team and opponent are properly passed
+    if (!team || !opponent) {
+        console.error("Team or opponent is undefined.");
+        return;
+    }
 
-    // Check if opponent is properly set and has a penaltyBox
-    if (!opponent || !opponent.penaltyBox) {
-        console.error("Opponent is undefined or does not have a penaltyBox.");
+    // Ensure opponent has a penaltyBox
+    if (!opponent.penaltyBox) {
+        console.error("Opponent does not have a penaltyBox.");
         return;
     }
     
