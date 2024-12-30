@@ -103,13 +103,17 @@ simulatePeriodBtn.addEventListener('click', () => {
 
 // Function to simulate a period of the game
 function simulatePeriod() {
+    // Ensure penaltyBox is initialized for both teams
+    if (!homeTeam.penaltyBox) homeTeam.penaltyBox = [];
+    if (!awayTeam.penaltyBox) awayTeam.penaltyBox = [];
+    
     // Update penalties
     updatePenaltyBox(homeTeam);
     updatePenaltyBox(awayTeam);
 
     // Simulate penalties
-    simulatePenalty(homeTeam, awayTeam);
-    simulatePenalty(awayTeam, homeTeam);
+    simulatePenalty(homeTeam, homeTeam, awayTeam, awayTeam);
+    simulatePenalty(awayTeam, awayTeam, homeTeam, homeTeam);
 
     // Handle power play and penalty kill scenarios
     if (homeTeam.penaltyBox.length > 0) {
