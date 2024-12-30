@@ -54,7 +54,7 @@ export function decrementPenaltyTime(team) {
 }
 
 // Function to simulate a power play (team with advantage)
-export function simulatePowerPlay(team) {
+export function simulatePowerPlay(team, opponent) {
     // Power play teams have a higher chance of scoring
     let goalChance = 0;
     let penaltyKillResistance = 0;
