@@ -29,9 +29,6 @@ export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
         if (!team.penaltyBox) team.penaltyBox = []; // Initialize if undefined
         team.penaltyBox.push({ player: penalizedPlayer, duration: penaltyDuration });
         
-        // Determine the powerplay and penalty kill
-        let opponent = team === homeTeam ? awayTeam : homeTeam;
-        
         // Log penalty event
         return `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}. ${opponent.name} gets a power play!`;
     }
