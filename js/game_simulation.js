@@ -50,6 +50,11 @@ startGameBtn.addEventListener('click', () => {
     homeTeam = teams.find(team => team.name === homeTeamNameSelected);
     awayTeam = teams.find(team => team.name === awayTeamNameSelected);
 
+    if (!homeTeam || !awayTeam) {
+        console.error("Home or away team could not be found.");
+        return;
+    }
+
     homeTeamName.textContent = homeTeam.name;
     awayTeamName.textContent = awayTeam.name;
 
@@ -128,6 +133,9 @@ function simulatePeriod() {
         simulatePowerPlay(homeTeam, awayTeam);
         simulatePenaltyKill(awayTeam, homeTeam);
     }
+
+    console.log("Home Team:", homeTeam);
+    console.log("Away Team:", awayTeam);
 
     // Simulate regular gameplay
     simulateGoal(homeTeam, awayTeam);
