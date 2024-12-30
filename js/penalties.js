@@ -42,7 +42,7 @@ function getRandomPlayer(team) {
 }
 
 // Function to decrement penalty time for a team
-export function decrementPenaltyTime(team) {
+export function decrementPenaltyTime(team, opponent) {
     if (!team.penaltyBox) return;
     team.penaltyBox = team.penaltyBox.filter(penalty => {
         penalty.duration -= 1;
@@ -108,7 +108,7 @@ export function simulatePenaltyKill(team, opponent) {
 }
 
 // Check if penalty box has active penalties and update power play/penalty kill state
-export function updatePenaltyBox(team) {
+export function updatePenaltyBox(team, opponent) {
     const initialPenaltyCount = team.penaltyBox.length;
 
     decrementPenaltyTime(team);
@@ -119,7 +119,7 @@ export function updatePenaltyBox(team) {
 }
 
 // Additional helper: Log play-by-play for blocks during penalty kill
-export function logPenaltyKillEvents(team) {
+export function logPenaltyKillEvents(team, opponent) {
     team.lines.penaltyKillUnits.forEach(unit => {
         Object.values(unit).forEach(player => {
             if (player && player.skills) {
