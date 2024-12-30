@@ -206,7 +206,7 @@ function updatePlayByPlay() {
         li.textContent = event;
         playByPlayList.appendChild(li);
     });
-});
+}
 
 // Function to simulate an overtime period
 function simulateOvertime() {
