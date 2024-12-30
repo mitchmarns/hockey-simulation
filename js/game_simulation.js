@@ -103,14 +103,15 @@ simulatePeriodBtn.addEventListener('click', () => {
 
 // Function to simulate a period of the game
 function simulatePeriod() {
+    // Update penalties
     updatePenaltyBox(homeTeam);
     updatePenaltyBox(awayTeam);
 
+    // Simulate penalties
     simulatePenalty(homeTeam, awayTeam);
     simulatePenalty(awayTeam, homeTeam);
 
-
-
+    // Handle power play and penalty kill scenarios
     if (homeTeam.penaltyBox.length > 0) {
         simulatePowerPlay(awayTeam, homeTeam);
         simulatePenaltyKill(homeTeam, awayTeam);
@@ -124,6 +125,7 @@ function simulatePeriod() {
     simulateGoal(homeTeam, awayTeam);
     simulateGoal(awayTeam, homeTeam);
 
+    // Update scoreboard and play-by-play
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
     updatePlayByPlay();
 }
