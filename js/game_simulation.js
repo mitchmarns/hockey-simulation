@@ -174,9 +174,14 @@ function simulateAssist(team, scorer) {
     return Math.random() * 50 < assistChance ? assister : null;
 }
 
-export function simulateGoal(homeTeam, awayTeam, opponent) {
-    if (!team || !opponent || !opponent.penaltyBox) {
-        console.error("Team or opponent is undefined or improperly configured");
+export function simulateGoal(team, opponent) {
+    // Log for debugging
+    console.log("Team:", team);
+    console.log("Opponent:", opponent);
+
+    // Check if opponent is properly set and has a penaltyBox
+    if (!opponent || !opponent.penaltyBox) {
+        console.error("Opponent is undefined or does not have a penaltyBox.");
         return;
     }
     
