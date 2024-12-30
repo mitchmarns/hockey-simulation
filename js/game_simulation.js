@@ -207,16 +207,6 @@ function updatePlayByPlay() {
         playByPlayList.appendChild(li);
     });
 
-    // Display penalty box information
-    homeTeam.penaltyBox.forEach(player => {
-        playByPlay.push(`${player.name} is in the penalty box for ${homeTeam.name}`);
-    });
-    awayTeam.penaltyBox.forEach(player => {
-        playByPlay.push(`${player.name} is in the penalty box for ${awayTeam.name}`);
-    });
-}
-
-
 // Function to simulate an overtime period
 function simulateOvertime() {
     // Overtime is sudden death, so only one goal will decide the winner
