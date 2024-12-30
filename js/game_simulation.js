@@ -236,8 +236,3 @@ function simulateOvertime() {
         }
     }
 }
-
-// Helper function to get a random player from a team
-function getRandomPlayer(team) {
-    return team.players[Math.floor(Math.random() * team.players.length)];
-}
