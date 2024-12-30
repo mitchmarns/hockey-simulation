@@ -196,11 +196,11 @@ export function simulateGoal(team, opponent) {
 
     // Scoring probability is influenced by shooting and puck control skills
     let goalChance = (
-        scorer.skills.wristShotAccuracy * 0.4 +
-        scorer.skills.wristShotPower * 0.3 +
-        scorer.skills.puckControl * 0.2 +
-        scorer.skills.creativity * 0.1
-        ) * (opponent.penaltyBox.length > 0 ? 1.5 : 1);
+    scorer.skills.wristShotAccuracy * 0.4 +
+    scorer.skills.wristShotPower * 0.3 +
+    scorer.skills.puckControl * 0.2 +
+    scorer.skills.creativity * 0.1
+    ) * ((opponent && opponent.penaltyBox && opponent.penaltyBox.length > 0) ? 1.5 : 1);
 
     // Adjust the threshold for a goal
     if (goalChance > 50) {
