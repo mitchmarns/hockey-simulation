@@ -26,7 +26,8 @@ let period = 1;
 let homeScore = 0;
 let awayScore = 0;
 let playByPlay = [];
-let overtime = false; // Flag to check if the game is in overtime
+let overtime = false;
+let gameTickInterval = null;
 
 // DOM Elements
 const startGameBtn = document.getElementById('startGameBtn');
@@ -83,48 +84,42 @@ simulatePeriodBtn.addEventListener('click', () => {
         return;
     }
 
-    if (period <= 3) {
-        simulatePeriod();
-        period++;
+    if (gameTickInterval) clearInterval(gameTickInterval);
 
-        // Update the period display unless the game ends
+    gameTickInterval = setInterval(() => {
+        simulateGameTick();
+    }, 1000); // Game tick every second
+});
+
+function simulateGameTick() {
+    if (period <= 3) {
+        simulatePeriodTick();
+
         if (period > 3 && homeScore !== awayScore) {
             playByPlay.push("The game is over!");
             updatePlayByPlay();
-            simulatePeriodBtn.disabled = true; // Disable further simulation
+            endGame();
         } else if (period > 3 && homeScore === awayScore && !overtime) {
-            // Check for overtime if the game is tied
             overtime = true;
-            periodElement.textContent = "OT"; // Show overtime
+            periodElement.textContent = "OT";
             playByPlay.push("Overtime! Sudden death period begins.");
             updatePlayByPlay();
-        } else {
-            periodElement.textContent = period;
         }
     } else if (overtime) {
         simulateOvertime();
     }
-});
+}
 
 // Function to simulate a period of the game
-function simulatePeriod() {
-    // Ensure penaltyBox is initialized for both teams
-    if (!homeTeam.penaltyBox) homeTeam.penaltyBox = [];
-    if (!awayTeam.penaltyBox) awayTeam.penaltyBox = [];
-
-     // Decrement penalty times if necessary (should be called regularly in the game loop)
-    homeTeam.penaltyBox.forEach(player => decrementPenaltyTime(player));
-    awayTeam.penaltyBox.forEach(player => decrementPenaltyTime(player));
-    
-    // Update penalties
+function simulatePeriodTick() {
+    decrementPenaltyTime(homeTeam);
+    decrementPenaltyTime(awayTeam);
     updatePenaltyBox(homeTeam);
     updatePenaltyBox(awayTeam);
 
-    // Simulate penalties
-    simulatePenalty(homeTeam, homeTeam, awayTeam, awayTeam);  
-    simulatePenalty(awayTeam, homeTeam, awayTeam, homeTeam);
+    simulatePenalty(homeTeam, awayTeam);
+    simulatePenalty(awayTeam, homeTeam);
 
-    // Handle power play and penalty kill scenarios
     if (homeTeam.penaltyBox.length > 0) {
         simulatePowerPlay(awayTeam, homeTeam);
         simulatePenaltyKill(homeTeam, awayTeam);
@@ -134,14 +129,9 @@ function simulatePeriod() {
         simulatePenaltyKill(awayTeam, homeTeam);
     }
 
-    console.log("Home Team:", homeTeam);
-    console.log("Away Team:", awayTeam);
-
-    // Simulate regular gameplay
     simulateGoal(homeTeam, awayTeam);
     simulateGoal(awayTeam, homeTeam);
 
-    // Update scoreboard and play-by-play
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
     updatePlayByPlay();
 }
@@ -158,43 +148,28 @@ function simulateAssist(team, scorer) {
     let possibleAssisters = [];
     
     if (scorerLine) {
-        // Get players on the same line, excluding the scorer
         let linePlayerIds = Object.values(scorerLine).filter(id => id !== scorer.id);
         possibleAssisters = team.players.filter(player => linePlayerIds.includes(player.id));
     }
 
-    // If no players are found on the same line, consider the rest of the team (excluding the scorer)
     if (possibleAssisters.length === 0) {
         possibleAssisters = team.players.filter(player => player.id !== scorer.id);
     }
 
     // Randomly select an assister
     let assister = possibleAssisters[Math.floor(Math.random() * possibleAssisters.length)];
-
-    // Assisting probability based on passing, vision, and creativity
     let assistChance = (
         assister.skills.passing * 0.5 +
         assister.skills.vision * 0.3 +
         assister.skills.creativity * 0.2
     );
 
-    // Return the assister if the assist chance meets the threshold
     return Math.random() * 50 < assistChance ? assister : null;
 }
 
 export function simulateGoal(team, opponent) {
-    console.log("Simulating goal...");
-    console.log("Team:", team);
-    console.log("Opponent:", opponent);
-
-    if (!team || !opponent) {
-        console.error("Team or opponent is undefined.");
-        return;
-    }
-    
     let scorer = getRandomPlayer(team);
 
-    // Scoring probability is influenced by shooting and puck control skills
     let goalChance = (
     scorer.skills.wristShotAccuracy * 0.4 +
     scorer.skills.wristShotPower * 0.3 +
@@ -207,13 +182,16 @@ export function simulateGoal(team, opponent) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
 
-        // Attempt to simulate an assist, prioritizing players on the same line
+    if (Math.random() * 100 < goalChance) {
+        if (team === homeTeam) homeScore++;
+        else awayScore++;
+
         let assister = simulateAssist(team, scorer);
         let assistMessage = assister ? `Assist by ${assister.name}` : "Unassisted";
-        let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
-        playByPlay.push(goalMessage);
+        playByPlay.push(`${scorer.name} scores for ${team.name}! ${assistMessage}`);
     }
 }
+
 
 // Helper function to get a random player
 function getRandomPlayer(team) {
@@ -230,9 +208,15 @@ function updatePlayByPlay() {
     });
 }
 
+function endGame() {
+    if (gameTickInterval) clearInterval(gameTickInterval);
+    simulatePeriodBtn.disabled = true;
+    playByPlay.push("Game ended.");
+    updatePlayByPlay();
+}
+
 // Function to simulate an overtime period
 function simulateOvertime() {
-    // Overtime is sudden death, so only one goal will decide the winner
     if (overtime && !simulatePeriodBtn.disabled) {
         simulateGoal(homeTeam, awayTeam);
         if (homeScore > awayScore) {
