@@ -175,15 +175,12 @@ function simulateAssist(team, scorer) {
 }
 
 export function simulateGoal(team, opponent) {
-    // Ensure both team and opponent are properly passed
+    console.log("Simulating goal...");
+    console.log("Team:", team);
+    console.log("Opponent:", opponent);
+
     if (!team || !opponent) {
         console.error("Team or opponent is undefined.");
-        return;
-    }
-
-    // Ensure opponent has a penaltyBox
-    if (!opponent.penaltyBox) {
-        console.error("Opponent does not have a penaltyBox.");
         return;
     }
     
@@ -195,7 +192,7 @@ export function simulateGoal(team, opponent) {
         scorer.skills.wristShotPower * 0.3 +
         scorer.skills.puckControl * 0.2 +
         scorer.skills.creativity * 0.1
-        );
+        ) * (opponent.penaltyBox.length > 0 ? 1.5 : 1);
 
     // Adjust the threshold for a goal
     if (goalChance > 50) {
@@ -204,8 +201,6 @@ export function simulateGoal(team, opponent) {
 
         // Attempt to simulate an assist, prioritizing players on the same line
         let assister = simulateAssist(team, scorer);
-
-        // Create play-by-play message with or without assist
         let assistMessage = assister ? `Assist by ${assister.name}` : "Unassisted";
         let goalMessage = `${scorer.name} scores for ${team.name}! ${assistMessage}`;
         playByPlay.push(goalMessage);
