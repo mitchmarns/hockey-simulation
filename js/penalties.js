@@ -112,9 +112,12 @@ export function simulatePenaltyKill(team, opponent) {
 
 // Check if penalty box has active penalties and update power play/penalty kill state
 export function updatePenaltyBox(team) {
-    decrementPenaltyTime(team); // Reduce penalty durations
-    if (team.penaltyBox.length === 0) {
-        console.log(`${team.name} is back to full strength!`);
+    const initialPenaltyCount = team.penaltyBox.length;
+
+    decrementPenaltyTime(team);
+
+    if (initialPenaltyCount > 0 && team.penaltyBox.length === 0) {
+        playByPlay.push(`${team.name} is back to full strength!`);
     }
 }
 
