@@ -181,6 +181,7 @@ export function simulateGoal(team, opponent) {
     if (goalChance > 50) {
         if (team === homeTeam) homeScore++;
         else awayScore++;
+    }
 
     if (Math.random() * 100 < goalChance) {
         if (team === homeTeam) homeScore++;
