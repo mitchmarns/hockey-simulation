@@ -115,8 +115,8 @@ function simulatePeriod() {
     if (awayPenaltyMessage) playByPlay.push(awayPenaltyMessage);
 
     // Handle power plays
-    if (homeTeam.penaltyBox?.length > 0) simulatePowerPlay(awayTeam);
-    if (awayTeam.penaltyBox?.length > 0) simulatePowerPlay(homeTeam);
+    if (homeTeam.penaltyBox?.length > 0) simulatePowerPlay(awayTeam, homeTeam);
+    if (awayTeam.penaltyBox?.length > 0) simulatePowerPlay(homeTeam, awayTeam);
 
     // Simulate penalty kills
     if (homeTeam.penaltyBox?.length > 0) simulatePenaltyKill(homeTeam, awayTeam);
