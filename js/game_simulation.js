@@ -106,8 +106,9 @@ function simulatePeriod() {
     updatePenaltyBox(homeTeam);
     updatePenaltyBox(awayTeam);
 
-    simulatePenalty(homeTeam);
-    simulatePenalty(awayTeam);
+    simulatePenalty(homeTeam, awayTeam);
+    simulatePenalty(awayTeam, homeTeam);
+
 
 
     if (homeTeam.penaltyBox.length > 0) {
