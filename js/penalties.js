@@ -16,15 +16,18 @@ export function simulatePenalty(team, homeTeam, awayTeam) {
     // Adjust the threshold for penalties (calibrated for your skill ranges)
     if (penaltyChance > 0.5) { // Threshold adjusted to a value between 0 and 1
         // Generate a random penalty type from a predefined set
-        const penaltyTypes = [
-            "Hooking", "Tripping", "Slashing", "Interference", "High-sticking",
-            "Cross-checking", "Holding", "Boarding", "Roughing"
-        ];
-        const penalty = penaltyTypes[Math.floor(Math.random() * penaltyTypes.length)];
+        const penaltyTypes = {
+            "Hooking": 2, "Tripping": 2, "Slashing": 2, "Interference": 2,
+            "High-sticking": 2, "Cross-checking": 2, "Holding": 2, "Boarding": 2,
+            "Roughing": 2, "Fighting": 5, "Misconduct": 10
+        };
+        const penaltyKeys = Object.keys(penaltyTypes);
+        const penalty = penaltyKeys[Math.floor(Math.random() * penaltyKeys.length)];
+        const penaltyDuration = penaltyTypes[penalty];
 
         // Add player to the penalty box
         if (!team.penaltyBox) team.penaltyBox = []; // Initialize if undefined
-        team.penaltyBox.push(penalizedPlayer);
+        team.penaltyBox.push({ player: penalizedPlayer, duration: penaltyDuration });
         
         // Determine the powerplay and penalty kill
         let opponent = team === homeTeam ? awayTeam : homeTeam;
@@ -41,21 +44,42 @@ function getRandomPlayer(team) {
     return team.players[Math.floor(Math.random() * team.players.length)];
 }
 
+// Function to decrement penalty time for a team
+export function decrementPenaltyTime(team) {
+    if (!team.penaltyBox) return;
+    team.penaltyBox = team.penaltyBox.filter(penalty => {
+        penalty.duration -= 1; // Decrement time
+        return penalty.duration > 0; // Keep active penalties
+    });
+}
+
 // Function to simulate a power play (team with advantage)
 export function simulatePowerPlay(team) {
     // Power play teams have a higher chance of scoring
     let goalChance = 0;
+    let penaltyKillResistance = 0;
 
     team.lines.powerplayUnits.forEach(unit => {
         Object.values(unit).forEach(player => {
             if (player && player.skills) {
-                goalChance += player.skills.wristShotAccuracy * 0.5;
+                goalChance += player.skills.powerPlaySkill * 0.4;
             }
         });
     });
 
-    if (Math.random() < goalChance / 100) {
+    opponent.lines.penaltyKillUnits.forEach(unit => {
+        Object.values(unit).forEach(player => {
+            if (player && player.skills) {
+                penaltyKillResistance += player.skills.penaltyKilling * 0.3;
+            }
+        });
+    });
+
+    // Calculate adjusted goal chance
+    const adjustedChance = goalChance - penaltyKillResistance;
+    if (Math.random() < adjustedChance / 100) {
         simulateGoal(team);
+        console.log(`${team.name} scores on the power play!`);
     }
 }
 
@@ -63,15 +87,35 @@ export function simulatePowerPlay(team) {
 export function simulatePenaltyKill(team, opponent) {
     // Penalty kill teams have a reduced chance of letting a goal
     let saveChance = 0;
+    let shortHandedChance = 0;
+    
     team.lines.penaltyKillUnits.forEach(unit => {
-        unit.forEach(player => {
-            if (player) {
-                saveChance += player.skills.stickChecking * 0.4;
+        Object.values(unit).forEach(player => {
+            if (player && player.skills) {
+                saveChance += player.skills.stickChecking * 0.3;
+                shortHandedChance += player.skills.speed * 0.2; // Speed for breakaways
             }
         });
     });
+
+    // Simulate save or goal
     if (Math.random() > saveChance / 100) {
-        // If save chance is low, allow a goal
-        simulateGoal(team === homeTeam ? awayTeam : homeTeam);
+        simulateGoal(opponent); // Power play team scores
+    } else if (Math.random() < shortHandedChance / 200) {
+        simulateGoal(team); // Short-handed goal!
+        console.log(`${team.name} scores short-handed!`);
     }
+}
+
+// Additional helper: Log play-by-play for blocks during penalty kill
+export function logPenaltyKillEvents(team) {
+    team.lines.penaltyKillUnits.forEach(unit => {
+        Object.values(unit).forEach(player => {
+            if (player && player.skills) {
+                if (Math.random() < player.skills.shotBlocking / 100) {
+                    console.log(`${player.name} blocks the shot!`);
+                }
+            }
+        });
+    });
 }
