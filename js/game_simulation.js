@@ -205,7 +205,7 @@ function updatePlayByPlay() {
         let li = document.createElement('li');
         li.textContent = event;
         playByPlayList.appendChild(li);
-    }
+    });
 });
 
 // Function to simulate an overtime period
