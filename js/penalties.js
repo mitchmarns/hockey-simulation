@@ -100,9 +100,8 @@ export function simulatePenaltyKill(team, opponent) {
 
     // Simulate save or goal
     if (Math.random() > saveChance / 100) {
-        simulateGoal(opponent); // Power play team scores
+        console.log(`${opponent.name} scores on the power play!`);
     } else if (Math.random() < shortHandedChance / 200) {
-        simulateGoal(team); // Short-handed goal!
         console.log(`${team.name} scores short-handed!`);
     }
 }
@@ -116,17 +115,4 @@ export function updatePenaltyBox(team, opponent) {
     if (initialPenaltyCount > 0 && team.penaltyBox.length === 0) {
         playByPlay.push(`${team.name} is back to full strength!`);
     }
-}
-
-// Additional helper: Log play-by-play for blocks during penalty kill
-export function logPenaltyKillEvents(team, opponent) {
-    team.lines.penaltyKillUnits.forEach(unit => {
-        Object.values(unit).forEach(player => {
-            if (player && player.skills) {
-                if (Math.random() < player.skills.shotBlocking / 100) {
-                    console.log(`${player.name} blocks the shot!`);
-                }
-            }
-        });
-    });
 }
