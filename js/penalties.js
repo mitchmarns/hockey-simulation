@@ -39,10 +39,6 @@ export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
         const penalty = penaltyKeys[Math.floor(Math.random() * penaltyKeys.length)];
         const penaltyDuration = penaltyTypes[penalty];
 
-        // Add player to the penalty box
-        if (!team.penaltyBox) team.penaltyBox = []; // Initialize if undefined
-        team.penaltyBox.push({ player: penalizedPlayer, duration: penaltyDuration, timestamp: Date.now() });
-
         // delayed penalty
         if (penaltyCategory === "minor" && Math.random() < 0.2) { // 20% chance of delayed penalty
             const delayedMessage = `${team.name} has a delayed penalty! Opponent gets a chance to score.`;
