@@ -2,8 +2,8 @@ import { simulateGoal, playByPlay } from './game_simulation.js';
 
 // Function to simulate a penalty for a given team
 export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
-    // Pick a random player from the team
-    let penalizedPlayer = getRandomPlayer(team);
+    const eligiblePlayers = team.players.filter(player => !player.injured);
+    let penalizedPlayer = eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
     if (!penalizedPlayer) return null; 
 
     // Check if the player is already in the penalty box
@@ -17,7 +17,7 @@ export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
         penalizedPlayer.skills.aggression * 0.4 - // Aggression increases penalty chance
         penalizedPlayer.skills.poise * 0.3 +     // Poise decreases penalty chance
         penalizedPlayer.skills.stickChecking * 0.2 // Stick checking reduces minor penalties
-    ) * Math.random(); // Add randomness to the calculation
+        ) * Math.random(); // Add randomness to the calculation
 
     // Adjust the threshold for penalties (calibrated for your skill ranges)
     if (penaltyChance > 0.5) { // Threshold adjusted to a value between 0 and 1
