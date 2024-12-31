@@ -4,7 +4,13 @@ import { simulateGoal, playByPlay } from './game_simulation.js';
 export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
     // Pick a random player from the team
     let penalizedPlayer = getRandomPlayer(team);
-    if (!penalizedPlayer) return null; // Handle edge cases where no players are available
+    if (!penalizedPlayer) return null; 
+
+    // Check if the player is already in the penalty box
+    if (team.penaltyBox?.some(penalty => penalty.player.id === penalizedPlayer.id)) {
+        console.log(`${penalizedPlayer.name} is already in the penalty box and cannot be penalized again.`);
+        return null; // Skip assigning another penalty
+    }
 
     // Calculate the penalty likelihood based on player skills (same as before)
     let penaltyChance = (
