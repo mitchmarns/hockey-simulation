@@ -147,11 +147,17 @@ function simulateAssist(team, scorer) {
     
     if (scorerLine) {
         let linePlayerIds = Object.values(scorerLine).filter(id => id !== scorer.id);
-        possibleAssisters = team.players.filter(player => linePlayerIds.includes(player.id));
+        possibleAssisters = team.players.filter(player =>
+            linePlayerIds.includes(player.id) &&
+            !team.penaltyBox.some(penalty => penalty.player.id === player.id)
+        );
     }
 
     if (possibleAssisters.length === 0) {
-        possibleAssisters = team.players.filter(player => player.id !== scorer.id);
+        possibleAssisters = team.players.filter(player =>
+            player.id !== scorer.id &&
+            !team.penaltyBox.some(penalty => penalty.player.id === player.id)
+        );
     }
 
     // Randomly select an assister
@@ -166,7 +172,17 @@ function simulateAssist(team, scorer) {
 }
 
 export function simulateGoal(team, opponent) {
-    let scorer = getRandomPlayer(team);
+    const eligiblePlayers = team.players.filter(player =>
+        !team.penaltyBox.some(penalty => penalty.player.id === player.id)
+    );
+
+    if (eligiblePlayers.length === 0) {
+        playByPlay.push(`${team.name} cannot score as all eligible players are in the penalty box.`);
+        updatePlayByPlay();
+        return;
+    }
+
+    let scorer = eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
 
     let goalChance = (
     scorer.skills.wristShotAccuracy * 0.4 +
@@ -195,7 +211,12 @@ export function simulateGoal(team, opponent) {
 
 // Helper function to get a random player
 function getRandomPlayer(team) {
-    return team.players[Math.floor(Math.random() * team.players.length)];
+    const eligiblePlayers = team.players.filter(player =>
+        !team.penaltyBox.some(penalty => penalty.player.id === player.id)
+    );
+
+    if (eligiblePlayers.length === 0) return null; // No eligible players
+    return eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
 }
 
 // Update the play-by-play list
