@@ -129,6 +129,9 @@ function simulatePeriodTick() {
 
     simulateGoal(homeTeam, awayTeam); 
     simulateGoal(awayTeam, homeTeam);
+
+    // Update the score display
+    scoreElement.textContent = `${homeScore} - ${awayScore}`;
 }
 
 function simulateAssist(team, scorer) {
@@ -185,6 +188,7 @@ export function simulateGoal(team, opponent) {
         let assister = simulateAssist(team, scorer);
         let assistMessage = assister ? `Assist by ${assister.name}` : "Unassisted";
         playByPlay.push(`${scorer.name} scores for ${team.name}! ${assistMessage}`);
+        updatePlayByPlay();
     }
 }
 
