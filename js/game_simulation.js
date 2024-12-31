@@ -90,6 +90,9 @@ simulatePeriodBtn.addEventListener('click', () => {
 
     if (gameTickInterval) clearInterval(gameTickInterval);
 
+    // Reset timer for the new period
+    periodStartTime = Date.now();
+
     gameTickInterval = setInterval(() => {
         simulateGameTick();
     }, gameTickDuration);
@@ -146,6 +149,34 @@ function simulatePeriodTick() {
 
     // Update the score display
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
+
+    // Check if the period has ended
+    let periodElapsed = Date.now() - periodStartTime;
+    if (periodElapsed >= periodDuration) {
+        endCurrentPeriod();
+    }
+}
+
+function endCurrentPeriod() {
+    clearInterval(gameTickInterval); // Stop the current period's simulation
+    playByPlay.push(`End of Period ${period}.`);
+    updatePlayByPlay();
+
+    if (period < 3) {
+        period++;
+        periodStartTime = Date.now(); // Reset timer for the next period
+        periodElement.textContent = `Period ${period}`;
+        alert(`Starting Period ${period}`);
+    } else {
+        if (homeScore === awayScore) {
+            overtime = true;
+            playByPlay.push("Game is tied! Starting overtime.");
+            updatePlayByPlay();
+            simulateOvertime(); // Handle overtime
+        } else {
+            endGame(); // End the game
+        }
+    }
 }
 
 function simulateAssist(team, scorer) {
