@@ -147,6 +147,9 @@ function simulatePeriodTick() {
     simulateGoal(homeTeam, awayTeam); 
     simulateGoal(awayTeam, homeTeam);
 
+    simulateRandomEvent(homeTeam, awayTeam);
+    simulateRandomEvent(awayTeam, homeTeam);
+
     // Update the score display
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
 
@@ -230,17 +233,23 @@ export function simulateGoal(team, opponent) {
     let scorer = eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
 
     let goalChance = (
-    scorer.skills.wristShotAccuracy * 0.4 +
-    scorer.skills.wristShotPower * 0.3 +
-    scorer.skills.puckControl * 0.2 +
-    scorer.skills.creativity * 0.1
-    ) * ((opponent && opponent.penaltyBox && opponent.penaltyBox.length > 0) ? 1.5 : 1);
+        scorer.skills.wristShotAccuracy * 0.35 +
+        scorer.skills.wristShotPower * 0.25 +
+        scorer.skills.creativity * 0.15 +
+        scorer.skills.hockeyIQ * 0.15 +
+        Math.random() * 20 // Add randomness
+    );
 
-    // Adjust the threshold for a goal
-    if (goalChance > 50) {
-        if (team === homeTeam) homeScore++;
-        else awayScore++;
-    }
+    // Adjust for opponent's defense and goalie skills
+    const defenseModifier = opponent.players.reduce((sum, player) => {
+        return sum + (player.skills.defense || 0) * 0.05;
+    }, 0);
+
+    const goalieModifier = opponent.players
+        .filter(player => player.position === 'Starter' || player.position === 'Backup')
+        .reduce((sum, player) => sum + player.skills.glove + player.skills.legs + player.skills.stick, 0) / 3;
+
+    goalChance -= defenseModifier + (goalieModifier * 0.5);
 
     if (Math.random() * 100 < goalChance) {
         if (team === homeTeam) homeScore++;
@@ -253,6 +262,22 @@ export function simulateGoal(team, opponent) {
     }
 }
 
+function simulateRandomEvent(team, opponent) {
+    const randomEventRoll = Math.random();
+
+    if (randomEventRoll < 0.05) { // 5% chance of a lucky goal
+        playByPlay.push(`A lucky bounce leads to a goal for ${team.name}!`);
+        if (team === homeTeam) homeScore++;
+        else awayScore++;
+        updatePlayByPlay();
+    } else if (randomEventRoll < 0.1) { // 5% chance of a breakaway
+        let randomPlayer = getRandomPlayer(team);
+        if (randomPlayer) {
+            playByPlay.push(`${randomPlayer.name} from ${team.name} breaks away but is stopped!`);
+            updatePlayByPlay();
+        }
+    }
+}
 
 // Helper function to get a random player
 function getRandomPlayer(team) {
