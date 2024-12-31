@@ -95,7 +95,7 @@ export function decrementPenaltyTime(team, opponent) {
     team.penaltyBox = team.penaltyBox.filter(penalty => {
         penalty.duration -= 1;
         if (penalty.duration <= 0) {
-            console.log(`${penalty.player.name} is out of the box for ${team.name}.`);
+            playByPlay.push(`${penalty.player.name} is out of the penalty box for ${team.name}.`);
         }
         return penalty.duration > 0;
     });
@@ -154,11 +154,11 @@ export function simulatePenaltyKill(team, opponent) {
 
 // Check if penalty box has active penalties and update power play/penalty kill state
 export function updatePenaltyBox(team, opponent) {
-    const initialPenaltyCount = team.penaltyBox.length;
-
+    const initialPenaltyCount = team.penaltyBox?.length || 0;
     decrementPenaltyTime(team);
 
-    if (initialPenaltyCount > 0 && team.penaltyBox.length === 0) {
+    if (initialPenaltyCount > 0 && (team.penaltyBox?.length || 0) === 0) {
         playByPlay.push(`${team.name} is back to full strength!`);
+        console.log(`${team.name} is back to full strength!`);
     }
 }
