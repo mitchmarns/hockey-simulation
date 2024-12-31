@@ -25,7 +25,7 @@ let awayTeam = null;
 let period = 1;
 let homeScore = 0;
 let awayScore = 0;
-let playByPlay = [];
+export let playByPlay = [];
 let overtime = false;
 let periodDuration = 30 * 1000;
 let gameTickDuration = 1000;
@@ -199,7 +199,7 @@ function getRandomPlayer(team) {
 }
 
 // Update the play-by-play list
-function updatePlayByPlay() {
+export function updatePlayByPlay() {
     playByPlayList.innerHTML = '';
     playByPlay.forEach(event => {
         let li = document.createElement('li');
