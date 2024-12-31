@@ -1,4 +1,4 @@
-import { simulateGoal } from './game_simulation.js';
+import { simulateGoal, updatePlayByPlay } from './game_simulation.js';
 
 // Function to simulate a penalty for a given team
 export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
@@ -29,11 +29,13 @@ export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
         if (!team.penaltyBox) team.penaltyBox = []; // Initialize if undefined
         team.penaltyBox.push({ player: penalizedPlayer, duration: penaltyDuration });
         
-        // Log penalty event
-        return `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}. ${opponent.name} gets a power play!`;
+        // Log the penalty event to playByPlay
+        const penaltyMessage = `${penalizedPlayer.name} from ${team.name} is penalized for ${penalty}. ${opponent.name} gets a power play!`;
+        playByPlay.push(penaltyMessage);  // Add to playByPlay
+        return penaltyMessage;
     }
 
-    return null; // No penalty occurred
+    return null;
 }
 
 // Helper function to get a random player from a team
