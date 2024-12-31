@@ -1,4 +1,5 @@
 import { simulatePenalty, simulatePowerPlay, simulatePenaltyKill, decrementPenaltyTime, updatePenaltyBox } from './penalties.js';
+import { simulateInjury, updateInjuryStatus } from './injuries.js';
 
 // Retrieve the teams from localStorage
 let teams = JSON.parse(localStorage.getItem('teams'));
@@ -100,18 +101,31 @@ function simulateGameTick() {
     if (period <= 3 && periodElapsed < periodDuration) {
         simulatePeriodTick();
 
-        // Period is over, move to the next period
-        if (periodElapsed >= periodDuration) {
-            period++; // Increment period
-            periodStartTime = Date.now(); // Reset period timer
-            periodElement.textContent = `Period ${period}`;
+        // Check for injuries during each game tick
+        let injuredHomePlayer = simulateInjury(homeTeam);
+        let injuredAwayPlayer = simulateInjury(awayTeam);
+
+        if (injuredHomePlayer) {
+            playByPlay.push(`${injuredHomePlayer.name} from ${homeTeam.name} is injured and out of the game.`);
+            updatePlayByPlay();
         }
 
-        // Continue the game flow (penalties, goals, etc.)
+        if (injuredAwayPlayer) {
+            playByPlay.push(`${injuredAwayPlayer.name} from ${awayTeam.name} is injured and out of the game.`);
+            updatePlayByPlay();
+        }
+
+        // Heal players over time
+        updateInjuryStatus(homeTeam);
+        updateInjuryStatus(awayTeam);
+
+        // Period is over, move to the next period
+        if (periodElapsed >= periodDuration) {
+            period++;
+            periodStartTime = Date.now();
+            periodElement.textContent = `Period ${period}`;
+        }
     } else if (period > 3 && !overtime) {
-        // Handle overtime after period 3 ends
-        simulateOvertime();
-    } else if (period > 3 && overtime) {
         simulateOvertime();
     }
 }
@@ -212,6 +226,7 @@ export function simulateGoal(team, opponent) {
 // Helper function to get a random player
 function getRandomPlayer(team) {
     const eligiblePlayers = team.players.filter(player =>
+        !player.injured &&
         !team.penaltyBox.some(penalty => penalty.player.id === player.id)
     );
 
