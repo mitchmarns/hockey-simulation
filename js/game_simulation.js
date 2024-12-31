@@ -27,7 +27,10 @@ let homeScore = 0;
 let awayScore = 0;
 let playByPlay = [];
 let overtime = false;
+let periodDuration = 30 * 1000;
+let gameTickDuration = 1000;
 let gameTickInterval = null;
+let periodStartTime = Date.now();
 
 // DOM Elements
 const startGameBtn = document.getElementById('startGameBtn');
@@ -88,30 +91,27 @@ simulatePeriodBtn.addEventListener('click', () => {
 
     gameTickInterval = setInterval(() => {
         simulateGameTick();
-    }, 1000); // Game tick every second
+    }, gameTickDuration);
 });
 
 function simulateGameTick() {
-    if (period <= 3) {
+    let periodElapsed = Date.now() - periodStartTime;
+    
+    if (period <= 3 && periodElapsed < periodDuration) {
         simulatePeriodTick();
 
-        // End of period check
-        if (period === 3) {
-            if (homeScore !== awayScore) {
-                playByPlay.push("The game is over!");
-                updatePlayByPlay();
-                endGame();
-            } else if (homeScore === awayScore && !overtime) {
-                overtime = true;
-                periodElement.textContent = "OT";
-                playByPlay.push("Overtime! Sudden death period begins.");
-                updatePlayByPlay();
-            } else {
-                period++; // Move to next period
-                periodElement.textContent = `Period ${period}`;
-            }
+        // Period is over, move to the next period
+        if (periodElapsed >= periodDuration) {
+            period++; // Increment period
+            periodStartTime = Date.now(); // Reset period timer
+            periodElement.textContent = `Period ${period}`;
         }
-    } else if (overtime) {
+
+        // Continue the game flow (penalties, goals, etc.)
+    } else if (period > 3 && !overtime) {
+        // Handle overtime after period 3 ends
+        simulateOvertime();
+    } else if (period > 3 && overtime) {
         simulateOvertime();
     }
 }
