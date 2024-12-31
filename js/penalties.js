@@ -1,4 +1,4 @@
-import { simulateGoal, updatePlayByPlay } from './game_simulation.js';
+import { simulateGoal, playByPlay } from './game_simulation.js';
 
 // Function to simulate a penalty for a given team
 export function simulatePenalty(team, homeTeam, awayTeam, opponent) {
