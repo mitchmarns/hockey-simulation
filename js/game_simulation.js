@@ -104,18 +104,20 @@ function simulateGameTick() {
     if (period <= 3 && periodElapsed < periodDuration) {
         simulatePeriodTick();
 
-        // Check for injuries during each game tick
-        let injuredHomePlayer = simulateInjury(homeTeam);
-        let injuredAwayPlayer = simulateInjury(awayTeam);
-
-        if (injuredHomePlayer) {
-            playByPlay.push(`${injuredHomePlayer.name} from ${homeTeam.name} is injured and out of the game.`);
-            updatePlayByPlay();
+        if (Math.random() < 0.05) { // 5% chance of injury
+            let injuredHomePlayer = simulateInjury(homeTeam);
+            if (injuredHomePlayer) {
+                playByPlay.push(`${injuredHomePlayer.name} from ${homeTeam.name} is injured and out of the game.`);
+                updatePlayByPlay();
+            }
         }
 
-        if (injuredAwayPlayer) {
-            playByPlay.push(`${injuredAwayPlayer.name} from ${awayTeam.name} is injured and out of the game.`);
-            updatePlayByPlay();
+        if (Math.random() < 0.05) { // 5% chance of injury
+            let injuredAwayPlayer = simulateInjury(awayTeam);
+            if (injuredAwayPlayer) {
+                playByPlay.push(`${injuredAwayPlayer.name} from ${awayTeam.name} is injured and out of the game.`);
+                updatePlayByPlay();
+            }
         }
 
         // Heal players over time
@@ -138,17 +140,45 @@ function simulatePeriodTick() {
     decrementPenaltyTime(homeTeam);
     decrementPenaltyTime(awayTeam);
     
-    simulatePenalty(homeTeam, awayTeam, homeTeam, awayTeam);
-    simulatePenalty(awayTeam, homeTeam, awayTeam, homeTeam);
+     // Introduce randomness for penalties
+    if (Math.random() < 0.1) { // 10% chance for a penalty to occur during the tick
+        simulatePenalty(homeTeam, awayTeam, homeTeam, awayTeam);
+    }
 
-    simulatePowerPlay(homeTeam, awayTeam);
-    simulatePowerPlay(awayTeam, homeTeam);
+    if (Math.random() < 0.1) { // 10% chance for a penalty to occur during the tick
+        simulatePenalty(awayTeam, homeTeam, awayTeam, homeTeam);
+    }
 
-    simulateGoal(homeTeam, awayTeam); 
-    simulateGoal(awayTeam, homeTeam);
+    // Simulate power plays with randomness based on active penalties
+    if (homeTeam.penaltyMinutes > 0) { // If the home team has a penalty
+        if (Math.random() < 0.3) { // 30% chance for something to happen on power play
+            simulatePowerPlay(homeTeam, awayTeam);
+        }
+    }
 
-    simulateRandomEvent(homeTeam, awayTeam);
-    simulateRandomEvent(awayTeam, homeTeam);
+    if (awayTeam.penaltyMinutes > 0) { // If the away team has a penalty
+        if (Math.random() < 0.3) { // 30% chance for something to happen on power play
+            simulatePowerPlay(awayTeam, homeTeam);
+        }
+    }
+
+    // Goal scoring simulation with randomness based on team skill
+    if (Math.random() < 0.05) { // 5% chance for a goal to occur each tick
+        simulateGoal(homeTeam, awayTeam); // Home team might score
+    }
+
+    if (Math.random() < 0.05) { // 5% chance for a goal to occur each tick
+        simulateGoal(awayTeam, homeTeam); // Away team might score
+    }
+
+    // Simulate random events (breakaways, injuries, fights, etc.)
+    if (Math.random() < 0.2) { // 20% chance for a random event to occur
+        simulateRandomEvent(homeTeam, awayTeam);
+    }
+
+    if (Math.random() < 0.2) { // 20% chance for a random event to occur
+        simulateRandomEvent(awayTeam, homeTeam);
+    }
 
     // Update the score display
     scoreElement.textContent = `${homeScore} - ${awayScore}`;
@@ -298,6 +328,9 @@ export function updatePlayByPlay() {
         li.textContent = event;
         playByPlayList.appendChild(li);
     });
+
+    // Scroll to the most recent event
+    playByPlayList.scrollTop = playByPlayList.scrollHeight;
 }
 
 function endGame() {
