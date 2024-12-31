@@ -95,15 +95,21 @@ function simulateGameTick() {
     if (period <= 3) {
         simulatePeriodTick();
 
-        if (period > 3 && homeScore !== awayScore) {
-            playByPlay.push("The game is over!");
-            updatePlayByPlay();
-            endGame();
-        } else if (period > 3 && homeScore === awayScore && !overtime) {
-            overtime = true;
-            periodElement.textContent = "OT";
-            playByPlay.push("Overtime! Sudden death period begins.");
-            updatePlayByPlay();
+        // End of period check
+        if (period === 3) {
+            if (homeScore !== awayScore) {
+                playByPlay.push("The game is over!");
+                updatePlayByPlay();
+                endGame();
+            } else if (homeScore === awayScore && !overtime) {
+                overtime = true;
+                periodElement.textContent = "OT";
+                playByPlay.push("Overtime! Sudden death period begins.");
+                updatePlayByPlay();
+            } else {
+                period++; // Move to next period
+                periodElement.textContent = `Period ${period}`;
+            }
         }
     } else if (overtime) {
         simulateOvertime();
