@@ -100,7 +100,8 @@ simulatePeriodBtn.addEventListener('click', () => {
 
 function simulateGameTick() {
     let periodElapsed = Date.now() - periodStartTime;
-    
+
+    // Check if the current period is still within the allowed duration
     if (period <= 3 && periodElapsed < periodDuration) {
         simulatePeriodTick();
 
